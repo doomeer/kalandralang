@@ -31,13 +31,15 @@ no instructions are provided to get it to run on them; you're on your own.
 
 ## User Manual
 
-The [Kalandralang User Manual](doc/manual.html) contains:
-- [installation instructions](doc/manual.html#installation);
-- [usage instructions](doc/manual.html#usage);
-- an [example recipe](doc/manual.html#example-recipe);
-- and the full [language reference](doc/manual.html#language-reference).
+The [Kalandralang User Manual](https://doomeer.github.io/kalandralang/doc/manual.html)
+contains:
+- [installation instructions](https://doomeer.github.io/kalandralang/doc/manual.html#installation);
+- [usage instructions](https://doomeer.github.io/kalandralang/doc/manual.html#usage);
+- an [example recipe](https://doomeer.github.io/kalandralang/doc/manual.html#example-recipe);
+- and the full [language reference](https://doomeer.github.io/kalandralang/doc/manual.html#language-reference).
 
-You can also find more examples in the [examples](examples) directory.
+You can also find more examples in the
+[examples](https://github.com/doomeer/kalandralang/tree/master/examples) directory.
 
 ## Features
 
