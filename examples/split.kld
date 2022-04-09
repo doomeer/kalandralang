@@ -1,0 +1,16 @@
+# This example shows how to use beastcrafting to split items.
+# First, we start from an Agate Amulet with +1 to Level of all Chaos Skill Gems.
+buy "Metadata/Items/Amulets/Amulet9" with "GlobalChaosGemLevel1"
+
+# Then we split the amulet.
+# One of the resulting item becomes the current item,
+# the other becomes the set-aside item.
+beastcraft_split
+
+# We want the current item to be the one that has +1 to Level of all Chaos Skill Gems.
+# To do that, we swap the current item and the set-aside item if the current item
+# is not the one with the modifier.
+if not has "GlobalChaosGemLevel1" then swap
+
+# At this point, the current item is the amulet with +1 to Level of all Chaos Skill Gems,
+# and the set-aside item is the other amulet.

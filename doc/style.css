@@ -1,0 +1,68 @@
+body {
+  max-width: 70em;
+  margin: auto;
+  background-color: #fff8ee;
+  margin-bottom: 1em;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+pre {
+  padding: 1em;
+}
+
+pre, code {
+  background-color: #ffffff;
+  font-size: 110%;
+}
+
+h2, h3, h4 {
+  padding: 0.2em;
+}
+
+h2 {
+  background: linear-gradient(90deg, #ffcc88 0%, #fff8ee 100%);
+  border-top: #000000 solid 2px;
+}
+
+h3 {
+  background: linear-gradient(90deg, #ffddaa 0%, #fff8ee 100%);
+  border-top: #000000 solid 1px;
+}
+
+h4 {
+  background: linear-gradient(90deg, #ffeecc 0%, #fff8ee 100%);
+}
+
+table {
+  border-collapse: collapse;
+  border: 1px solid;
+}
+
+td, th {
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  border-left: 1px solid;
+  border-right: 1px solid;
+}
+
+tr:not(:first-child) {
+  border-top: 1px solid #ffffff;
+}
+
+td {
+  background-color: #fff8f0;
+}
+
+th {
+  background-color: #fff8dd;
+  border-bottom: 1px solid;
+}

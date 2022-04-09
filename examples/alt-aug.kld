@@ -1,0 +1,29 @@
+# This example shows how to use Orbs of Alteration and Orbs of Augmentation
+# to obtain +1 to Level of All Skill Gems on an Agate Amulet.
+# First, we start from an Agate Amulet with magic rarity.
+buy "Metadata/Items/Amulets/Amulet9"
+scour
+transmute
+
+# Then we spam.
+until has "GlobalSkillGemLevel1" do {
+  if no_prefix then {
+    # No prefix: we use an Orb of Augmentation to get one.
+    augment
+  }
+  else {
+    # There is a prefix: use a Orb of Alteration.
+    # +1 to Level of All Skill Gems is a prefix, so there is no point
+    # in trying to use an Orb of Augmentation.
+    alt
+  }
+
+  # After using either an Orb of Augmentation or an Orb of Alteration,
+  # we check whether the amulet has the mod we want.
+  # This is the condition of the "until" instruction: "GlobalSkillGemLevel1"
+  # is the identifier for +1 to Level of All Skill Gems.
+  # If the item doesn't have the mod, we continue the loop.
+}
+
+# And now the current item has +1 to Level of All Skill Gems.
+# It may or may not have a suffix too.

@@ -1,0 +1,14 @@
+(executable
+ (name main)
+ (public_name kalandralang)
+ (libraries
+  uri
+  cohttp-lwt-unix
+  lwt
+  ezjsonm
+  clap
+  re))
+
+(ocamllex lexer)
+
+(ocamlyacc parser)

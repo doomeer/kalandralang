@@ -1,0 +1,84 @@
+# This recipe produces Citrine Amulets with:
+# - +1 to Level of All Fire Skill Gems
+# - Life
+# - Increased Fire Damage
+# - Increased Cast Speed
+# - Increased Spell Damage
+
+# First, we buy a base.
+#
+# Citrine Amulet's internal name is "Metadata/Items/Amulets/Amulet10".
+# To find this identifier, run: kalandralang find citrine
+#
+# We buy one with item level 84 for 1 chaos.
+# Kalandralang will choose a random rare amulet for us.
+buy "Metadata/Items/Amulets/Amulet10" ilvl 84 for 1 chaos
+
+# Let's display the current item.
+echo "Item we bought:"
+show
+
+# Then, we start working on the suffixes.
+# We spam Deafening Essence of Zeal until the amulet has both the essence mod
+# (i.e. Increased Cast Speed) and Tier 1 Increased Fire Damage.
+#
+# Increased Fire Damage's internal name is "FireDamagePercent5".
+# To find this identifier, run: kalandralang find 'increased fire damage'
+# This gives a lot of results; an alternative is to go to
+# https://poedb.tw/us/Amulets#ModifiersCalc, click on the mod you are interested in,
+# click on the "i" icon next to the tier you want, and copy-paste the Mod Id.
+#
+# "repeat" causes the instruction (here "essence_of_zeal") to always be executed
+# at least once. This ensures that we do have the essence mod even if the amulet
+# already had "FireDamagePercent5" when we bought it.
+repeat essence_of_zeal until has "FireDamagePercent5"
+
+# Let's display the current item.
+echo "Item after essence spam:"
+show
+
+# Now that we are happy with our suffixes, we start working on our prefixes.
+#
+# We will use Harvest to augment fire.
+# But first we need to make sure the amulet has two open prefixes:
+# - one for the augment itself;
+# - and one to craft Adds # to # Fire Damage to Attacks
+#   to ensure the augment gives us +1 to Level of All Fire Skill Gems.
+#
+# Additionally, we take the opportunity to ensure that we have Increased Spell Damage
+# on the amulet.
+#
+# To do that, we use Harvest to reforge keeping suffixes until there are
+# two open prefixes (i.e. exactly 1 prefix), and Increased Spell Damage.
+# The internal name for this modifier is:
+# - "SpellDamage5" for Tier 1;
+# - "SpellDamage4" for Tier 2.
+# We are happy with Tier 2, but it doesn't mean we don't want Tier 1,
+# so our stopping condition checks for both mods.
+#
+# "until" does not execute the instruction (here "harvest_reforge_keep_suffixes")
+# if the condition already holds.
+until prefix_count 1 and (has "SpellDamage5" or has "SpellDamage4") do {
+  harvest_reforge_keep_suffixes
+
+  # It may be the case that the amulet has the mod we want but more than one prefix.
+  # If this happens, we can try to annul. We repeat the operation until either
+  # we annuled Increased Spell Damage, or we have only 1 prefix.
+  while prefix_count 2..3 and (has "SpellDamage5" or has "SpellDamage4") do annul
+}
+
+# Let's display the current item.
+echo "Item after harvest reforges:"
+show
+
+# Let's craft Adds # to # Fire Damage to Attacks and augment fire to get
+# our +1 to Level of All Fire Skill Gems.
+craft "EinharMasterAddedFireDamage1"
+harvest_augment_fire
+
+# Finally, let's craft life and call it a day!
+remove_crafted_mods
+craft "EinharMasterIncreasedLife3"
+
+# Let's say that we can sell this for 10 Exalted Orbs.
+gain 10 exalt
