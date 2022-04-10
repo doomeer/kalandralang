@@ -60,11 +60,6 @@ show
 # if the condition already holds.
 until prefix_count 1 and (has "SpellDamage5" or has "SpellDamage4") do {
   harvest_reforge_keep_suffixes
-
-  # It may be the case that the amulet has the mod we want but more than one prefix.
-  # If this happens, we can try to annul. We repeat the operation until either
-  # we annuled Increased Spell Damage, or we have only 1 prefix.
-  while prefix_count 2..3 and (has "SpellDamage5" or has "SpellDamage4") do annul
 }
 
 # Let's display the current item.

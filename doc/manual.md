@@ -229,11 +229,6 @@ show
 # if the condition already holds.
 until prefix_count 1 and (has "SpellDamage5" or has "SpellDamage4") do {
   harvest_reforge_keep_suffixes
-
-  # It may be the case that the amulet has the mod we want but more than one prefix.
-  # If this happens, we can try to annul. We repeat the operation until either
-  # we annuled Increased Spell Damage, or we have only 1 prefix.
-  while prefix_count 2..3 and (has "SpellDamage5" or has "SpellDamage4") do annul
 }
 
 # Let's display the current item.
@@ -265,50 +260,51 @@ Item we bought:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 11% increased Spell Damage (SpellDamage2)
-(prefix) +47 to maximum Mana (IncreasedMana7)
-(prefix) 2% increased maximum Energy Shield (IncreasedEnergyShieldPercent1)
-(suffix) +27% to Lightning Resistance (LightningResist4)
+(prefix) +29 to maximum Life (IncreasedLife2)
+(prefix) 20% increased maximum Energy Shield (IncreasedEnergyShieldPercent7)
+(suffix) +24% to Global Critical Strike Multiplier (CriticalMultiplier3)
+(suffix) +17% to Cold Resistance (ColdResist2)
 --------
 Paid up to now: 0.01ex (1c)
 Item after essence spam:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 14% increased maximum Energy Shield (IncreasedEnergyShieldPercent5)
-(prefix) Adds 13 to 23 Physical Damage to Attacks (AddedPhysicalDamage9)
-(suffix) 23% increased Fire Damage (FireDamagePercent5)
-(suffix) 17% increased Cast Speed (IncreasedCastSpeed4)
+(prefix) 0.73% of Physical Attack Damage Leeched as Life (LifeLeechPermyriad2)
+(suffix) 25% increased Fire Damage (FireDamagePercent5)
+(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
+(suffix) +38% to Global Critical Strike Multiplier (CriticalMultiplier6)
 --------
-Paid up to now: 1.39ex (241c)
+Paid up to now: 3.49ex (604c)
 Item after harvest reforges:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 19% increased Spell Damage (SpellDamage4)
+(prefix) 18% increased Spell Damage (SpellDamage4)
 (suffix) 24% increased Fire Damage (FireDamagePercent5)
-(suffix) +43% to Cold Resistance (ColdResist7)
+(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
+(suffix) +36% to Global Critical Strike Multiplier (CriticalMultiplier6)
 --------
-Paid up to now: 13.44ex (2324c)
+Paid up to now: 18.49ex (3198c)
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 22% increased Spell Damage (SpellDamage4)
-(suffix) 26% increased Fire Damage (FireDamagePercent5)
-(suffix) +46% to Fire Resistance (FireResist8)
-(suffix) +45% to Cold Resistance (ColdResist7)
-(prefix) {crafted} +55 to maximum Life (EinharMasterIncreasedLife3)
+(prefix) 18% increased Spell Damage (SpellDamage4)
+(prefix) +1 to Level of all Fire Skill Gems (GlobalFireGemLevel1_)
+(suffix) 23% increased Fire Damage (FireDamagePercent5)
+(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
+(suffix) +38% to Global Critical Strike Multiplier (CriticalMultiplier6)
+(prefix) {crafted} +45 to maximum Life (EinharMasterIncreasedLife3)
 --------
 Cost:
      1 × chaos
-     2 × annul
-     8 × harvest_reforge_keep_suffixes
+    10 × harvest_reforge_keep_suffixes
      1 × remove_crafted_mods
-    80 × essence_of_zeal
+   201 × essence_of_zeal
      1 × harvest_augment_fire
      1 × craft "EinharMasterAddedFireDamage1"
      1 × craft "EinharMasterIncreasedLife3"
-Total: 23.44ex (4054c) — Profit: -13.44ex (-2324c)
+Total: 28.50ex (4928c) — Profit: -18.50ex (-3198c)
 ```
 
 ### Run 100 Times
@@ -321,29 +317,28 @@ Kalandra eventually tells us:
 ```
 Average cost (out of 100):
      1.00 × chaos
-     1.49 × annul
-    45.96 × harvest_reforge_keep_suffixes
+    75.55 × harvest_reforge_keep_suffixes
      1.00 × remove_crafted_mods
-   138.66 × essence_of_zeal
+   152.01 × essence_of_zeal
      1.00 × harvest_augment_fire
      1.00 × craft "EinharMasterAddedFireDamage1"
      1.00 × craft "EinharMasterIncreasedLife3"
-Total: 81.39ex (14075c) — Profit: -71.39ex (-12345c)
+Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 
-  █                                                                             
-  █  ▇                                                                          
-  █  █                                                                          
-  █  █                                                                          
-  █▅▅█                                                                          
-  ████ ▄                                                                        
-  ████ █ ▄  ▄                                                                   
-  ████▃█ █▃▃█  ▃ ▃                                                              
-  ██████ ████  █ █  ▂    ▂                                                      
-  ██████ ████▁▁█▁█  █  ▁ █▁                                                     
- ▁██████▁█████████▁ █▁ █ ██▁       ▁▁ ▁▁   ▁      ▁     ▁   ▁                   
- ██████████████████ ██ █ ███       ██ ██   █      █     █   █                   
+     █                                                                          
+   ▆ █                                                                          
+   █ █ ▅   ▅                                                                    
+ ▃ █ █ █  ▃█                                                                    
+ █ █ █ █ ▂██                                                                    
+ █ █ █ █ ███                                                                    
+ █ █████ ███                                                                    
+ █▆█████▆███                                                                    
+ ███████████▅ ▅      ▅                                                          
+ ████████████ █▃▃▃  ▃█▃ ▃                                                       
+▂████████████ ████▂ ███ █▂▂    ▂                ▂                               
+█████████████ █████ ███ ███    █                █                               
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-0ex                                                                        500ex
+0ex                                                                       1000ex
 ```
 It looks like this recipe is really not worth it!
 
