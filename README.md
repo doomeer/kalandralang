@@ -7,22 +7,8 @@ executes the recipe, showing you the final item and the total ingredient cost.
 You can tell Kalandralang to execute the recipe multiple
 times to get an idea of the average cost of the recipe. It even shows you
 pretty graphs:
-```
-  █                                                                             
-  █  ▇                                                                          
-  █  █                                                                          
-  █  █                                                                          
-  █▅▅█                                                                          
-  ████ ▄                                                                        
-  ████ █ ▄  ▄                                                                   
-  ████▃█ █▃▃█  ▃ ▃                                                              
-  ██████ ████  █ █  ▂    ▂                                                      
-  ██████ ████▁▁█▁█  █  ▁ █▁                                                     
- ▁██████▁█████████▁ █▁ █ ██▁       ▁▁ ▁▁   ▁      ▁     ▁   ▁                   
- ██████████████████ ██ █ ███       ██ ██   █      █     █   █                   
-‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-0ex                                                                        500ex
-```
+
+![Pretty Graph](doc/pretty-graph.png)
 
 ## Supported Operating Systems
 
