@@ -380,7 +380,6 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         item_must_be_normal_or_magic item;
         item_cannot_be_fractured item;
-        item_cannot_be_split item;
         let state = return item in
         { state with imprint = Some item }
     | Aisling ->
@@ -478,8 +477,11 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
                 fail "no current item"
             | _, None ->
                 fail "no imprint"
-            | Some _, Some imprint ->
-                imprint
+            | Some item, Some imprint ->
+                if item.split && not imprint.split then
+                    fail "can't apply imprint (can't revert to pre-split)"
+                else
+                    imprint
         in
         goto_next { state with item = Some imprint; imprint = None }
     | Gain amount ->
