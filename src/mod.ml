@@ -58,6 +58,12 @@ let is_suffix modifier =
     | _ ->
         false
 
+let is_prefix_or_suffix modifier =
+  (* Currently always true but will change when we add eldritch implicits. *)
+  match modifier.generation_type with
+    | Prefix | Suffix ->
+        true
+
 let is_crafted modifier =
   match modifier.domain with
     | Crafted ->

@@ -526,8 +526,24 @@ let reforge_rare_with_veiled_mod item =
   let item = add_random_veiled_mod item in
   spawn_additional_random_mods item
 
+let is_prefix_or_suffix { modifier; _ } = Mod.is_prefix_or_suffix modifier
+
 let split item =
   if item.split then fail "item is already split";
-  let mods1, mods2 = List.partition (fun _ -> Random.bool ()) item.mods in
+  let mods_to_split, non_splittable_mods = List.partition is_prefix_or_suffix item.mods in
+  let pool = Pool.create_from_list mods_to_split in
+  (* Both resulting items will have at least one mod. *)
+  let mandatory_mod1, mandatory_mod2 =
+    let mod1 = Pool.pick pool in
+    let mod2 = Pool.pick pool in
+    match mod1, mod2 with
+      | Some mod1, Some mod2 -> mod1, mod2
+      | None, _ | _, None -> fail "cannot split an item with less than two modifiers"
+  in
+  let other_mods1, other_mods2 =
+    List.partition (fun _ -> Random.bool ()) (Pool.to_list pool)
+  in
+  let mods1 = mandatory_mod1 :: other_mods1 @ non_splittable_mods in
+  let mods2 = mandatory_mod2 :: other_mods2 @ non_splittable_mods in
   set_to_lowest_possible_rarity { item with mods = mods1; split = true },
   set_to_lowest_possible_rarity { item with mods = mods2; split = true }
