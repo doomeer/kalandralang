@@ -370,6 +370,7 @@ let apply_currency state (currency: AST.currency) =
         return @@ Item.add_mod Mod.(by_id beastcrafted_spider_aspect_id) item
     | Beastcraft_split ->
         with_item state @@ fun item ->
+        item_must_be_rare item;
         item_cannot_be_influenced item;
         item_cannot_be_fractured item;
         item_cannot_be_split item;
