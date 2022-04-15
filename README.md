@@ -31,6 +31,7 @@ You can also find more examples in the
 
 Kalandralang supports:
 - basic currencies;
+- Eldricht currencies;
 - Awakener's Orb;
 - essences;
 - most fossils;
@@ -38,15 +39,15 @@ Kalandralang supports:
 - most relevant Harvest crafts;
 - beastcrafting: imprinting and splitting items;
 - Betrayal crafting: Aisling;
-- influenced items.
+- influenced items;
+- synthesized items.
 
 Kalandralang does not support in particular:
 - unveiling;
 - Hollow and Sanctified Fossils;
 - Orb of Dominance;
-- Eldricht currencies;
 - lucky Harvest crafts;
 - "reforge more common" Harvest crafts;
 - flasks (unless you like the idea of having rare flasks);
-- synthesized items;
-- implicits in general.
+- cluster jewels;
+- implicits other than Eldritch implicits.
