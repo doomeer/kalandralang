@@ -254,7 +254,7 @@ let values_for_mode translation = function
       let get_value stat_id =
         match Id.Map.find_opt stat_id ranges with
           | None ->
-              (-9999)
+              0
           | Some (min, max) ->
               (min + max) / 2
       in
@@ -263,14 +263,12 @@ let values_for_mode translation = function
       let get_value stat_id =
         match Id.Map.find_opt stat_id values with
           | None ->
-              (-9999)
+              0
           | Some value ->
               value
       in
       List.map get_value translation.stats
 
-(* TODO: doesn't work for LocalIncreasedPhysicalDamagePercentAndPierceInfluence4_
-   (reproduce with: kalandralang find 'pierce*target' *)
 let translate_one mode translation =
   if
     let rec matches values conditions =
