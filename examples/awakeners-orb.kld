@@ -1,0 +1,23 @@
+# This example shows how to use an Awakener's Orb to mix two influenced items.
+
+# First, we start from an Agate Amulet with Projectiles Pierce an additional Target,
+# which is a Hunter influenced modifier.
+buy hunter "Metadata/Items/Amulets/Amulet9"
+  with "AdditionalPierceInfluence1"
+
+# We set this item aside.
+set_aside
+
+# Then, we buy a Marble Amulet with #% increased Area of Effect,
+# which is a Warlord influenced modifier.
+buy warlord "Metadata/Items/Amulet/AmuletAtlas2"
+  with "AreaOfEffectInfluence3"
+
+# We apply an Awakener's Orb to destroy the set-aside item (i.e. the Agate Amulet)
+# and to add its influence to the current item (i.e. the Marble Amulet).
+awaken
+
+# The result is an item which has both the Hunter and Warlord influences.
+# It likely has both Projectiles Pierce an additional Target
+# and #% increased Area of Effect, but this is not guaranteed since we did not
+# check that those were the only influenced modifiers on the items.
