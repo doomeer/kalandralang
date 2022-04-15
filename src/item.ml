@@ -34,9 +34,10 @@ type t =
     rarity: rarity;
     mods: modifier list;
     split: bool;
+    influence: Influence.t;
   }
 
-let pp { base; level; tags; rarity; mods; split } =
+let pp { base; level; tags; rarity; mods; split; influence } =
   Pretext.OCaml.record [
     "base", Base_item.pp base;
     "level", Pretext.OCaml.int level;
@@ -44,23 +45,11 @@ let pp { base; level; tags; rarity; mods; split } =
     "rarity", pp_rarity rarity;
     "mods", Pretext.OCaml.list pp_modifier mods;
     "split", Pretext.OCaml.bool split;
+    "influence", Influence.pp influence;
   ]
 
 let show_modifier { modifier; fractured } =
   Mod.show ~fractured With_random_values modifier
-
-let has_influence influence item =
-  match Base_tag.get_influence_tag_for_tags item.base.tags influence with
-    | None ->
-        false
-    | Some influence_tag ->
-        Id.Set.mem influence_tag item.tags
-
-let has_any_influence item =
-  List.exists (fun influence -> has_influence influence item) Base_tag.influence_list
-
-let influences item =
-  List.filter (fun influence -> has_influence influence item) Base_tag.influence_list
 
 let show item =
   let compare_mods
@@ -85,28 +74,28 @@ let show item =
   in
   let mods = List.sort compare_mods item.mods in
   let rarity = show_rarity item.rarity in
-  let influences =
-    let check_influence influence =
-      if has_influence influence item then
-        [ " (" ^ Base_tag.show_influence influence ^ ")" ]
-      else
-        []
-    in
-    String.concat "" @@ List.flatten @@ List.map check_influence Base_tag.influence_list
+  let influence =
+    match item.influence with
+      | Not_influenced ->
+          ""
+      | Fractured ->
+          " (Fractured)"
+      | Synthesized ->
+          " (Synthesized)"
+      | SEC sec ->
+          " (" ^ Influence.show_sec sec ^ ")"
+      | SEC_pair (sec1, sec2) ->
+          " (" ^ Influence.show_sec sec1 ^ " / " ^ Influence.show_sec sec2 ^ ")"
+      | Exarch ->
+          " (Exarch)"
+      | Eater ->
+          " (Eater)"
+      | Exarch_and_eater ->
+          " (Exarch / Eater)"
   in
   let split = if item.split then [ "Split" ] else [] in
-  "--------\n" ^ Id.show item.base.name ^ " (" ^ rarity ^ ")" ^ influences ^ "\n--------\n" ^
+  "--------\n" ^ Id.show item.base.name ^ " (" ^ rarity ^ ")" ^ influence ^ "\n--------\n" ^
   String.concat "\n" (List.map show_modifier mods @ split) ^ "\n--------"
-
-let make base level rarity =
-  {
-    base;
-    level;
-    rarity;
-    tags = Id.Set.empty;
-    mods = [];
-    split = false;
-  }
 
 let set_rarity rarity item =
   { item with rarity }
@@ -531,12 +520,34 @@ let reforge_rare_prefixes ?(can_add_suffixes = true) item =
   let item = spawn_random_mod ~fail_if_impossible: false ?only item in
   spawn_additional_random_mods ?only item
 
-let add_influence influence item =
+let add_sec_influence_tag influence item =
   match Base_tag.get_influence_tag_for_tags item.base.tags influence with
     | None ->
         fail "cannot add an influence to this item type"
     | Some influence_tag ->
         { item with tags = Id.Set.add influence_tag item.tags }
+
+let add_influence influence item =
+  let item = { item with influence = Influence.add item.influence influence } in
+  match influence with
+    | SEC sec ->
+        item |> add_sec_influence_tag sec
+    | SEC_pair (sec1, sec2) ->
+        item |> add_sec_influence_tag sec1 |> add_sec_influence_tag sec2
+    | Not_influenced | Fractured | Synthesized | Exarch | Eater | Exarch_and_eater ->
+        item
+
+let make base level rarity influence =
+  {
+    base;
+    level;
+    rarity;
+    tags = Id.Set.empty;
+    mods = [];
+    split = false;
+    influence = Not_influenced;
+  }
+  |> add_influence influence
 
 let is_influence_mod influence_tag modifier =
   let tag_with_weight (mod_tag, weight) =
@@ -545,12 +556,12 @@ let is_influence_mod influence_tag modifier =
   in
   List.exists tag_with_weight modifier.Mod.spawn_weights
 
-let spawn_random_influence_mod influence item =
+let spawn_random_sec_influence_mod influence item =
   match Base_tag.get_influence_tag_for_tags item.base.tags influence with
     | None ->
-        fail "cannot add an influence to this item type"
+        fail "cannot add influence to this item type"
     | Some influence_tag ->
-        let item = { item with tags = Id.Set.add influence_tag item.tags } in
+        let item = add_influence (SEC influence) item in
         let pool = mod_pool item in
         let pool =
           let is_influence_mod (_, modifier) = is_influence_mod influence_tag modifier in
@@ -643,11 +654,15 @@ let spawn_random_eater_implicit tier item =
   spawn_random_mod ~only: (Eater_implicits tier) item
 
 let apply_eldritch_ichor tier item =
-  remove_all_implicits_except_exarch item
+  item
+  |> add_influence Eater
+  |> remove_all_implicits_except_exarch
   |> spawn_random_eater_implicit tier
 
 let apply_eldritch_ember tier item =
-  remove_all_implicits_except_eater item
+  item
+  |> add_influence Exarch
+  |> remove_all_implicits_except_eater
   |> spawn_random_exarch_implicit tier
 
 type dominant_eldritch =

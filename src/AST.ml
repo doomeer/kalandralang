@@ -174,14 +174,9 @@ type buy_with =
     fractured: bool;
   }
 
-type influences =
-  | Zero
-  | One of Base_tag.influence
-  | Two of Base_tag.influence * Base_tag.influence
-
 type buy =
   {
-    influences: influences;
+    influence: Influence.t;
     base: Id.t;
     ilvl: int;
     mods: buy_with list;
@@ -192,7 +187,7 @@ type buy =
 let pp_string string =
   Pretext.atom ("\"" ^ string ^ "\"")
 
-let pp_influence (influence: Base_tag.influence) =
+let pp_sec_influence (influence: Influence.sec) =
   let open Pretext in
   match influence with
     | Shaper -> atom "shaper"
@@ -202,7 +197,7 @@ let pp_influence (influence: Base_tag.influence) =
     | Redeemer -> atom "redeemer"
     | Warlord -> atom "warlord"
 
-let pp_buy { influences; base; ilvl; mods; cost } =
+let pp_buy { influence; base; ilvl; mods; cost } =
   let open Pretext in
   let pp_with buy_with =
     if buy_with.fractured then
@@ -214,10 +209,23 @@ let pp_buy { influences; base; ilvl; mods; cost } =
     box [
       atom "buy"; space;
       (
-        match influences with
-          | Zero -> empty
-          | One i -> seq [ pp_influence i; space ]
-          | Two (i, j) -> seq [ pp_influence i; space; pp_influence j; space ]
+        match influence with
+          | Not_influenced ->
+              empty
+          | Fractured ->
+              seq [ atom "fractured"; space ]
+          | Synthesized ->
+              seq [ atom "synthesized"; space ]
+          | SEC sec ->
+              seq [ pp_sec_influence sec; space ]
+          | SEC_pair (sec1, sec2) ->
+              seq [ pp_sec_influence sec1; space; pp_sec_influence sec2; space ]
+          | Exarch ->
+              seq [ atom "exarch"; space ]
+          | Eater ->
+              seq [ atom "eater"; space ]
+          | Exarch_and_eater ->
+              seq [ atom "exarch"; space; atom "eater"; space ]
       );
       Id.pp base;
     ];
@@ -235,7 +243,7 @@ let pp_buy { influences; base; ilvl; mods; cost } =
 
 type buy_being_made =
   {
-    bbm_influences: influences;
+    bbm_influence: Influence.t;
     bbm_base: Id.t option;
     bbm_ilvl: int option;
     bbm_mods: buy_with list;
@@ -244,7 +252,7 @@ type buy_being_made =
   }
 
 type buy_argument =
-  | BA_influence of Base_tag.influence
+  | BA_influence of Influence.t
   | BA_base of Id.t
   | BA_ilvl of int
   | BA_with of buy_with
@@ -253,13 +261,8 @@ type buy_argument =
 let make_buy args =
   let handle_arg bbm = function
     | BA_influence influence ->
-        let bbm_influences =
-          match bbm.bbm_influences with
-            | Zero -> One influence
-            | One existing_influence -> Two (existing_influence, influence)
-            | Two _ -> fail "buy: cannot specify more than 2 influences"
-        in
-        { bbm with bbm_influences }
+        let bbm_influence = Influence.add bbm.bbm_influence influence in
+        { bbm with bbm_influence }
     | BA_base id ->
         let bbm_base =
           match bbm.bbm_base with
@@ -286,7 +289,7 @@ let make_buy args =
   in
   let empty_bbm =
     {
-      bbm_influences = Zero;
+      bbm_influence = Not_influenced;
       bbm_base = None;
       bbm_ilvl = None;
       bbm_mods = [];
@@ -295,7 +298,7 @@ let make_buy args =
   in
   let bbm = List.fold_left handle_arg empty_bbm args in
   {
-    influences = bbm.bbm_influences;
+    influence = bbm.bbm_influence;
     base = (
       match bbm.bbm_base with
         | None -> fail "buy: missing base type id"

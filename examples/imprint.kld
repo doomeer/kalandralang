@@ -1,4 +1,4 @@
-  # This example shows how to use beastcrafting to split items.
+  # This example shows how to use beastcrafting to imprint items.
   # First, we start from an Agate Amulet with magic rarity.
   buy "Metadata/Items/Amulets/Amulet9"
   scour

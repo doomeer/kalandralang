@@ -11,6 +11,9 @@
     | "hunter" -> HUNTER
     | "redeemer" -> REDEEMER
     | "warlord" -> WARLORD
+    | "exarch" -> EXARCH
+    | "eater" -> EATER
+    | "synthesized" -> SYNTHESIZED
     | "ilvl" -> ILVL
     | "with" -> WITH
     | "fractured" -> FRACTURED

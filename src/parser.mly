@@ -10,7 +10,7 @@
 
 %token COLON AND OR NOT PLUS DOT_DOT TRUE FALSE EOF
 %token BUY ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL
-%token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD
+%token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD EXARCH EATER SYNTHESIZED
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN HAS
 %token PREFIX_COUNT NO_PREFIX OPEN_PREFIX FULL_PREFIXES
 %token SUFFIX_COUNT NO_SUFFIX OPEN_SUFFIX FULL_SUFFIXES
@@ -35,12 +35,15 @@ amount:
   { [ $1, $2 ] }
 
 influence:
-| SHAPER { Base_tag.Shaper }
-| ELDER { Base_tag.Elder }
-| CRUSADER { Base_tag.Crusader }
-| HUNTER { Base_tag.Hunter }
-| REDEEMER { Base_tag.Redeemer }
-| WARLORD { Base_tag.Warlord }
+| SHAPER { Influence.SEC Shaper }
+| ELDER { Influence.SEC Elder }
+| CRUSADER { Influence.SEC Crusader }
+| HUNTER { Influence.SEC Hunter }
+| REDEEMER { Influence.SEC Redeemer }
+| WARLORD { Influence.SEC Warlord }
+| EXARCH { Influence.Exarch }
+| EATER { Influence.Eater }
+| SYNTHESIZED { Influence.Synthesized }
 
 buy_arguments:
 | influence buy_arguments

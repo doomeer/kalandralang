@@ -168,15 +168,18 @@ let item_must_be_rare (item: Item.t) =
 let item_must_be_normal_or_magic (item: Item.t) =
   match item.rarity with
     | Normal | Magic -> ()
-    | Rare -> fail "item is not rare"
+    | Rare -> fail "item is rare"
 
-let item_cannot_be_influenced (item: Item.t) =
-  if Item.has_any_influence item then
-    fail "item is influenced"
-
-let item_cannot_be_fractured (item: Item.t) =
-  if Item.is_fractured item then
-    fail "item is fractured"
+let check_can_apply_conqueror_exalt (item: Item.t) =
+  match item.influence with
+    | Not_influenced -> ()
+    | Fractured ->
+        fail "cannot use a conqueror exalted orb on a fractured item"
+    | Synthesized ->
+        fail "cannot use a conqueror exalted orb on a synthesized item"
+    | SEC _ | SEC_pair _
+    | Exarch | Eater | Exarch_and_eater ->
+        fail "cannot use a conqueror exalted orb on an influenced item"
 
 let item_cannot_be_split (item: Item.t) =
   if item.split then
@@ -245,23 +248,23 @@ let apply_currency state (currency: AST.currency) =
     | Crusader_exalted_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
-        item_cannot_be_influenced item;
-        return @@ Item.spawn_random_influence_mod Crusader item
+        check_can_apply_conqueror_exalt item;
+        return @@ Item.spawn_random_sec_influence_mod Crusader item
     | Hunter_exalted_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
-        item_cannot_be_influenced item;
-        return @@ Item.spawn_random_influence_mod Hunter item
+        check_can_apply_conqueror_exalt item;
+        return @@ Item.spawn_random_sec_influence_mod Hunter item
     | Redeemer_exalted_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
-        item_cannot_be_influenced item;
-        return @@ Item.spawn_random_influence_mod Redeemer item
+        check_can_apply_conqueror_exalt item;
+        return @@ Item.spawn_random_sec_influence_mod Redeemer item
     | Warlord_exalted_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
-        item_cannot_be_influenced item;
-        return @@ Item.spawn_random_influence_mod Warlord item
+        check_can_apply_conqueror_exalt item;
+        return @@ Item.spawn_random_sec_influence_mod Warlord item
     | Veiled_chaos_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
@@ -291,18 +294,17 @@ let apply_currency state (currency: AST.currency) =
     | Awakeners_orb ->
         with_item state @@ fun item ->
         with_aside state @@ fun aside ->
-        let item_influence =
-          match Item.influences item with
-            | [] -> fail "current item has no influence"
-            | [ influence ] -> influence
-            | _ :: _ :: _ -> fail "current item has more than one influence"
+        let get_sec_influence name (item: Item.t) =
+          match item.influence with
+            | SEC x ->
+                x
+            | SEC_pair _ ->
+                fail "%s has more than one influence" name
+            | Not_influenced | Exarch | Eater | Exarch_and_eater | Synthesized | Fractured ->
+                fail "%s does not have a Shaper / Elder / Conqueror influence" name
         in
-        let aside_influence =
-          match Item.influences aside with
-            | [] -> fail "item set aside has no influence"
-            | [ influence ] -> influence
-            | _ :: _ :: _ -> fail "item set aside has more than one influence"
-        in
+        let item_influence = get_sec_influence "current item" item in
+        let aside_influence = get_sec_influence "item set aside" aside in
         let random_influenced_mod_from (item: Item.t) influence =
           match Base_tag.get_influence_tag_for_tags item.base.tags influence with
             | None ->
@@ -328,8 +330,8 @@ let apply_currency state (currency: AST.currency) =
               rarity = Rare;
               mods = mod1 @ mod2;
           }
-          |> Item.add_influence item_influence
-          |> Item.add_influence aside_influence
+          |> Item.add_influence (SEC item_influence)
+          |> Item.add_influence (SEC aside_influence)
           |> Item.spawn_additional_random_mods
         in
         { (return item) with aside = None }
@@ -353,11 +355,23 @@ let apply_currency state (currency: AST.currency) =
         return @@ Item.apply_eldritch_chaos item
     | Harvest_augment tag ->
         with_item state @@ fun item ->
-        if Item.has_any_influence item then fail "item has an influence";
+        (
+          match item.influence with
+            | Not_influenced | Synthesized | Fractured ->
+                ()
+            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+                fail "cannot harvest augment an influenced item"
+        );
         return @@ Item.spawn_random_mod ~tag item
     | Harvest_non_to tag ->
         with_item state @@ fun item ->
-        if Item.has_any_influence item then fail "item has an influence";
+        (
+          match item.influence with
+            | Not_influenced | Synthesized | Fractured ->
+                ()
+            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+                fail "cannot harvest non-X to X an influenced item"
+        );
         let item =
           Item.remove_random_mod item
             ~without_tag: tag
@@ -389,16 +403,32 @@ let apply_currency state (currency: AST.currency) =
     | Beastcraft_split ->
         with_item state @@ fun item ->
         item_must_be_rare item;
-        item_cannot_be_influenced item;
-        item_cannot_be_fractured item;
         item_cannot_be_split item;
+        (
+          match item.influence with
+            | Not_influenced ->
+                ()
+            | Fractured ->
+                fail "cannot split a fractured item"
+            | Synthesized ->
+                fail "cannot split a synthesized item"
+            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+                fail "cannot split an influenced item"
+        );
         let item1, item2 = Item.split item in
         let state = return item1 in
         { state with aside = Some item2 }
     | Beastcraft_imprint ->
         with_item state @@ fun item ->
         item_must_be_normal_or_magic item;
-        item_cannot_be_fractured item;
+        (
+          match item.influence with
+            | Not_influenced | Synthesized
+            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+                ()
+            | Fractured ->
+                fail "cannot imprint a fractured item"
+        );
         let state = return item in
         { state with imprint = Some item }
     | Aisling ->
@@ -450,24 +480,17 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         goto state label
     | Stop ->
         { state with point = Array.length state.program.instructions }
-    | Buy { influences; base; ilvl; mods; cost } ->
+    | Buy { influence; base; ilvl; mods; cost } ->
         (* TODO: check that [mods] are compatible with influences.
            More generally, check that [mods] can actually exist on the item. *)
         state.debug ("buy " ^ Id.show base);
-        let item = Item.make (Base_item.by_id base) ilvl Rare in
+        let item = Item.make (Base_item.by_id base) ilvl Rare influence in
         let item =
-          match influences with
-            | Zero -> item
-            | One i -> item |> Item.add_influence i
-            | Two (i, j) -> item |> Item.add_influence i |> Item.add_influence j
-        in
-        let item =
-          List.fold_left
-            (fun item ({ modifier; fractured }: AST.buy_with) ->
-               if fractured && influences <> Zero then
-                 fail "fractured items cannot have influences";
-               Item.add_mod ~fractured (Mod.by_id modifier) item)
-            item mods
+          let add_mod item ({ modifier; fractured }: AST.buy_with) =
+            let item = if fractured then Item.add_influence Fractured item else item in
+            Item.add_mod ~fractured (Mod.by_id modifier) item
+          in
+          List.fold_left add_mod item mods
         in
         let item = Item.spawn_additional_random_mods item in
         let state =

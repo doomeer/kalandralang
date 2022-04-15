@@ -1,3 +1,5 @@
+open Influence
+
 type item_type =
   | Amulet
   | Belt
@@ -24,33 +26,6 @@ type item_type =
   | Wand
   | Warstaff
   | Other
-
-(* TODO: eldricht influences, fractured, synthesized *)
-type influence =
-  | Shaper
-  | Elder
-  | Crusader
-  | Hunter
-  | Redeemer
-  | Warlord
-
-let influence_list =
-  [
-    Shaper;
-    Elder;
-    Crusader;
-    Hunter;
-    Redeemer;
-    Warlord;
-  ]
-
-let show_influence = function
-  | Shaper -> "Shaper"
-  | Elder -> "Elder"
-  | Crusader -> "Crusader"
-  | Hunter -> "Hunter"
-  | Redeemer -> "Redeemer"
-  | Warlord -> "Warlord"
 
 module Tag =
 struct
