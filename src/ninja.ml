@@ -1,4 +1,5 @@
 (* USES uri *)
+(* USES tls *)
 (* USES cohttp-lwt-unix *)
 (* USES lwt *)
 

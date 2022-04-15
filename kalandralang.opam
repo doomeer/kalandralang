@@ -15,6 +15,7 @@ depends: [
   "ezjsonm"
   "lwt"
   "re"
+  "tls"
   "uri"
   "odoc" {with-doc}
 ]

@@ -23,4 +23,5 @@
   ezjsonm
   lwt
   re
+  tls
   uri))

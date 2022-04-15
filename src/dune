@@ -3,6 +3,7 @@
  (public_name kalandralang)
  (libraries
   uri
+  tls
   cohttp-lwt-unix
   lwt
   ezjsonm
