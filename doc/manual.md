@@ -552,7 +552,8 @@ if open_prefix or open_suffix then augment
 is an instruction that sets or replaces the current item to a given base.
 - `<influence>` are keywords that can be used to specify that the item has this influence.
   Zero, one or two influences can be specified.
-  Influence keywords are: `shaper`, `elder`, `crusader`, `hunter`, `redeemer`, `warlord`.
+  Influence keywords are: `shaper`, `elder`, `crusader`, `hunter`, `redeemer`, `warlord`,
+  `exarch`, `eater`, `synthesized`.
 - The first identifier is the base type, such as `"Metadata/Items/Amulets/Amulet9"`
   for Agate Amulets.
 - `ilvl <number>` is optional and sets the item level. It defaults to 100.
