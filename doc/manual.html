@@ -167,7 +167,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#conditions">Conditions</a><ul>
 <li><a href="#constants">Constants</a></li>
 <li><a href="#boolean-operators">Boolean Operators</a></li>
-<li><a href="#parenthenses">Parenthenses</a></li>
+<li><a href="#parentheses">Parentheses</a></li>
 <li><a href="#predicates-on-current-item">Predicates on Current Item</a></li>
 </ul></li>
 </ul></li>
@@ -245,7 +245,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb14"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="ex">kalandralang</span> write-ninja-costs</a></code></pre></div>
 <p>If you are from the future, you may need to specify the league name:</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="ex">kalandralang</span> write-ninja-costs Archnemesis</a></code></pre></div>
-<p>Note that <code>write-ninja-costs</code> uses default values for crafts that are not listen on <a href="https://poe.ninja">poe.ninja</a>:</p>
+<p>Note that <code>write-ninja-costs</code> uses default values for crafts that are not listed on <a href="https://poe.ninja">poe.ninja</a>:</p>
 <ul>
 <li><a href="#harvest-crafting">Harvest crafts</a>;</li>
 <li><a href="#betrayal-crafting">Betrayal crafts</a>.</li>
@@ -318,28 +318,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb17-60" title="60"><span class="co"># if the condition already holds.</span></a>
 <a class="sourceLine" id="cb17-61" title="61"><span class="kw">until</span> <span class="ex">prefix_count</span> 1 and (has <span class="st">&quot;SpellDamage5&quot;</span> or has <span class="st">&quot;SpellDamage4&quot;</span>) <span class="kw">do</span> <span class="kw">{</span></a>
 <a class="sourceLine" id="cb17-62" title="62">  <span class="ex">harvest_reforge_keep_suffixes</span></a>
-<a class="sourceLine" id="cb17-63" title="63"></a>
-<a class="sourceLine" id="cb17-64" title="64">  <span class="co"># It may be the case that the amulet has the mod we want but more than one prefix.</span></a>
-<a class="sourceLine" id="cb17-65" title="65">  <span class="co"># If this happens, we can try to annul. We repeat the operation until either</span></a>
-<a class="sourceLine" id="cb17-66" title="66">  <span class="co"># we annuled Increased Spell Damage, or we have only 1 prefix.</span></a>
-<a class="sourceLine" id="cb17-67" title="67">  <span class="kw">while</span> <span class="ex">prefix_count</span> 2..3 and (has <span class="st">&quot;SpellDamage5&quot;</span> or has <span class="st">&quot;SpellDamage4&quot;</span>) <span class="kw">do</span> <span class="ex">annul</span></a>
-<a class="sourceLine" id="cb17-68" title="68"><span class="kw">}</span></a>
-<a class="sourceLine" id="cb17-69" title="69"></a>
-<a class="sourceLine" id="cb17-70" title="70"><span class="co"># Let&#39;s display the current item.</span></a>
-<a class="sourceLine" id="cb17-71" title="71"><span class="bu">echo</span> <span class="st">&quot;Item after harvest reforges:&quot;</span></a>
-<a class="sourceLine" id="cb17-72" title="72"><span class="ex">show</span></a>
+<a class="sourceLine" id="cb17-63" title="63"><span class="kw">}</span></a>
+<a class="sourceLine" id="cb17-64" title="64"></a>
+<a class="sourceLine" id="cb17-65" title="65"><span class="co"># Let&#39;s display the current item.</span></a>
+<a class="sourceLine" id="cb17-66" title="66"><span class="bu">echo</span> <span class="st">&quot;Item after harvest reforges:&quot;</span></a>
+<a class="sourceLine" id="cb17-67" title="67"><span class="ex">show</span></a>
+<a class="sourceLine" id="cb17-68" title="68"></a>
+<a class="sourceLine" id="cb17-69" title="69"><span class="co"># Let&#39;s craft Adds # to # Fire Damage to Attacks and augment fire to get</span></a>
+<a class="sourceLine" id="cb17-70" title="70"><span class="co"># our +1 to Level of All Fire Skill Gems.</span></a>
+<a class="sourceLine" id="cb17-71" title="71"><span class="ex">craft</span> <span class="st">&quot;EinharMasterAddedFireDamage1&quot;</span></a>
+<a class="sourceLine" id="cb17-72" title="72"><span class="ex">harvest_augment_fire</span></a>
 <a class="sourceLine" id="cb17-73" title="73"></a>
-<a class="sourceLine" id="cb17-74" title="74"><span class="co"># Let&#39;s craft Adds # to # Fire Damage to Attacks and augment fire to get</span></a>
-<a class="sourceLine" id="cb17-75" title="75"><span class="co"># our +1 to Level of All Fire Skill Gems.</span></a>
-<a class="sourceLine" id="cb17-76" title="76"><span class="ex">craft</span> <span class="st">&quot;EinharMasterAddedFireDamage1&quot;</span></a>
-<a class="sourceLine" id="cb17-77" title="77"><span class="ex">harvest_augment_fire</span></a>
-<a class="sourceLine" id="cb17-78" title="78"></a>
-<a class="sourceLine" id="cb17-79" title="79"><span class="co"># Finally, let&#39;s craft life and call it a day!</span></a>
-<a class="sourceLine" id="cb17-80" title="80"><span class="ex">remove_crafted_mods</span></a>
-<a class="sourceLine" id="cb17-81" title="81"><span class="ex">craft</span> <span class="st">&quot;EinharMasterIncreasedLife3&quot;</span></a>
-<a class="sourceLine" id="cb17-82" title="82"></a>
-<a class="sourceLine" id="cb17-83" title="83"><span class="co"># Let&#39;s say that we can sell this for 10 Exalted Orbs.</span></a>
-<a class="sourceLine" id="cb17-84" title="84"><span class="ex">gain</span> 10 exalt</a></code></pre></div>
+<a class="sourceLine" id="cb17-74" title="74"><span class="co"># Finally, let&#39;s craft life and call it a day!</span></a>
+<a class="sourceLine" id="cb17-75" title="75"><span class="ex">remove_crafted_mods</span></a>
+<a class="sourceLine" id="cb17-76" title="76"><span class="ex">craft</span> <span class="st">&quot;EinharMasterIncreasedLife3&quot;</span></a>
+<a class="sourceLine" id="cb17-77" title="77"></a>
+<a class="sourceLine" id="cb17-78" title="78"><span class="co"># Let&#39;s say that we can sell this for 10 Exalted Orbs.</span></a>
+<a class="sourceLine" id="cb17-79" title="79"><span class="ex">gain</span> 10 exalt</a></code></pre></div>
 <h3 id="run-once">Run Once</h3>
 <p>Run this recipe with:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb18-1" title="1"><span class="ex">kalandralang</span> run examples/fire-amulet.kld</a></code></pre></div>
@@ -348,80 +343,80 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 11% increased Spell Damage (SpellDamage2)
-(prefix) +47 to maximum Mana (IncreasedMana7)
-(prefix) 2% increased maximum Energy Shield (IncreasedEnergyShieldPercent1)
-(suffix) +27% to Lightning Resistance (LightningResist4)
+(prefix) +29 to maximum Life (IncreasedLife2)
+(prefix) 20% increased maximum Energy Shield (IncreasedEnergyShieldPercent7)
+(suffix) +24% to Global Critical Strike Multiplier (CriticalMultiplier3)
+(suffix) +17% to Cold Resistance (ColdResist2)
 --------
 Paid up to now: 0.01ex (1c)
 Item after essence spam:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 14% increased maximum Energy Shield (IncreasedEnergyShieldPercent5)
-(prefix) Adds 13 to 23 Physical Damage to Attacks (AddedPhysicalDamage9)
-(suffix) 23% increased Fire Damage (FireDamagePercent5)
-(suffix) 17% increased Cast Speed (IncreasedCastSpeed4)
+(prefix) 0.73% of Physical Attack Damage Leeched as Life (LifeLeechPermyriad2)
+(suffix) 25% increased Fire Damage (FireDamagePercent5)
+(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
+(suffix) +38% to Global Critical Strike Multiplier (CriticalMultiplier6)
 --------
-Paid up to now: 1.39ex (241c)
+Paid up to now: 3.49ex (604c)
 Item after harvest reforges:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 19% increased Spell Damage (SpellDamage4)
+(prefix) 18% increased Spell Damage (SpellDamage4)
 (suffix) 24% increased Fire Damage (FireDamagePercent5)
-(suffix) +43% to Cold Resistance (ColdResist7)
+(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
+(suffix) +36% to Global Critical Strike Multiplier (CriticalMultiplier6)
 --------
-Paid up to now: 13.44ex (2324c)
+Paid up to now: 18.49ex (3198c)
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 22% increased Spell Damage (SpellDamage4)
-(suffix) 26% increased Fire Damage (FireDamagePercent5)
-(suffix) +46% to Fire Resistance (FireResist8)
-(suffix) +45% to Cold Resistance (ColdResist7)
-(prefix) {crafted} +55 to maximum Life (EinharMasterIncreasedLife3)
+(prefix) 18% increased Spell Damage (SpellDamage4)
+(prefix) +1 to Level of all Fire Skill Gems (GlobalFireGemLevel1_)
+(suffix) 23% increased Fire Damage (FireDamagePercent5)
+(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
+(suffix) +38% to Global Critical Strike Multiplier (CriticalMultiplier6)
+(prefix) {crafted} +45 to maximum Life (EinharMasterIncreasedLife3)
 --------
 Cost:
      1 × chaos
-     2 × annul
-     8 × harvest_reforge_keep_suffixes
+    10 × harvest_reforge_keep_suffixes
      1 × remove_crafted_mods
-    80 × essence_of_zeal
+   201 × essence_of_zeal
      1 × harvest_augment_fire
      1 × craft &quot;EinharMasterAddedFireDamage1&quot;
      1 × craft &quot;EinharMasterIncreasedLife3&quot;
-Total: 23.44ex (4054c) — Profit: -13.44ex (-2324c)
+Total: 28.50ex (4928c) — Profit: -18.50ex (-3198c)
 </code></pre>
 <h3 id="run-100-times">Run 100 Times</h3>
 <p>Run this recipe 100 times with:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">kalandralang</span> run examples/fire-amulet.kld -c 100</a></code></pre></div>
-<p>Kalandra eventually tells us:</p>
+<p>Kalandralang eventually tells us:</p>
 <pre><code>Average cost (out of 100):
      1.00 × chaos
-     1.49 × annul
-    45.96 × harvest_reforge_keep_suffixes
+    75.55 × harvest_reforge_keep_suffixes
      1.00 × remove_crafted_mods
-   138.66 × essence_of_zeal
+   152.01 × essence_of_zeal
      1.00 × harvest_augment_fire
      1.00 × craft &quot;EinharMasterAddedFireDamage1&quot;
      1.00 × craft &quot;EinharMasterIncreasedLife3&quot;
-Total: 81.39ex (14075c) — Profit: -71.39ex (-12345c)
+Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 
-  █                                                                             
-  █  ▇                                                                          
-  █  █                                                                          
-  █  █                                                                          
-  █▅▅█                                                                          
-  ████ ▄                                                                        
-  ████ █ ▄  ▄                                                                   
-  ████▃█ █▃▃█  ▃ ▃                                                              
-  ██████ ████  █ █  ▂    ▂                                                      
-  ██████ ████▁▁█▁█  █  ▁ █▁                                                     
- ▁██████▁█████████▁ █▁ █ ██▁       ▁▁ ▁▁   ▁      ▁     ▁   ▁                   
- ██████████████████ ██ █ ███       ██ ██   █      █     █   █                   
+     █                                                                          
+   ▆ █                                                                          
+   █ █ ▅   ▅                                                                    
+ ▃ █ █ █  ▃█                                                                    
+ █ █ █ █ ▂██                                                                    
+ █ █ █ █ ███                                                                    
+ █ █████ ███                                                                    
+ █▆█████▆███                                                                    
+ ███████████▅ ▅      ▅                                                          
+ ████████████ █▃▃▃  ▃█▃ ▃                                                       
+▂████████████ ████▂ ███ █▂▂    ▂                ▂                               
+█████████████ █████ ███ ███    █                █                               
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-0ex                                                                        500ex
+0ex                                                                       1000ex
 </code></pre>
 <p>It looks like this recipe is really not worth it!</p>
 <p>It looks like hoping to get Increased Spell Damage with Harvest reforge keeping suffixes is very costly. Using Harvest augment fire to get +1 to Level of All Fire Skill Gems is also not cheap, maybe we should have started with the prefixes by spamming Alteration Orbs. Can you improve the recipe to make it less ambitious but also less catastrophic?</p>
@@ -1166,42 +1161,43 @@ Total: 81.39ex (14075c) — Profit: -71.39ex (-12345c)
 <p><code>until &lt;condition&gt; do &lt;instruction&gt;</code> executes the given instruction until the given condition holds. If the condition already holds before the while loop, the instruction is not executed at all. For instance:</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb52-1" title="1"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <p>is equivalent to:</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="kw">while</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <h5 id="repeat-loops">Repeat Loops</h5>
 <p><code>repeat &lt;instruction&gt; until &lt;condition&gt;</code> executes the given instruction until the given condition holds. The instruction is always executed at least once. For instance:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="ex">repeat</span> alt until has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb54-1" title="1"><span class="ex">repeat</span> alt until has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span></a></code></pre></div>
 <p>is equivalent to:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb54-1" title="1"><span class="ex">alt</span></a>
-<a class="sourceLine" id="cb54-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb55-1" title="1"><span class="ex">alt</span></a>
+<a class="sourceLine" id="cb55-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <p>and to:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb55-1" title="1"><span class="ex">.loop</span>:</a>
-<a class="sourceLine" id="cb55-2" title="2">  <span class="ex">alt</span></a>
-<a class="sourceLine" id="cb55-3" title="3">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then goto .loop</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb56-1" title="1"><span class="ex">.loop</span>:</a>
+<a class="sourceLine" id="cb56-2" title="2">  <span class="ex">alt</span></a>
+<a class="sourceLine" id="cb56-3" title="3">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then goto .loop</a></code></pre></div>
 <h3 id="selling">Selling</h3>
 <p><code>gain &lt;amount&gt;</code> causes the given <a href="#amounts">Amount</a> to be added to your earnings. It is typically used at the end of recipes to estimate profit margins. For instance, let's say that you want to estimate whether spamming Orbs of Alteration to get +1 to Level of all Chaos Skill Gems is more efficient than buying on the trade site, assuming you can sell the result for 20 chaos:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb56-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
-<a class="sourceLine" id="cb56-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> alt</a>
-<a class="sourceLine" id="cb56-3" title="3"><span class="ex">gain</span> 20 chaos</a></code></pre></div>
-<p>Kalandralang will execute the recipe and display your spendings, your earnings (here 20 Chaos Orbs), and the difference between the two.</p>
-<p>This is not a very interesting example though because you can just add 20 chaos from the spendings in your head. However, when combined with <a href="#if-conditionals">If Conditionals</a>, you can tell Kalandralang that the selling price depends on which mods the item has. For instance:</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb57-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
 <a class="sourceLine" id="cb57-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> alt</a>
-<a class="sourceLine" id="cb57-3" title="3"><span class="ex">gain</span> 20 chaos</a>
-<a class="sourceLine" id="cb57-4" title="4"><span class="kw">if</span> <span class="ex">has</span> <span class="st">&quot;Dexterity9&quot;</span> gain 30 chaos</a></code></pre></div>
+<a class="sourceLine" id="cb57-3" title="3"><span class="ex">gain</span> 20 chaos</a></code></pre></div>
+<p>Kalandralang will execute the recipe and display your spendings, your earnings (here 20 Chaos Orbs), and the difference between the two.</p>
+<p>This is not a very interesting example though because you can just add 20 chaos from the spendings in your head. However, when combined with <a href="#if-conditionals">If Conditionals</a>, you can tell Kalandralang that the selling price depends on which mods the item has. For instance:</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb58-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
+<a class="sourceLine" id="cb58-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> alt</a>
+<a class="sourceLine" id="cb58-3" title="3"><span class="ex">gain</span> 20 chaos</a>
+<a class="sourceLine" id="cb58-4" title="4"><span class="kw">if</span> <span class="ex">has</span> <span class="st">&quot;Dexterity9&quot;</span> gain 30 chaos</a></code></pre></div>
 <p>The earnings of this recipe depend on whether the item ends up with Tier 1 Dexterity or not. If it does end up with Tier 1 Dexterity, the earnings are 50 chaos. Otherwise, they are 20 chaos. This is particularly useful for recipes that can fail but for which the resulting item is still sellable.</p>
 <h3 id="other-instructions">Other Instructions</h3>
 <h4 id="echo">Echo</h4>
 <p><code>echo &lt;string&gt;</code> causes Kalandralang to output the given string. This is useful to know what is happening when debugging recipes, or simply to comment on what is going on. For instance:</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb58-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Will now try to obtain a veiled mod through Aisling.&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb59-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Will now try to obtain a veiled mod through Aisling.&quot;</span></a></code></pre></div>
 <h4 id="show">Show</h4>
 <p><code>show</code> causes Kalandralang to output the current item and the total amount we spent up to now. This is useful when debugging recipes, or simply to mark milestones in the recipe. It can typically be preceded by <code>echo</code>, for instance:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb59-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Prefixes are done:&quot;</span></a>
-<a class="sourceLine" id="cb59-2" title="2"><span class="ex">show</span></a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb60-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Prefixes are done:&quot;</span></a>
+<a class="sourceLine" id="cb60-2" title="2"><span class="ex">show</span></a></code></pre></div>
 <h4 id="show-mod-pool">Show Mod Pool</h4>
 <p><code>show_mod_pool</code> causes Kalandralang to output the mods that could be added to the current item and the chance to add them when adding a single modifier (e.g. using an Exalted Orb). This also shows the <a href="#identifiers">Identifier</a> of each mod.</p>
 <p>This does not show mods that are blocked by other existing modifiers. If the suffixes are full, it will not show any suffix, and if the prefixes are full, it will not show any prefix. In particular, if the item rarity is normal, this will never show anything.</p>
 <p>Example:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb60-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be added:&quot;</span></a>
-<a class="sourceLine" id="cb60-2" title="2"><span class="ex">show_mod_pool</span></a></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb61-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be added:&quot;</span></a>
+<a class="sourceLine" id="cb61-2" title="2"><span class="ex">show_mod_pool</span></a></code></pre></div>
 <h3 id="amounts">Amounts</h3>
 <p>Amounts are sequences of numbers followed by currencies. More precisely, amounts are of the form <code>(&lt;number&gt; &lt;currency&gt;)*</code>. For instance:</p>
 <ul>
@@ -1259,13 +1255,13 @@ Total: 81.39ex (14075c) — Profit: -71.39ex (-12345c)
 </tr>
 </tbody>
 </table>
-<h4 id="parenthenses">Parenthenses</h4>
+<h4 id="parentheses">Parentheses</h4>
 <p><code>not</code> has higher precedence than <code>and</code>, which has higher precedence than <code>or</code>. What this means is that the following expression:</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb61-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
 <p>Is equivalent to:</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="kw">((</span>not open_suffix) or (no_prefix and full_prefixes))</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">((</span>not open_suffix) or (no_prefix and full_prefixes))</a></code></pre></div>
 <p>Parentheses <code>( ... )</code> can be used around any condition. If operator precedence does not result in what you want, use parentheses. For instance:</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="ex">not</span> ((open_suffix or no_prefix) <span class="ex">and</span> full_prefixes)</a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" title="1"><span class="ex">not</span> ((open_suffix or no_prefix) <span class="ex">and</span> full_prefixes)</a></code></pre></div>
 <p>gives a completely different meaning to the expression. If you don't understand precedence, just use parentheses everywhere!</p>
 <h4 id="predicates-on-current-item">Predicates on Current Item</h4>
 <p>The following expressions are conditions that hold depending on the current item.</p>

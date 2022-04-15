@@ -149,7 +149,7 @@ If you are from the future, you may need to specify the league name:
 kalandralang write-ninja-costs Archnemesis
 ```
 Note that `write-ninja-costs` uses default values for crafts that are not
-listen on [poe.ninja](https://poe.ninja):
+listed on [poe.ninja](https://poe.ninja):
 - [Harvest crafts](#harvest-crafting);
 - [Betrayal crafts](#betrayal-crafting).
 
@@ -313,7 +313,7 @@ Run this recipe 100 times with:
 ```sh
 kalandralang run examples/fire-amulet.kld -c 100
 ```
-Kalandra eventually tells us:
+Kalandralang eventually tells us:
 ```
 Average cost (out of 100):
      1.00 × chaos
@@ -1026,6 +1026,9 @@ For instance:
 until has "GlobalChaosGemLevel1" do alt
 ```
 is equivalent to:
+```sh
+while not has "GlobalChaosGemLevel1" do alt
+```
 
 ##### Repeat Loops
 
@@ -1155,7 +1158,7 @@ The following operators can be used to combine conditions:
 | `and` | `<condition> and <condition>` | Conjunction of two conditions: holds if both conditions hold |
 | `or` | `<condition> or <condition>` | Disjunction of two conditions: holds if at least one of the two conditions hold |
 
-#### Parenthenses
+#### Parentheses
 
 `not` has higher precedence than `and`, which has higher precedence than `or`.
 What this means is that the following expression:
