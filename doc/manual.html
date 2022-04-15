@@ -126,8 +126,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li><a href="#buying-a-base">Buying a Base</a></li>
 <li><a href="#crafting-instructions">Crafting Instructions</a><ul>
-<li><a href="#currencies">Currencies</a></li>
+<li><a href="#currencies">Currencies</a><ul>
+<li><a href="#basic-currencies">Basic Currencies</a></li>
+<li><a href="#conqueror-exalted-orbs">Conqueror Exalted Orbs</a></li>
+<li><a href="#eldritch-currencies">Eldritch Currencies</a></li>
+<li><a href="#betrayal-currencies">Betrayal Currencies</a></li>
 <li><a href="#awakeners-orb">Awakener's Orb</a></li>
+</ul></li>
 <li><a href="#essences">Essences</a></li>
 <li><a href="#fossils">Fossils</a></li>
 <li><a href="#crafting-bench">Crafting Bench</a><ul>
@@ -533,6 +538,7 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <h3 id="crafting-instructions">Crafting Instructions</h3>
 <h4 id="currencies">Currencies</h4>
 <p>The following keywords are instructions to apply currency to the current item.</p>
+<h5 id="basic-currencies">Basic Currencies</h5>
 <table>
 <thead>
 <tr class="header">
@@ -581,6 +587,17 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td><code>exalt</code></td>
 <td>Exalted Orb</td>
 </tr>
+</tbody>
+</table>
+<h5 id="conqueror-exalted-orbs">Conqueror Exalted Orbs</h5>
+<table>
+<thead>
+<tr class="header">
+<th>Keyword</th>
+<th>Currency</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
 <td><code>crusader_exalt</code></td>
 <td>Crusader Exalted Orb</td>
@@ -597,13 +614,79 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td><code>warlord_exalt</code></td>
 <td>Warlord Exalted Orb</td>
 </tr>
+</tbody>
+</table>
+<h5 id="eldritch-currencies">Eldritch Currencies</h5>
+<table>
+<thead>
+<tr class="header">
+<th>Keyword</th>
+<th>Currency</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>lesser_ember</code></td>
+<td>Lesser Eldritch Ember</td>
+</tr>
+<tr class="even">
+<td><code>greater_ember</code></td>
+<td>Greater Eldritch Ember</td>
+</tr>
+<tr class="odd">
+<td><code>grand_ember</code></td>
+<td>Grand Eldritch Ember</td>
+</tr>
+<tr class="even">
+<td><code>exceptional_ember</code></td>
+<td>Exceptional Eldritch Ember</td>
+</tr>
+<tr class="odd">
+<td><code>lesser_ichor</code></td>
+<td>Lesser Eldritch Ichor</td>
+</tr>
+<tr class="even">
+<td><code>greater_ichor</code></td>
+<td>Greater Eldritch Ichor</td>
+</tr>
+<tr class="odd">
+<td><code>grand_ichor</code></td>
+<td>Grand Eldritch Ichor</td>
+</tr>
+<tr class="even">
+<td><code>exceptional_ichor</code></td>
+<td>Exceptional Eldritch Ichor</td>
+</tr>
+<tr class="odd">
+<td><code>eldritch_annul</code></td>
+<td>Eldritch Orb of Annulment</td>
+</tr>
+<tr class="even">
+<td><code>eldritch_exalt</code></td>
+<td>Eldritch Exalted Orb</td>
+</tr>
+<tr class="odd">
+<td><code>eldritch_chaos</code></td>
+<td>Eldritch Chaos Orb</td>
+</tr>
+</tbody>
+</table>
+<h5 id="betrayal-currencies">Betrayal Currencies</h5>
+<table>
+<thead>
+<tr class="header">
+<th>Keyword</th>
+<th>Currency</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
 <td><code>veiled_chaos</code></td>
 <td>Veiled Chaos Orb</td>
 </tr>
 </tbody>
 </table>
-<h4 id="awakeners-orb">Awakener's Orb</h4>
+<h5 id="awakeners-orb">Awakener's Orb</h5>
 <p>The <code>awaken</code> instruction applies an Awakener's Orb on the <a href="#set-aside-item">Set-Aside Item</a> to destroy it and add its influence to the <a href="#current-item">Current Item</a>. For instance, here is how to destroy a hunter-influenced Agate Amulet to add hunter influence to a warlord Marble Amulet:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb32-1" title="1"><span class="ex">buy</span> hunter <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
 <a class="sourceLine" id="cb32-2" title="2">  <span class="ex">with</span> <span class="st">&quot;AdditionalPierceInfluence1&quot;</span></a>

@@ -606,6 +606,8 @@ internally in the game.
 
 The following keywords are instructions to apply currency to the current item.
 
+##### Basic Currencies
+
 | Keyword | Currency |
 | --- | --- |
 | `transmute` | Orb of Transmutation |
@@ -618,13 +620,39 @@ The following keywords are instructions to apply currency to the current item.
 | `chaos` | Chaos Orb |
 | `annul` | Orb of Annulment |
 | `exalt` | Exalted Orb |
+
+##### Conqueror Exalted Orbs
+
+| Keyword | Currency |
+| --- | --- |
 | `crusader_exalt` | Crusader Exalted Orb |
 | `hunter_exalt` | Hunter Exalted Orb |
 | `redeemer_exalt` | Redeemer Exalted Orb |
 | `warlord_exalt` | Warlord Exalted Orb |
+
+##### Eldritch Currencies
+
+| Keyword | Currency |
+| --- | --- |
+| `lesser_ember` | Lesser Eldritch Ember |
+| `greater_ember` | Greater Eldritch Ember |
+| `grand_ember` | Grand Eldritch Ember |
+| `exceptional_ember` | Exceptional Eldritch Ember |
+| `lesser_ichor` | Lesser Eldritch Ichor |
+| `greater_ichor` | Greater Eldritch Ichor |
+| `grand_ichor` | Grand Eldritch Ichor |
+| `exceptional_ichor` | Exceptional Eldritch Ichor |
+| `eldritch_annul` | Eldritch Orb of Annulment |
+| `eldritch_exalt` | Eldritch Exalted Orb |
+| `eldritch_chaos` | Eldritch Chaos Orb |
+
+##### Betrayal Currencies
+
+| Keyword | Currency |
+| --- | --- |
 | `veiled_chaos` | Veiled Chaos Orb |
 
-#### Awakener's Orb
+##### Awakener's Orb
 
 The `awaken` instruction applies an Awakener's Orb on the
 [Set-Aside Item](#set-aside-item) to destroy it and add its influence
