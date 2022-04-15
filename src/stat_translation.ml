@@ -298,7 +298,7 @@ let translate_one mode translation =
 
 let translate mode id translations =
   List.find_map (translate_one mode) translations
-  |> default (sf "(no translation matches conditions for %s)" (Id.show id))
+  |> default (Id.show id)
 
 let by_id = ref Id.Map.empty
 
@@ -309,7 +309,7 @@ let import (x: data) = by_id := x
 let translate_id mode id =
   match Id.Map.find_opt id !by_id with
     | None ->
-        "(no translation found for " ^ Id.show id ^ ")"
+        Id.show id
     | Some translations ->
         translate mode id translations
 
