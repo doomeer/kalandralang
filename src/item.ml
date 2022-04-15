@@ -70,11 +70,18 @@ let show item =
       | Item, Crafted -> -1
       | Crafted, Item -> 1
       | _ ->
-          match a.Mod.generation_type, b.Mod.generation_type with
-            | Prefix, Suffix -> -1
-            | Suffix, Prefix -> 1
-            | _ ->
-                Id.compare a.id b.id
+          let int_of_generation_type = function
+            | Mod.Exarch_implicit _ -> 0
+            | Mod.Eater_implicit _ -> 1
+            | Mod.Prefix -> 2
+            | Mod.Suffix -> 3
+          in
+          let c =
+            Int.compare
+              (int_of_generation_type a.Mod.generation_type)
+              (int_of_generation_type b.Mod.generation_type)
+          in
+          if c <> 0 then c else Id.compare a.id b.id
   in
   let mods = List.sort compare_mods item.mods in
   let rarity = show_rarity item.rarity in
@@ -167,8 +174,15 @@ let tags item =
 let has_tag tag item =
   Id.Set.mem tag (tags item)
 
+type only =
+  | Prefixes_and_suffixes
+  | Prefixes
+  | Suffixes
+  | Eater_implicits of Mod.eldritch_tier
+  | Exarch_implicits of Mod.eldritch_tier
+
 (* If [tag] is specified, restrict the mod pool to mods with this tag. *)
-let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?only item =
+let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffixes) item =
   let item_tags = tags item in
   let prefix_count = prefix_count item in
   let suffix_count = suffix_count item in
@@ -176,9 +190,10 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?only item =
   let max_suffix = max_suffix_count item in
   let allow_prefix, allow_suffix =
     match only with
-      | None -> true, true
-      | Some Mod.Prefix -> true, false
-      | Some Mod.Suffix -> false, true
+      | Prefixes_and_suffixes -> true, true
+      | Prefixes -> true, false
+      | Suffixes -> false, true
+      | Eater_implicits _ | Exarch_implicits _ -> false, false
   in
   let not_tags =
     Id.Set.of_list @@ List.flatten [
@@ -193,6 +208,33 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?only item =
     ]
   in
   let can_spawn_mod modifier =
+    let can_spawn_this_generation_type =
+      (* Note: max prefix/suffix count is handled below, not here *)
+      match only, modifier.Mod.generation_type with
+        | Prefixes_and_suffixes, (Prefix | Suffix)
+        | Prefixes, Prefix
+        | Suffixes, Suffix ->
+            true
+        | Exarch_implicits only_tier, Exarch_implicit mod_tier
+        | Eater_implicits only_tier, Eater_implicit mod_tier ->
+            only_tier = mod_tier
+        | _ ->
+            false
+    in
+    let already_has_mod_group =
+      match modifier.Mod.generation_type with
+        | Exarch_implicit _
+        | Eater_implicit _ ->
+            (* My experiment on one mod (unveiling move speed + onslaught on boots)
+               seems to show that implicits and prefixes/suffixes are independent,
+               but this needs to be experimented on more. *)
+            (* Since we can only have one of each eldritch implicits,
+               and [mod_pool] is used to *replace* mods when used with eldritch implicits,
+               we allow all eldritch implicits to be in the mod pool. *)
+            false
+        | _ ->
+            has_mod_group modifier.Mod.group item
+    in
     if
       (crafted && (modifier.Mod.domain <> Crafted)) ||
       (not crafted && (modifier.Mod.domain <> item.base.domain))
@@ -210,7 +252,9 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?only item =
       None
     else if Mod.is_suffix modifier && (not allow_suffix || suffix_count >= max_suffix) then
       None
-    else if has_mod_group modifier.Mod.group item then
+    else if not can_spawn_this_generation_type then
+      None
+    else if already_has_mod_group then
       None
     else if not (Id.Set.is_empty (Id.Set.inter not_tags modifier.tags)) then
       None
@@ -269,8 +313,8 @@ let add_mod ?(fractured = false) modifier item =
   );
   add_mod_force ~fractured modifier item
 
-let spawn_random_mod ?(fail_if_impossible = true) ?fossils ?tag item =
-  match random_from_pool (mod_pool ?fossils ?tag item) with
+let spawn_random_mod ?(fail_if_impossible = true) ?fossils ?tag ?only item =
+  match random_from_pool (mod_pool ?fossils ?tag ?only item) with
     | None ->
         if fail_if_impossible then
           match tag with
@@ -547,3 +591,33 @@ let split item =
   let mods2 = mandatory_mod2 :: other_mods2 @ non_splittable_mods in
   set_to_lowest_possible_rarity { item with mods = mods1; split = true },
   set_to_lowest_possible_rarity { item with mods = mods2; split = true }
+
+let is_exarch_implicit_or_not_an_implicit { modifier; _ } =
+  Mod.is_exarch_implicit modifier ||
+  not (Mod.is_implicit modifier)
+
+let is_eater_implicit_or_not_an_implicit { modifier; _ } =
+  Mod.is_eater_implicit modifier ||
+  not (Mod.is_implicit modifier)
+
+let remove_all_implicits_except_exarch item =
+  let mods = List.filter is_exarch_implicit_or_not_an_implicit item.mods in
+  { item with mods }
+
+let remove_all_implicits_except_eater item =
+  let mods = List.filter is_eater_implicit_or_not_an_implicit item.mods in
+  { item with mods }
+
+let spawn_random_exarch_implicit tier item =
+  spawn_random_mod ~only: (Exarch_implicits tier) item
+
+let spawn_random_eater_implicit tier item =
+  spawn_random_mod ~only: (Eater_implicits tier) item
+
+let apply_eldritch_ichor tier item =
+  remove_all_implicits_except_exarch item
+  |> spawn_random_eater_implicit tier
+
+let apply_eldritch_ember tier item =
+  remove_all_implicits_except_eater item
+  |> spawn_random_exarch_implicit tier

@@ -104,6 +104,14 @@
     | "fundamental" -> FOSSIL Fundamental
     | "deft" -> FOSSIL Deft
     | "awaken" -> CURRENCY Awakeners_orb
+    | "lesser_ember" -> CURRENCY (Ember Lesser)
+    | "greater_ember" -> CURRENCY (Ember Greater)
+    | "grand_ember" -> CURRENCY (Ember Grand)
+    | "exceptional_ember" -> CURRENCY (Ember Exceptional)
+    | "lesser_ichor" -> CURRENCY (Ichor Lesser)
+    | "greater_ichor" -> CURRENCY (Ichor Greater)
+    | "grand_ichor" -> CURRENCY (Ichor Grand)
+    | "exceptional_ichor" -> CURRENCY (Ichor Exceptional)
     | "harvest_augment_attack" -> CURRENCY (Harvest_augment `attack)
     | "harvest_augment_caster" -> CURRENCY (Harvest_augment `caster)
     | "harvest_augment_chaos" -> CURRENCY (Harvest_augment `chaos)

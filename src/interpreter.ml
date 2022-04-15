@@ -333,6 +333,12 @@ let apply_currency state (currency: AST.currency) =
           |> Item.spawn_additional_random_mods
         in
         { (return item) with aside = None }
+    | Ember tier ->
+        with_item state @@ fun item ->
+        return @@ Item.apply_eldritch_ember (AST.eldritch_tier_of_currency tier) item
+    | Ichor tier ->
+        with_item state @@ fun item ->
+        return @@ Item.apply_eldritch_ichor (AST.eldritch_tier_of_currency tier) item
     | Harvest_augment tag ->
         with_item state @@ fun item ->
         if Item.has_any_influence item then fail "item has an influence";
@@ -408,7 +414,7 @@ let apply_currency state (currency: AST.currency) =
     | Craft_any_prefix ->
         with_item state @@ fun item ->
         let item =
-          match Item.mod_pool item ~crafted: true ~only: Prefix with
+          match Item.mod_pool item ~crafted: true ~only: Prefixes with
             | [] ->
                 fail "no prefix to craft"
             | (_, modifier) :: _ ->
@@ -418,7 +424,7 @@ let apply_currency state (currency: AST.currency) =
     | Craft_any_suffix ->
         with_item state @@ fun item ->
         let item =
-          match Item.mod_pool item ~crafted: true ~only: Suffix with
+          match Item.mod_pool item ~crafted: true ~only: Suffixes with
             | [] ->
                 fail "no suffix to craft"
             | (_, modifier) :: _ ->

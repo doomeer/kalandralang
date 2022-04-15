@@ -41,6 +41,18 @@ type 'a node =
     node: 'a;
   }
 
+type eldritch_currency_tier =
+  | Lesser
+  | Greater
+  | Grand
+  | Exceptional
+
+let eldritch_tier_of_currency: eldritch_currency_tier -> Mod.eldritch_tier = function
+  | Lesser -> Lesser
+  | Greater -> Greater
+  | Grand -> Grand
+  | Exceptional -> Exceptional
+
 (* TODO: orb of conflict (or is it dominance? the maven one) *)
 (* TODO: eldricht currencies *)
 (* TODO: show_veiled_mod_pool *)
@@ -67,6 +79,8 @@ type currency =
   | Essence of Essence.name
   | Fossils of Fossil.t list
   | Awakeners_orb
+  | Ember of eldritch_currency_tier
+  | Ichor of eldritch_currency_tier
   (* Not really currencies but... *)
   | Harvest_augment of Mod.harvest_tag
   | Harvest_non_to of Mod.harvest_tag
@@ -109,6 +123,14 @@ let show_currency = function
   | Essence name -> "essence_of_" ^ Essence.show_name name
   | Fossils fossils -> String.concat " + " (List.map Fossil.show fossils)
   | Awakeners_orb -> "awaken"
+  | Ember Lesser -> "lesser_ember"
+  | Ember Greater -> "greater_ember"
+  | Ember Grand -> "grand_ember"
+  | Ember Exceptional -> "exceptional_ember"
+  | Ichor Lesser -> "lesser_ichor"
+  | Ichor Greater -> "greater_ichor"
+  | Ichor Grand -> "grand_ichor"
+  | Ichor Exceptional -> "exceptional_ichor"
   | Harvest_augment tag -> "harvest_augment_" ^ Id.show (Mod.tag_id tag)
   | Harvest_non_to tag -> let t = Id.show (Mod.tag_id tag) in "harvest_non_" ^ t ^ "_to_" ^ t
   | Harvest_reforge tag -> "harvest_reforge_" ^ Id.show (Mod.tag_id tag)

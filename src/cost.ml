@@ -62,6 +62,14 @@ type 'a t =
     powerful_resonator: 'a;
     prime_resonator: 'a;
     awaken: 'a;
+    lesser_ember: 'a;
+    greater_ember: 'a;
+    grand_ember: 'a;
+    exceptional_ember: 'a;
+    lesser_ichor: 'a;
+    greater_ichor: 'a;
+    grand_ichor: 'a;
+    exceptional_ichor: 'a;
     harvest_augment_attack: 'a;
     harvest_augment_caster: 'a;
     harvest_augment_chaos: 'a;
@@ -180,6 +188,14 @@ let default =
     powerful_resonator = Chaos 3.;
     prime_resonator = Chaos 40.;
     awaken = Exalt 1.;
+    lesser_ember = Chaos 0.5;
+    greater_ember = Chaos 2.;
+    grand_ember = Chaos 10.;
+    exceptional_ember = Chaos 50.;
+    lesser_ichor = Chaos 0.5;
+    greater_ichor = Chaos 2.;
+    grand_ichor = Chaos 10.;
+    exceptional_ichor = Chaos 80.;
     harvest_augment_attack = harvest_augment;
     harvest_augment_caster = harvest_augment;
     harvest_augment_chaos = harvest_augment;
@@ -351,6 +367,22 @@ let get (currency: AST.currency) =
         resonator +. fossils
     | Awakeners_orb ->
         get (fun x -> x.awaken) (fun x -> x.awaken)
+    | Ember Lesser ->
+        get (fun x -> x.lesser_ember) (fun x -> x.lesser_ember)
+    | Ember Greater ->
+        get (fun x -> x.greater_ember) (fun x -> x.greater_ember)
+    | Ember Grand ->
+        get (fun x -> x.grand_ember) (fun x -> x.grand_ember)
+    | Ember Exceptional ->
+        get (fun x -> x.exceptional_ember) (fun x -> x.exceptional_ember)
+    | Ichor Lesser ->
+        get (fun x -> x.lesser_ichor) (fun x -> x.lesser_ichor)
+    | Ichor Greater ->
+        get (fun x -> x.greater_ichor) (fun x -> x.greater_ichor)
+    | Ichor Grand ->
+        get (fun x -> x.grand_ichor) (fun x -> x.grand_ichor)
+    | Ichor Exceptional ->
+        get (fun x -> x.exceptional_ichor) (fun x -> x.exceptional_ichor)
     | Harvest_augment `attack ->
         get (fun x -> x.harvest_augment_attack) (fun x -> x.harvest_augment_attack)
     | Harvest_augment `caster ->
@@ -523,6 +555,14 @@ let get_default used_by name =
     | "powerful_resonator" -> default.powerful_resonator
     | "prime_resonator" -> default.prime_resonator
     | "awaken" -> default.awaken
+    | "lesser_ember" -> default.lesser_ember
+    | "greater_ember" -> default.greater_ember
+    | "grand_ember" -> default.grand_ember
+    | "exceptional_ember" -> default.exceptional_ember
+    | "lesser_ichor" -> default.lesser_ichor
+    | "greater_ichor" -> default.greater_ichor
+    | "grand_ichor" -> default.grand_ichor
+    | "exceptional_ichor" -> default.exceptional_ichor
     | "harvest_augment_attack" -> default.harvest_augment_attack
     | "harvest_augment_caster" -> default.harvest_augment_caster
     | "harvest_augment_chaos" -> default.harvest_augment_chaos
@@ -660,6 +700,14 @@ let load filename =
     powerful_resonator = get "powerful_resonator";
     prime_resonator = get "prime_resonator";
     awaken = get "awaken";
+    lesser_ember = get "lesser_ember";
+    greater_ember = get "greater_ember";
+    grand_ember = get "grand_ember";
+    exceptional_ember = get "exceptional_ember";
+    lesser_ichor = get "lesser_ichor";
+    greater_ichor = get "greater_ichor";
+    grand_ichor = get "grand_ichor";
+    exceptional_ichor = get "exceptional_ichor";
     harvest_augment_attack = get "harvest_augment_attack";
     harvest_augment_caster = get "harvest_augment_caster";
     harvest_augment_chaos = get "harvest_augment_chaos";
@@ -888,6 +936,30 @@ let write filename v =
         v "awaken"
           (fun x -> x.awaken)
           (fun x -> x.awaken);
+        v "lesser_ember"
+          (fun x -> x.lesser_ember)
+          (fun x -> x.lesser_ember);
+        v "greater_ember"
+          (fun x -> x.greater_ember)
+          (fun x -> x.greater_ember);
+        v "grand_ember"
+          (fun x -> x.grand_ember)
+          (fun x -> x.grand_ember);
+        v "exceptional_ember"
+          (fun x -> x.exceptional_ember)
+          (fun x -> x.exceptional_ember);
+        v "lesser_ichor"
+          (fun x -> x.lesser_ichor)
+          (fun x -> x.lesser_ichor);
+        v "greater_ichor"
+          (fun x -> x.greater_ichor)
+          (fun x -> x.greater_ichor);
+        v "grand_ichor"
+          (fun x -> x.grand_ichor)
+          (fun x -> x.grand_ichor);
+        v "exceptional_ichor"
+          (fun x -> x.exceptional_ichor)
+          (fun x -> x.exceptional_ichor);
         v "harvest_augment_attack"
           (fun x -> x.harvest_augment_attack)
           (fun x -> x.harvest_augment_attack);

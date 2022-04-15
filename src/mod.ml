@@ -1,14 +1,34 @@
 open Misc
 
+type eldritch_tier =
+  | Lesser
+  | Greater
+  | Grand
+  | Exceptional
+  | Exquisite
+  | Perfect
+
+let show_eldritch_tier = function
+  | Lesser -> "Lesser"
+  | Greater -> "Greater"
+  | Grand -> "Grand"
+  | Exceptional -> "Exceptional"
+  | Exquisite -> "Exquisite"
+  | Perfect -> "Perfect"
+
 (* There are other generation types ("corrupted", "exarch_implicit", ...)
    but we only support the following ones. *)
 type generation_type =
   | Prefix
   | Suffix
+  | Exarch_implicit of eldritch_tier
+  | Eater_implicit of eldritch_tier
 
 let show_generation_type = function
   | Prefix -> "Prefix"
   | Suffix -> "Suffix"
+  | Exarch_implicit tier -> "Exarch " ^ show_eldritch_tier tier
+  | Eater_implicit tier -> "Eater " ^ show_eldritch_tier tier
 
 let pp_generation_type generation_type =
   Pretext.OCaml.variant (show_generation_type generation_type) []
@@ -59,10 +79,32 @@ let is_suffix modifier =
         false
 
 let is_prefix_or_suffix modifier =
-  (* Currently always true but will change when we add eldritch implicits. *)
   match modifier.generation_type with
     | Prefix | Suffix ->
         true
+    | _ ->
+        false
+
+let is_implicit modifier =
+  match modifier.generation_type with
+    | Exarch_implicit _ | Eater_implicit _ ->
+        true
+    | Prefix | Suffix ->
+        false
+
+let is_exarch_implicit modifier =
+  match modifier.generation_type with
+    | Exarch_implicit _ ->
+        true
+    | _ ->
+        false
+
+let is_eater_implicit modifier =
+  match modifier.generation_type with
+    | Eater_implicit _ ->
+        true
+    | _ ->
+        false
 
 let is_crafted modifier =
   match modifier.domain with
@@ -119,6 +161,13 @@ let import (x: data) =
 
 let royale_rex = rex "Royale"
 
+let no_tier_6_eldritch_implicit_tag = Id.make "no_tier_6_eldritch_implicit"
+let no_tier_5_eldritch_implicit_tag = Id.make "no_tier_5_eldritch_implicit"
+let no_tier_4_eldritch_implicit_tag = Id.make "no_tier_4_eldritch_implicit"
+let no_tier_3_eldritch_implicit_tag = Id.make "no_tier_3_eldritch_implicit"
+let no_tier_2_eldritch_implicit_tag = Id.make "no_tier_2_eldritch_implicit"
+let no_tier_1_eldritch_implicit_tag = Id.make "no_tier_1_eldritch_implicit"
+
 let load filename =
   let as_spawn_weight json =
     let tag = ref None in
@@ -162,9 +211,13 @@ let load filename =
               (
                 match JSON.as_string value with
                   | "prefix" ->
-                      generation_type := Some Prefix
+                      generation_type := Some `Prefix
                   | "suffix" ->
-                      generation_type := Some Suffix
+                      generation_type := Some `Suffix
+                  | "eater_implicit" ->
+                      generation_type := Some `Eater_implicit
+                  | "exarch_implicit" ->
+                      generation_type := Some `Exarch_implicit
                   | _ ->
                       ()
               )
@@ -207,27 +260,58 @@ let load filename =
       match !generation_type, !domain with
         | None, _ | _, None ->
             ()
-        | Some (Prefix | Suffix as generation_type), Some domain ->
-            let modifier =
-              {
-                id;
-                domain;
-                generation_type;
-                group = !group;
-                required_level = !required_level;
-                spawn_weights = !spawn_weights;
-                generation_weights = !generation_weights;
-                tags = !tags;
-                adds_tags = !adds_tags;
-                stats = !stats;
-              }
+        | Some generation_type,
+          Some domain ->
+            let spawn_weights = !spawn_weights in
+            let generation_type =
+              match generation_type with
+                | `Prefix -> Some Prefix
+                | `Suffix -> Some Suffix
+                | `Eater_implicit | `Exarch_implicit as generation_type ->
+                    let no_tier tag =
+                      List.exists (fun (t, w) -> w = 0 && Id.compare t tag = 0) spawn_weights
+                    in
+                    let tier =
+                      if no_tier no_tier_6_eldritch_implicit_tag then Some Lesser else
+                      if no_tier no_tier_5_eldritch_implicit_tag then Some Greater else
+                      if no_tier no_tier_4_eldritch_implicit_tag then Some Grand else
+                      if no_tier no_tier_3_eldritch_implicit_tag then Some Exceptional else
+                      if no_tier no_tier_2_eldritch_implicit_tag then Some Exquisite else
+                      if no_tier no_tier_1_eldritch_implicit_tag then Some Perfect else
+                        None
+                    in
+                    match tier with
+                      | None ->
+                          None
+                      | Some tier ->
+                          match generation_type with
+                            | `Eater_implicit -> Some (Eater_implicit tier)
+                            | `Exarch_implicit -> Some (Exarch_implicit tier)
             in
-            match Id.Map.find_opt id !id_map with
-              | Some _ ->
-                  fail "%s: two items with id %s" filename (Id.show id)
+            match generation_type with
               | None ->
-                  pool := modifier :: !pool;
-                  id_map := Id.Map.add id modifier !id_map
+                  ()
+              | Some generation_type ->
+                  let modifier =
+                    {
+                      id;
+                      domain;
+                      generation_type;
+                      group = !group;
+                      required_level = !required_level;
+                      spawn_weights;
+                      generation_weights = !generation_weights;
+                      tags = !tags;
+                      adds_tags = !adds_tags;
+                      stats = !stats;
+                    }
+                  in
+                  match Id.Map.find_opt id !id_map with
+                    | Some _ ->
+                        fail "%s: two items with id %s" filename (Id.show id)
+                    | None ->
+                        pool := modifier :: !pool;
+                        id_map := Id.Map.add id modifier !id_map
   in
   List.iter add_entry JSON.(parse_file filename |> as_object)
 
@@ -248,6 +332,8 @@ let show ?(indentation = 0) ?(fractured = false) mode modifier =
     match modifier.generation_type with
       | Prefix -> "(prefix) "
       | Suffix -> "(suffix) "
+      | Exarch_implicit tier -> "(" ^ show_eldritch_tier tier ^ " Exarch) "
+      | Eater_implicit tier -> "(" ^ show_eldritch_tier tier ^ " Eater) "
   in
   let fractured = if fractured then "{fractured} " else "" in
   let domain =

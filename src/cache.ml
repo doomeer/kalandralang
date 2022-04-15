@@ -1,4 +1,4 @@
-let version = "KKASH000"
+let version = "KKASH001"
 
 exception Wrong_version
 
@@ -155,11 +155,35 @@ let o_mod_generation_type o (x: Mod.generation_type) =
   match x with
     | Prefix -> o_byte o 0
     | Suffix -> o_byte o 1
+    | Exarch_implicit Lesser -> o_byte o 2
+    | Exarch_implicit Greater -> o_byte o 3
+    | Exarch_implicit Grand -> o_byte o 4
+    | Exarch_implicit Exceptional -> o_byte o 5
+    | Exarch_implicit Exquisite -> o_byte o 6
+    | Exarch_implicit Perfect -> o_byte o 7
+    | Eater_implicit Lesser -> o_byte o 8
+    | Eater_implicit Greater -> o_byte o 9
+    | Eater_implicit Grand -> o_byte o 10
+    | Eater_implicit Exceptional -> o_byte o 11
+    | Eater_implicit Exquisite -> o_byte o 12
+    | Eater_implicit Perfect -> o_byte o 13
 
 let i_mod_generation_type i: Mod.generation_type =
   match i_byte i with
     | 0 -> Prefix
     | 1 -> Suffix
+    | 2 -> Exarch_implicit Lesser
+    | 3 -> Exarch_implicit Greater
+    | 4 -> Exarch_implicit Grand
+    | 5 -> Exarch_implicit Exceptional
+    | 6 -> Exarch_implicit Exquisite
+    | 7 -> Exarch_implicit Perfect
+    | 8 -> Eater_implicit Lesser
+    | 9 -> Eater_implicit Greater
+    | 10 -> Eater_implicit Grand
+    | 11 -> Eater_implicit Exceptional
+    | 12 -> Eater_implicit Exquisite
+    | 13 -> Eater_implicit Perfect
     | _ -> failwith "invalid mod generation type"
 
 let o_mod_stat o ({ id; min; max }: Mod.stat) =
