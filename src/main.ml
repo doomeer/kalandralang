@@ -247,6 +247,16 @@ let main () =
                debugging or to show off extremely lucky crafts."
             ()
         in
+        let show_seed =
+          Clap.flag
+            ~set_long: "show-seed"
+            ~description:
+              "Print the seed used by the pseudo-random number \
+               generator (PRNG) seed. Can be used to quickly repeat \
+               execution until something weird or interesting happens, \
+               to then reproduce it with --seed."
+            false
+        in
         let filename =
           Clap.optional_string
             ~placeholder: "FILE"
@@ -255,7 +265,7 @@ let main () =
                unspecified, read the recipe from stdin."
             ()
         in
-        `run (filename, count, verbose, seed)
+        `run (filename, count, verbose, seed, show_seed)
       );
       (
         Clap.case "format"
@@ -339,11 +349,25 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, count, verbose, seed) ->
+    | `run (filename, count, verbose, seed, show_seed) ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
         load ();
         Option.iter Random.init seed;
+        if show_seed then (
+          let seed =
+            match seed with
+              | None ->
+                  (* According to the doc, the argument of Random.int
+                     must be less than 2^30. *)
+                  let seed = Random.int 0x3fffffff in
+                  Random.init seed;
+                  seed
+              | Some seed ->
+                  seed
+          in
+          echo "Seed: %d" seed
+        );
         run_recipe compiled_recipe ~count ~verbose
     | `compile filename ->
         let recipe = parse_recipe filename in
