@@ -114,8 +114,11 @@ let set_rarity rarity item =
 let is_fractured item =
   List.exists (fun { fractured; _ } -> fractured) item.mods
 
-let mod_count item =
-  List.length item.mods
+let is_prefix_or_suffix { modifier; _ } =
+  Mod.is_prefix_or_suffix modifier
+
+let prefix_and_suffix_count item =
+  List.length (List.filter is_prefix_or_suffix item.mods)
 
 (* TODO: jewels
    (domain "abyss_jewel" or ... misc for regular jewels
@@ -335,14 +338,23 @@ type meta =
     cannot_roll_caster_mods: bool;
   }
 
-let meta ~respect_cannot_be_changed ~respect_cannot_roll item =
+let meta
+    ?(force_prefixes_cannot_be_changed = false)
+    ?(force_suffixes_cannot_be_changed = false)
+    ~respect_cannot_be_changed
+    ~respect_cannot_roll
+    item =
   let prefixes_cannot_be_changed =
-    respect_cannot_be_changed &&
-    has_mod Mod.(by_id prefixes_cannot_be_changed_id) item
+    force_prefixes_cannot_be_changed || (
+      respect_cannot_be_changed &&
+      has_mod Mod.(by_id prefixes_cannot_be_changed_id) item
+    )
   in
   let suffixes_cannot_be_changed =
-    respect_cannot_be_changed &&
-    has_mod Mod.(by_id suffixes_cannot_be_changed_id) item
+    force_suffixes_cannot_be_changed || (
+      respect_cannot_be_changed &&
+      has_mod Mod.(by_id suffixes_cannot_be_changed_id) item
+    )
   in
   let cannot_roll_attack_mods =
     respect_cannot_roll &&
@@ -360,14 +372,28 @@ let meta ~respect_cannot_be_changed ~respect_cannot_roll item =
   }
 
 let can_be_removed meta { modifier; fractured } =
+  Mod.is_prefix_or_suffix modifier &&
   not fractured &&
   not (meta.prefixes_cannot_be_changed && Mod.is_prefix modifier) &&
   not (meta.suffixes_cannot_be_changed && Mod.is_suffix modifier) &&
   not (meta.cannot_roll_attack_mods && Mod.is_attack modifier) &&
   not (meta.cannot_roll_caster_mods && Mod.is_caster modifier)
 
-let remove_random_mod ?without_tag ~respect_cannot_be_changed ~respect_cannot_roll item =
-  let meta = meta ~respect_cannot_be_changed ~respect_cannot_roll item in
+let remove_random_mod
+    ?without_tag
+    ?force_prefixes_cannot_be_changed
+    ?force_suffixes_cannot_be_changed
+    ~respect_cannot_be_changed
+    ~respect_cannot_roll
+    item =
+  let meta =
+    meta
+      ?force_prefixes_cannot_be_changed
+      ?force_suffixes_cannot_be_changed
+      ~respect_cannot_be_changed
+      ~respect_cannot_roll
+      item
+  in
   let removable_mods = List.filter (can_be_removed meta) item.mods in
   let removable_mods =
     match without_tag with
@@ -424,8 +450,8 @@ let set_to_lowest_possible_rarity item =
   in
   { item with rarity }
 
-let spawn_additional_random_mods ?fossils item =
-  let spawn_random_mod = spawn_random_mod ~fail_if_impossible: false ?fossils in
+let spawn_additional_random_mods ?fossils ?only item =
+  let spawn_random_mod = spawn_random_mod ~fail_if_impossible: false ?fossils ?only in
   (* Tested a small sample, counting how many items had 4, 5, 6 mods after a chaos. *)
   (* TODO: better sample *)
   let w4 = 56 in
@@ -440,7 +466,7 @@ let spawn_additional_random_mods ?fossils item =
     else
       spawn_random_mod (spawn_random_mod item)
   in
-  match mod_count item with
+  match prefix_and_suffix_count item with
     | 0 ->
         item |> spawn_random_mod |> spawn_random_mod |> spawn_random_mod |> spawn_random_mod
         |> add_from_4
@@ -493,15 +519,17 @@ let reforge_rare ?(respect_cannot_be_changed = true) ?fossils ?tag ?modifier ite
   in
   spawn_additional_random_mods ?fossils item
 
-let reforge_rare_suffixes item =
+let reforge_rare_suffixes ?(can_add_prefixes = true) item =
   let item = remove_all_suffixes item in
-  let item = spawn_random_mod ~fail_if_impossible: false item in
-  spawn_additional_random_mods item
+  let only = if can_add_prefixes then None else Some Suffixes in
+  let item = spawn_random_mod ~fail_if_impossible: false ?only item in
+  spawn_additional_random_mods ?only item
 
-let reforge_rare_prefixes item =
+let reforge_rare_prefixes ?(can_add_suffixes = true) item =
   let item = remove_all_prefixes item in
-  let item = spawn_random_mod ~fail_if_impossible: false item in
-  spawn_additional_random_mods item
+  let only = if can_add_suffixes then None else Some Prefixes in
+  let item = spawn_random_mod ~fail_if_impossible: false ?only item in
+  spawn_additional_random_mods ?only item
 
 let add_influence influence item =
   match Base_tag.get_influence_tag_for_tags item.base.tags influence with
@@ -621,3 +649,59 @@ let apply_eldritch_ichor tier item =
 let apply_eldritch_ember tier item =
   remove_all_implicits_except_eater item
   |> spawn_random_exarch_implicit tier
+
+type dominant_eldritch =
+  | Exarch
+  | Eater
+
+let get_dominant_eldritch item =
+  let exarch_tier = ref None in
+  let eater_tier = ref None in
+  let update_tiers { modifier; _ } =
+    match modifier.generation_type with
+      | Exarch_implicit tier -> exarch_tier := Some tier
+      | Eater_implicit tier -> eater_tier := Some tier
+      | _ -> ()
+  in
+  List.iter update_tiers item.mods;
+  match !exarch_tier, !eater_tier with
+    | None, None -> None
+    | None, Some _ -> Some Eater
+    | Some _, None -> Some Exarch
+    | Some exarch_tier, Some eater_tier ->
+        let c = Mod.compare_eldritch_tiers exarch_tier eater_tier in
+        if c > 0 then Some Exarch else
+        if c < 0 then Some Eater else
+          None
+
+let with_dominance item f =
+  match get_dominant_eldritch item with
+    | None ->
+        fail "neither the Searing Exarch nor the Eater of Worlds is dominant"
+    | Some dominance ->
+        f dominance
+
+let apply_eldritch_annul item =
+  with_dominance item @@ function
+  | Exarch ->
+      remove_random_mod
+        ~force_suffixes_cannot_be_changed: true
+        ~respect_cannot_be_changed: true
+        ~respect_cannot_roll: true
+        item
+  | Eater ->
+      remove_random_mod
+        ~force_prefixes_cannot_be_changed: true
+        ~respect_cannot_be_changed: true
+        ~respect_cannot_roll: true
+        item
+
+let apply_eldritch_exalt item =
+  with_dominance item @@ function
+  | Exarch -> spawn_random_mod ~only: Prefixes item
+  | Eater -> spawn_random_mod ~only: Suffixes item
+
+let apply_eldritch_chaos item =
+  with_dominance item @@ function
+  | Exarch -> reforge_rare_prefixes ~can_add_suffixes: false item
+  | Eater -> reforge_rare_suffixes ~can_add_prefixes: false item

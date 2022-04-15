@@ -54,7 +54,6 @@ let eldritch_tier_of_currency: eldritch_currency_tier -> Mod.eldritch_tier = fun
   | Exceptional -> Exceptional
 
 (* TODO: orb of conflict (or is it dominance? the maven one) *)
-(* TODO: eldricht currencies *)
 (* TODO: show_veiled_mod_pool *)
 (* TODO: harvest reforge lucky *)
 (* TODO: harvest reforge keep prefix/suffix lucky *)
@@ -81,6 +80,9 @@ type currency =
   | Awakeners_orb
   | Ember of eldritch_currency_tier
   | Ichor of eldritch_currency_tier
+  | Eldritch_annul
+  | Eldritch_exalt
+  | Eldritch_chaos
   (* Not really currencies but... *)
   | Harvest_augment of Mod.harvest_tag
   | Harvest_non_to of Mod.harvest_tag
@@ -131,6 +133,9 @@ let show_currency = function
   | Ichor Greater -> "greater_ichor"
   | Ichor Grand -> "grand_ichor"
   | Ichor Exceptional -> "exceptional_ichor"
+  | Eldritch_annul -> "eldritch_annul"
+  | Eldritch_exalt -> "eldritch_exalt"
+  | Eldritch_chaos -> "eldritch_chaos"
   | Harvest_augment tag -> "harvest_augment_" ^ Id.show (Mod.tag_id tag)
   | Harvest_non_to tag -> let t = Id.show (Mod.tag_id tag) in "harvest_non_" ^ t ^ "_to_" ^ t
   | Harvest_reforge tag -> "harvest_reforge_" ^ Id.show (Mod.tag_id tag)

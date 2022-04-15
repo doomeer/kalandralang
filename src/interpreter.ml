@@ -339,6 +339,18 @@ let apply_currency state (currency: AST.currency) =
     | Ichor tier ->
         with_item state @@ fun item ->
         return @@ Item.apply_eldritch_ichor (AST.eldritch_tier_of_currency tier) item
+    | Eldritch_annul ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        return @@ Item.apply_eldritch_annul item
+    | Eldritch_exalt ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        return @@ Item.apply_eldritch_exalt item
+    | Eldritch_chaos ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        return @@ Item.apply_eldritch_chaos item
     | Harvest_augment tag ->
         with_item state @@ fun item ->
         if Item.has_any_influence item then fail "item has an influence";

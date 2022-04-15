@@ -16,6 +16,17 @@ let show_eldritch_tier = function
   | Exquisite -> "Exquisite"
   | Perfect -> "Perfect"
 
+let int_of_eldritch_tier = function
+  | Lesser -> 1
+  | Greater -> 2
+  | Grand -> 3
+  | Exceptional -> 4
+  | Exquisite -> 5
+  | Perfect -> 6
+
+let compare_eldritch_tiers a b =
+  Int.compare (int_of_eldritch_tier a) (int_of_eldritch_tier b)
+
 (* There are other generation types ("corrupted", "exarch_implicit", ...)
    but we only support the following ones. *)
 type generation_type =

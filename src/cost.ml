@@ -70,6 +70,9 @@ type 'a t =
     greater_ichor: 'a;
     grand_ichor: 'a;
     exceptional_ichor: 'a;
+    eldritch_annul: 'a;
+    eldritch_exalt: 'a;
+    eldritch_chaos: 'a;
     harvest_augment_attack: 'a;
     harvest_augment_caster: 'a;
     harvest_augment_chaos: 'a;
@@ -196,6 +199,9 @@ let default =
     greater_ichor = Chaos 2.;
     grand_ichor = Chaos 10.;
     exceptional_ichor = Chaos 80.;
+    eldritch_annul = Chaos 10.;
+    eldritch_exalt = Chaos 15.;
+    eldritch_chaos = Chaos 30.;
     harvest_augment_attack = harvest_augment;
     harvest_augment_caster = harvest_augment;
     harvest_augment_chaos = harvest_augment;
@@ -383,6 +389,12 @@ let get (currency: AST.currency) =
         get (fun x -> x.grand_ichor) (fun x -> x.grand_ichor)
     | Ichor Exceptional ->
         get (fun x -> x.exceptional_ichor) (fun x -> x.exceptional_ichor)
+    | Eldritch_annul ->
+        get (fun x -> x.eldritch_annul) (fun x -> x.eldritch_annul)
+    | Eldritch_exalt ->
+        get (fun x -> x.eldritch_exalt) (fun x -> x.eldritch_exalt)
+    | Eldritch_chaos ->
+        get (fun x -> x.eldritch_chaos) (fun x -> x.eldritch_chaos)
     | Harvest_augment `attack ->
         get (fun x -> x.harvest_augment_attack) (fun x -> x.harvest_augment_attack)
     | Harvest_augment `caster ->
@@ -563,6 +575,9 @@ let get_default used_by name =
     | "greater_ichor" -> default.greater_ichor
     | "grand_ichor" -> default.grand_ichor
     | "exceptional_ichor" -> default.exceptional_ichor
+    | "eldritch_annul" -> default.eldritch_annul
+    | "eldritch_exalt" -> default.eldritch_exalt
+    | "eldritch_chaos" -> default.eldritch_chaos
     | "harvest_augment_attack" -> default.harvest_augment_attack
     | "harvest_augment_caster" -> default.harvest_augment_caster
     | "harvest_augment_chaos" -> default.harvest_augment_chaos
@@ -708,6 +723,9 @@ let load filename =
     greater_ichor = get "greater_ichor";
     grand_ichor = get "grand_ichor";
     exceptional_ichor = get "exceptional_ichor";
+    eldritch_annul = get "eldritch_annul";
+    eldritch_exalt = get "eldritch_exalt";
+    eldritch_chaos = get "eldritch_chaos";
     harvest_augment_attack = get "harvest_augment_attack";
     harvest_augment_caster = get "harvest_augment_caster";
     harvest_augment_chaos = get "harvest_augment_chaos";
@@ -960,6 +978,15 @@ let write filename v =
         v "exceptional_ichor"
           (fun x -> x.exceptional_ichor)
           (fun x -> x.exceptional_ichor);
+        v "eldritch_annul"
+          (fun x -> x.eldritch_annul)
+          (fun x -> x.eldritch_annul);
+        v "eldritch_exalt"
+          (fun x -> x.eldritch_exalt)
+          (fun x -> x.eldritch_exalt);
+        v "eldritch_chaos"
+          (fun x -> x.eldritch_chaos)
+          (fun x -> x.eldritch_chaos);
         v "harvest_augment_attack"
           (fun x -> x.harvest_augment_attack)
           (fun x -> x.harvest_augment_attack);
