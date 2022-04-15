@@ -243,7 +243,7 @@ type show_mode =
   | With_ranges
   | With_random_values
 
-let show ?(fractured = false) mode modifier =
+let show ?(indentation = 0) ?(fractured = false) mode modifier =
   let generation_type =
     match modifier.generation_type with
       | Prefix -> "(prefix) "
@@ -256,7 +256,9 @@ let show ?(fractured = false) mode modifier =
       | Crafted -> "{crafted} "
       | Veiled -> "{veiled} "
   in
-  let margin = String.make (String.length generation_type + String.length domain) ' ' in
+  let margin =
+    String.make (indentation + String.length generation_type + String.length domain) ' '
+  in
   let translated_mod =
     match modifier.domain with
       | Veiled ->

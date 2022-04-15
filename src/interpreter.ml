@@ -511,7 +511,9 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         let show_mod (w, (m: Mod.t)) =
           let weight = Printf.sprintf "%.3f%%" (float w *. 100. /. total_weight) in
           let padding = String.make (max 0 (6 - String.length weight)) ' ' in
-          echo "%s%s %s" padding weight (Mod.show With_ranges m)
+          echo "%s%s %s" padding weight
+            (Mod.show ~indentation: (String.length padding + String.length weight + 1)
+               With_ranges m)
         in
         List.iter show_mod prefixes;
         List.iter show_mod suffixes;
