@@ -441,44 +441,25 @@ let set_to_lowest_possible_rarity item =
 
 let spawn_additional_random_mods ?fossils ?only item =
   let spawn_random_mod = spawn_random_mod ~fail_if_impossible: false ?fossils ?only in
-  (* Tested a small sample, counting how many items had 4, 5, 6 mods after a chaos. *)
-  (* TODO: better sample *)
-  let w4 = 56 in
-  let w5 = 22 in
-  let w6 = 3 in
-  let add_from_4 item =
-    let i = Random.int (w4 + w5 + w6) in
-    if i < w4 then
-      item
-    else if i < w4 + w5 then
-      spawn_random_mod item
+  let final_mod_count =
+    if Base_item.is_jewel item.base then
+      let w3 = 65 in
+      let w4 = 35 in
+      let i = Random.int (w3 + w4) in
+      if i < w3 then 3 else 4
     else
-      spawn_random_mod (spawn_random_mod item)
+      let w4 = 8 in
+      let w5 = 3 in
+      let w6 = 1 in
+      let i = Random.int (w4 + w5 + w6) in
+      if i < w4 then 4 else if i < w4 + w5 then 5 else 6
   in
-  match prefix_and_suffix_count item with
-    | 0 ->
-        item |> spawn_random_mod |> spawn_random_mod |> spawn_random_mod |> spawn_random_mod
-        |> add_from_4
-    | 1 ->
-        item |> spawn_random_mod |> spawn_random_mod |> spawn_random_mod
-        |> add_from_4
-    | 2 ->
-        item |> spawn_random_mod |> spawn_random_mod
-        |> add_from_4
-    | 3 ->
-        item |> spawn_random_mod
-        |> add_from_4
-    | 4 ->
-        item
-        |> add_from_4
-    | 5 ->
-        let i = Random.int (w4 + w5 + w6) in
-        if i < w4 + w5 then
-          item
-        else
-          spawn_random_mod item
-    | _ ->
-        item
+  let rec spawn_n_mods count item =
+    if count <= 0
+    then item
+    else item |> spawn_random_mod |> (spawn_n_mods (count-1))
+  in
+  spawn_n_mods (final_mod_count - prefix_and_suffix_count item) item
 
 let reforge_magic item =
   let item =
