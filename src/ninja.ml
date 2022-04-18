@@ -14,19 +14,29 @@ let http_get uri =
   let* response_body = Cohttp_lwt.Body.to_string response_body in
   match response.status with
     | #Cohttp.Code.success_status ->
-        return (JSON.parse ~origin: "poe.ninja's response" response_body)
+        return (Some (JSON.parse ~origin: "poe.ninja's response" response_body))
     | status ->
-        fail "poe.ninja responded with %s - %s"
+        echo "failed to fetch %s: %s - %s"
+          (Uri.to_string uri)
           (Cohttp.Code.string_of_status status)
-          response_body
+          response_body;
+        return None
 
-let as_currencies json =
-  let as_currency json =
-    let name = JSON.(json |-> "currencyTypeName" |> as_string) in
-    let cost = JSON.(json |-> "chaosEquivalent" |> as_float) in
-    name, cost
-  in
-  JSON.(json |-> "lines" |> as_array) |> List.map as_currency |> String_map.of_list
+let as_currencies = function
+  | None ->
+      String_map.empty
+  | Some json ->
+      try
+        let as_currency json =
+          let name = JSON.(json |-> "currencyTypeName" |> as_string) in
+          let cost = JSON.(json |-> "chaosEquivalent" |> as_float) in
+          name, cost
+        in
+        JSON.(json |-> "lines" |> as_array) |> List.map as_currency |> String_map.of_list
+      with exn ->
+        echo "failed to parse poe.ninja's response (CurrencyOverview): %s"
+          (Printexc.to_string exn);
+        String_map.empty
 
 let get_currencies league =
   Uri.(with_query' (of_string "https://poe.ninja/api/data/CurrencyOverview")) [
@@ -37,13 +47,21 @@ let get_currencies league =
   |> http_get
   |> as_currencies
 
-let as_items json =
-  let as_item json =
-    let name = JSON.(json |-> "name" |> as_string) in
-    let cost = JSON.(json |-> "chaosValue" |> as_float) in
-    name, cost
-  in
-  JSON.(json |-> "lines" |> as_array) |> List.map as_item |> String_map.of_list
+let as_items = function
+  | None ->
+      String_map.empty
+  | Some json ->
+      try
+        let as_item json =
+          let name = JSON.(json |-> "name" |> as_string) in
+          let cost = JSON.(json |-> "chaosValue" |> as_float) in
+          name, cost
+        in
+        JSON.(json |-> "lines" |> as_array) |> List.map as_item |> String_map.of_list
+      with exn ->
+        echo "failed to parse poe.ninja's response (ItemOverview): %s"
+          (Printexc.to_string exn);
+        String_map.empty
 
 let get_items ~league item_type =
   Uri.(with_query' (of_string "https://poe.ninja/api/data/ItemOverview")) [
@@ -66,13 +84,21 @@ let get_resonators league =
 let get_beasts league =
   get_items ~league "Beast"
 
-let as_tft json =
-  let as_item json =
-    let name = JSON.(json |-> "name" |> as_string) in
-    let cost = JSON.(json |-> "chaos" |> as_float) in
-    name, cost
-  in
-  JSON.(json |-> "data" |> as_array) |> List.map as_item |> String_map.of_list
+let as_tft = function
+  | None ->
+      String_map.empty
+  | Some json ->
+      try
+        let as_item json =
+          let name = JSON.(json |-> "name" |> as_string) in
+          let cost = JSON.(json |-> "chaos" |> as_float) in
+          name, cost
+        in
+        JSON.(json |-> "data" |> as_array) |> List.map as_item |> String_map.of_list
+      with exn ->
+        echo "failed to parse TFT's JSON file: %s"
+          (Printexc.to_string exn);
+        String_map.empty
 
 let get_tft league filename =
   Uri.of_string
@@ -94,7 +120,7 @@ let write_costs ~ninja_league ~tft_league ~filename =
     (
       match result with
         | None ->
-            echo "%s: %s: failed to find value, will use default" kind name
+            echo "%s: %s: failed to fetch value, will use default" kind name
         | Some value ->
             echo "%s: %s: %gc" kind name value
     );

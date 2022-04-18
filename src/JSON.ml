@@ -6,7 +6,7 @@ type origin_item =
   | Array_item of int
 
 let show_origin_item = function
-  | File s -> s ^ ": "
+  | File s -> s
   | Object_field s -> "." ^ s
   | Array_item i -> "." ^ string_of_int i
 
@@ -14,6 +14,12 @@ type t =
   {
     json: Ezjsonm.value;
     origin_rev: origin_item list;
+  }
+
+let make origin json =
+  {
+    json;
+    origin_rev = [ File origin ];
   }
 
 let parse ~origin string =

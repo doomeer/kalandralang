@@ -1,5 +1,7 @@
 type t
 
+val make: string -> Ezjsonm.value -> t
+
 val parse: origin: string -> string -> t
 
 val parse_file: string -> t
