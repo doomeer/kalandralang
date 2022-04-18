@@ -452,7 +452,7 @@ let spawn_additional_random_mods ?fossils ?only item =
       let w5 = 3 in
       let w6 = 1 in
       let i = Random.int (w4 + w5 + w6) in
-      if i < w4 then 4 else if i < w5 then 5 else 6
+      if i < w4 then 4 else if i < w4 + w5 then 5 else 6
   in
   let rec spawn_n_mods count item =
     if count <= 0
