@@ -162,7 +162,7 @@ let load () =
   )
   else (
     echo "%s does not exist, will use default values." costs_json_filename;
-    echo "Use the 'write-default-costs' or 'write-ninja-costs' command to create it.";
+    echo "Use the 'write-default-costs' or 'update-costs' command to create it.";
   );
   echo "Ready."
 
@@ -329,18 +329,28 @@ let main () =
         `write_default_costs
       );
       (
-        Clap.case "write-ninja-costs"
+        Clap.case "update-costs"
           ~description:
-            "Read costs from poe.ninja's API and output them to data/costs.json.
-             Warning: if you customized this file, all your changes will be lost."
+            "Read costs from poe.ninja's API and from The Forbidden \
+             Trove's repository and output them to data/costs.json.
+             Warning: if you customized this file, all your changes \
+             will be lost."
         @@ fun () ->
-        let league =
+        let ninja_league =
           Clap.default_string
+            ~long: "ninja-league"
             ~placeholder: "LEAGUE"
             ~description: "League name to give to poe.ninja's API."
             "Archnemesis"
         in
-        `write_poe_ninja_costs league
+        let tft_league =
+          Clap.default_string
+            ~long: "tft-league"
+            ~placeholder: "LEAGUE"
+            ~description: "Folder name in The Forbidden Trove's repository."
+            "lsc"
+        in
+        `update_costs (ninja_league, tft_league)
       );
     ]
   in
@@ -383,9 +393,9 @@ let main () =
     | `write_default_costs ->
         if not (Sys.file_exists "data") then Sys.mkdir "data" 0755;
         Cost.write_defaults costs_json_filename
-    | `write_poe_ninja_costs league ->
+    | `update_costs (ninja_league, tft_league) ->
         if not (Sys.file_exists "data") then Sys.mkdir "data" 0755;
-        Ninja.write_costs ~league ~filename: costs_json_filename
+        Ninja.write_costs ~ninja_league ~tft_league ~filename: costs_json_filename
 
 let backtrace = false
 

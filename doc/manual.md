@@ -137,21 +137,23 @@ Kalandralang reads the cost of currencies, harvest crafts etc. from file `data/c
 It is a good idea to regularly update this file.
 See [Costs](#costs) for more information.
 
-##### From poe.ninja
+##### From poe.ninja and TFT
 
 The following command uses [poe.ninja](https://poe.ninja)'s API
+and reads from The Forbidden Trove's
+[repository](https://github.com/The-Forbidden-Trove/tft-data-prices/tree/master/lsc)
 to generate file `data/costs.json` :
 ```sh
-kalandralang write-ninja-costs
+kalandralang update-costs
 ```
 If you are from the future, you may need to specify the league name:
 ```sh
-kalandralang write-ninja-costs Archnemesis
+kalandralang update-costs --ninja-league Archnemesis
 ```
-Note that `write-ninja-costs` uses default values for crafts that are not
-listed on [poe.ninja](https://poe.ninja):
-- [Harvest crafts](#harvest-crafting);
-- [Betrayal crafts](#betrayal-crafting).
+You can also specify the folder to read from TFT's repository:
+```
+kalandralang update-costs --tft-league lsc
+```
 
 ##### With Default Values
 
@@ -358,7 +360,7 @@ a lot over time. You can customize those values by creating a file named
 [Setup a Working Directory](#setup-a-working-directory).
 
 To customize costs, it is recommended to generate `data/costs.json`
-using `write-default-costs` or `write-ninja-costs`
+using `write-default-costs` or `update-costs`
 (see [Generate Cost Data](#generate-cost-data)).
 You can then edit the values in this file manually.
 

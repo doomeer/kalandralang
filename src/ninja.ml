@@ -74,21 +74,21 @@ let as_tft json =
   in
   JSON.(json |-> "data" |> as_array) |> List.map as_item |> String_map.of_list
 
-let get_tft filename =
+let get_tft league filename =
   Uri.of_string
-    ("https://raw.githubusercontent.com/The-Forbidden-Trove/tft-data-prices/master/lsc/" ^
-     filename)
+    ("https://raw.githubusercontent.com/The-Forbidden-Trove/tft-data-prices/master/" ^
+     league ^ "/" ^ filename)
   |> http_get
   |> as_tft
 
-let write_costs ~league ~filename =
-  let currencies = get_currencies league in
-  let essences = get_essences league in
-  let fossils = get_fossils league in
-  let resonators = get_resonators league in
-  let beasts = get_beasts league in
-  let harvest_crafts = get_tft "harvest.json" in
-  let services = get_tft "service.json" in
+let write_costs ~ninja_league ~tft_league ~filename =
+  let currencies = get_currencies ninja_league in
+  let essences = get_essences ninja_league in
+  let fossils = get_fossils ninja_league in
+  let resonators = get_resonators ninja_league in
+  let beasts = get_beasts ninja_league in
+  let harvest_crafts = get_tft tft_league "harvest.json" in
+  let services = get_tft tft_league "service.json" in
   let wrap kind f name =
     let result = f name in
     (
