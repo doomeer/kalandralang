@@ -173,6 +173,46 @@ type only =
   | Eater_implicits of Mod.eldritch_tier
   | Exarch_implicits of Mod.eldritch_tier
 
+(* Mod pool for a given domain and a given set of item tags (i.e. including SEC influences).
+   Includes Eldritch implicits (all tiers).
+   Not restricted by:
+   - ilvl;
+   - whether prefixes / suffixes are full;
+   - existing mods;
+   - fossils;
+   - meta-mods;
+   - etc. *)
+(* TODO: can improve performances further by not returning Eldritch implicits
+   and treating them separately. *)
+let full_mod_pool = memoize @@ fun (domain, item_tags) ->
+  let can_spawn_mod modifier =
+    if modifier.Mod.domain <> domain then
+      None
+    else
+      let matching_tag (tag, weight) =
+        if Id.Set.mem tag item_tags then
+          Some weight
+        else
+          None
+      in
+      match List.find_map matching_tag modifier.spawn_weights with
+        | None ->
+            None
+        | Some weight when weight <= 0 && domain <> Crafted ->
+            None
+        | Some weight ->
+            match List.find_map matching_tag modifier.generation_weights with
+              | None ->
+                  Some (weight, modifier)
+              | Some percent_multiplier ->
+                  let weight = weight * percent_multiplier / 100 in
+                  if weight <= 0 && domain <> Crafted then
+                    None
+                  else
+                    Some (weight, modifier)
+  in
+  List.filter_map can_spawn_mod !Mod.pool
+
 (* If [tag] is specified, restrict the mod pool to mods with this tag. *)
 let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffixes) item =
   let item_tags = tags item in
@@ -199,7 +239,7 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffi
         [];
     ]
   in
-  let can_spawn_mod modifier =
+  let can_spawn_mod (_, modifier) =
     let can_spawn_this_generation_type =
       (* Note: max prefix/suffix count is handled below, not here *)
       match only, modifier.Mod.generation_type with
@@ -228,11 +268,6 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffi
             has_mod_group modifier.Mod.group item
     in
     if
-      (crafted && (modifier.Mod.domain <> Crafted)) ||
-      (not crafted && (modifier.Mod.domain <> item.base.domain))
-    then
-      None
-    else if
       match tag with
         | None -> false
         | Some tag -> not (Id.Set.mem (Mod.tag_id tag) modifier.tags)
@@ -283,7 +318,8 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffi
                   else
                     Some (weight, modifier)
   in
-  List.filter_map can_spawn_mod !Mod.pool
+  let domain = if crafted then Base_item.Crafted else item.base.domain in
+  List.filter_map can_spawn_mod (full_mod_pool (domain, item_tags))
 
 let add_mod_force ?(fractured = false) modifier item =
   { item with mods = { modifier; fractured } :: item.mods }

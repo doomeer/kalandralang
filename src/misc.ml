@@ -46,3 +46,14 @@ let rex_glob pattern = Re.compile (Re.Glob.glob (String.lowercase_ascii pattern)
 let rex pattern = Re.compile (Re.Perl.re pattern)
 let (=~) string rex = Re.execp rex string
 let (=~!) string rex = not (string =~ rex)
+
+let memoize f =
+  let table = Hashtbl.create 31 in
+  fun x ->
+    match Hashtbl.find_opt table x with
+      | Some y ->
+          y
+      | None ->
+          let y = f x in
+          Hashtbl.add table x y;
+          y
