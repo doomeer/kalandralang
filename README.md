@@ -47,7 +47,6 @@ Kalandralang does not support in particular:
 - Hollow and Sanctified Fossils;
 - Orb of Dominance;
 - lucky Harvest crafts;
-- "reforge more common" Harvest crafts;
 - flasks (unless you like the idea of having rare flasks);
 - cluster jewels;
 - implicits other than Eldritch implicits.
