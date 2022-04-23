@@ -371,34 +371,17 @@ field `"harvest_reforge_life"` specifies the cost of the `harvest_reforge_life`
 [instruction](#harvest-crafting), and field `"pristine"` specifies the value
 of Pristine Fossils. For resonators, the fields are named
 `"primitive_resonator"`, `"potent_resonator"`, `"powerful_resonator"`
-and `"prime_resonator"`.
-
-The value of each field is either:
-- a number, specifying the value in Chaos Orbs;
-- or an object, specifying the value in terms of the value of other instructions.
+and `"prime_resonator"`. The value of each field is the cost in chaos.
 
 For instance, the following `costs.json` file:
 ```json
 {
   "exalt": 150,
-  "hunter_exalt": { "exalt": 1.5 }
+  "hunter_exalt": 225
 }
 ```
 specifies that the value of Exalted Orbs is 150 Chaos Orbs,
-and that the value of Hunter Exalted Orbs is 1.5 Exalted Orbs (i.e. 225 Chaos Orbs).
-
-You can specify multiple fields in values. The resulting value is the sum.
-For instance:
-```json
-{
-  "hunter_exalt": { "exalt": 1.5, "chaos": 10 }
-}
-```
-specifies that the value of Hunter Exalted Orbs is 1.5 Exalted Orbs, plus 10 Chaos Orbs.
-
-You cannot specify the value of Chaos Orbs themselves, but you can use them in
-definitions of other values. Most of the time though you would just put a number
-directly as Chaos Orb is the default unit.
+and that the value of Hunter Exalted Orbs is 225 Chaos Orbs.
 
 If the value of a given instruction is not specified (i.e. does not appear in the
 file or is defined as `null`), its default value is used.

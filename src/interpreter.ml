@@ -52,11 +52,11 @@ struct
 
   let to_chaos a =
     let total = ref 0. in
-    Map.iter (fun c n -> total := !total +. float n *. Cost.get c) a;
+    Map.iter (fun c n -> total := !total +. float n *. Cost.get_currency c) a;
     !total
 
   let to_exalt a =
-    to_chaos a /. Cost.get Exalted_orb
+    to_chaos a /. Cost.(get exalt)
 
   let iter a f = Map.iter f a
 end
