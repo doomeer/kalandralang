@@ -87,6 +87,7 @@ type currency =
   | Harvest_augment of Mod.harvest_tag
   | Harvest_non_to of Mod.harvest_tag
   | Harvest_reforge of Mod.harvest_tag
+  | Harvest_reforge_more_common of Mod.harvest_tag
   | Harvest_reforge_keep_prefixes
   | Harvest_reforge_keep_suffixes
   | Harvest_reforge_more_likely
@@ -141,6 +142,8 @@ let show_currency = function
   | Harvest_augment tag -> "harvest_augment_" ^ Id.show (Mod.tag_id tag)
   | Harvest_non_to tag -> let t = Id.show (Mod.tag_id tag) in "harvest_non_" ^ t ^ "_to_" ^ t
   | Harvest_reforge tag -> "harvest_reforge_" ^ Id.show (Mod.tag_id tag)
+  | Harvest_reforge_more_common tag ->
+      "harvest_reforge_" ^ Id.show (Mod.tag_id tag) ^ "_more_common"
   | Harvest_reforge_keep_prefixes -> "harvest_reforge_keep_prefixes"
   | Harvest_reforge_keep_suffixes -> "harvest_reforge_keep_suffixes"
   | Harvest_reforge_more_likely -> "harvest_reforge_more_likely"

@@ -372,6 +372,39 @@ let harvest_reforge_physical: field =
 let harvest_reforge_speed: field =
   h "Reforge Speed" "harvest_reforge_speed" 10.
 
+let harvest_reforge_attack_more_common: field =
+  h "Reforge Attack More Common" "harvest_reforge_attack_more_common" 15.
+
+let harvest_reforge_caster_more_common: field =
+  h "Reforge Caster More Common" "harvest_reforge_caster_more_common" 15.
+
+let harvest_reforge_chaos_more_common: field =
+  h "Reforge Chaos More Common" "harvest_reforge_chaos_more_common" 15.
+
+let harvest_reforge_cold_more_common: field =
+  h "Reforge Cold More Common" "harvest_reforge_cold_more_common" 15.
+
+let harvest_reforge_critical_more_common: field =
+  h "Reforge Critical More Common" "harvest_reforge_critical_more_common" 15.
+
+let harvest_reforge_defences_more_common: field =
+  h "Reforge Defence More Common" "harvest_reforge_defences_more_common" 15.
+
+let harvest_reforge_fire_more_common: field =
+  h "Reforge Fire More Common" "harvest_reforge_fire_more_common" 15.
+
+let harvest_reforge_life_more_common: field =
+  h "Reforge Life More Common" "harvest_reforge_life_more_common" 15.
+
+let harvest_reforge_lightning_more_common: field =
+  h "Reforge Lightning More Common" "harvest_reforge_lightning_more_common" 15.
+
+let harvest_reforge_physical_more_common: field =
+  h "Reforge Physical More Common" "harvest_reforge_physical_more_common" 15.
+
+let harvest_reforge_speed_more_common: field =
+  h "Reforge Speed More Common" "harvest_reforge_speed_more_common" 15.
+
 let harvest_reforge_keep_prefixes: field =
   h "Reforge keep Prefix" "harvest_reforge_keep_prefixes" (1.5 *. ex)
 
@@ -605,6 +638,28 @@ let get_currency (currency: AST.currency) =
         get harvest_reforge_physical
     | Harvest_reforge `speed ->
         get harvest_reforge_speed
+    | Harvest_reforge_more_common `attack ->
+        get harvest_reforge_attack_more_common
+    | Harvest_reforge_more_common `caster ->
+        get harvest_reforge_caster_more_common
+    | Harvest_reforge_more_common `chaos ->
+        get harvest_reforge_chaos_more_common
+    | Harvest_reforge_more_common `cold ->
+        get harvest_reforge_cold_more_common
+    | Harvest_reforge_more_common `critical ->
+        get harvest_reforge_critical_more_common
+    | Harvest_reforge_more_common `defences ->
+        get harvest_reforge_defences_more_common
+    | Harvest_reforge_more_common `fire ->
+        get harvest_reforge_fire_more_common
+    | Harvest_reforge_more_common `life ->
+        get harvest_reforge_life_more_common
+    | Harvest_reforge_more_common `lightning ->
+        get harvest_reforge_lightning_more_common
+    | Harvest_reforge_more_common `physical ->
+        get harvest_reforge_physical_more_common
+    | Harvest_reforge_more_common `speed ->
+        get harvest_reforge_speed_more_common
     | Harvest_reforge_keep_prefixes ->
         get harvest_reforge_keep_prefixes
     | Harvest_reforge_keep_suffixes ->

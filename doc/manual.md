@@ -810,6 +810,17 @@ The following keywords are instructions to perform harvest crafts on the current
 | `harvest_reforge_lightning` | **Reforge** an item as a rare item with random modifiers, including a **Lightning** modifier |
 | `harvest_reforge_physical` | **Reforge** an item as a rare item with random modifiers, including a **Physical** modifier |
 | `harvest_reforge_speed` | **Reforge** an item as a rare item with random modifiers, including a **Speed** modifier |
+| `harvest_reforge_attack_more_common` | **Reforge** an item as a rare item with random modifiers, including an **Attack** modifier. Attack modifiers are more common |
+| `harvest_reforge_caster_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Caster** modifier. Caster modifiers are more common |
+| `harvest_reforge_chaos_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Chaos** modifier. Chaos modifiers are more common |
+| `harvest_reforge_cold_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Cold** modifier. Cold modifiers are more common |
+| `harvest_reforge_critical_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Critical** modifier. Critical modifiers are more common |
+| `harvest_reforge_defences_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Defences** modifier. Defences modifiers are more common |
+| `harvest_reforge_fire_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Fire** modifier. Fire modifiers are more common |
+| `harvest_reforge_life_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Life** modifier. Life modifiers are more common |
+| `harvest_reforge_lightning_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Lightning** modifier. Lightning modifiers are more common |
+| `harvest_reforge_physical_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Physical** modifier. Physical modifiers are more common |
+| `harvest_reforge_speed_more_common` | **Reforge** an item as a rare item with random modifiers, including a **Speed** modifier. Speed modifiers are more common |
 | `harvest_reforge_keep_prefixes` | **Reforge** a rare item, keeping all **Prefixes** |
 | `harvest_reforge_keep_suffixes` | **Reforge** a rare item, keeping all **Suffixes** |
 | `harvest_reforge_more_likely` | **Reforge** a rare item, being much **more likely** to receive the same modifier types |

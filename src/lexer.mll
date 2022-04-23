@@ -151,6 +151,28 @@
     | "harvest_reforge_lightning" -> CURRENCY (Harvest_reforge `lightning)
     | "harvest_reforge_physical" -> CURRENCY (Harvest_reforge `physical)
     | "harvest_reforge_speed" -> CURRENCY (Harvest_reforge `speed)
+    | "harvest_reforge_attack_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `attack)
+    | "harvest_reforge_caster_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `caster)
+    | "harvest_reforge_chaos_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `chaos)
+    | "harvest_reforge_cold_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `cold)
+    | "harvest_reforge_critical_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `critical)
+    | "harvest_reforge_defences_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `defences)
+    | "harvest_reforge_fire_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `fire)
+    | "harvest_reforge_life_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `life)
+    | "harvest_reforge_lightning_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `lightning)
+    | "harvest_reforge_physical_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `physical)
+    | "harvest_reforge_speed_more_common" ->
+        CURRENCY (Harvest_reforge_more_common `speed)
     | "harvest_reforge_keep_prefixes" -> CURRENCY Harvest_reforge_keep_prefixes
     | "harvest_reforge_keep_suffixes" -> CURRENCY Harvest_reforge_keep_suffixes
     | "harvest_reforge_more_likely" -> CURRENCY Harvest_reforge_more_likely

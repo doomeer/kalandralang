@@ -382,6 +382,10 @@ let apply_currency state (currency: AST.currency) =
     | Harvest_reforge tag ->
         with_item state @@ fun item ->
         return @@ Item.reforge_rare ~tag (Item.set_rarity Rare item)
+    | Harvest_reforge_more_common tag ->
+        with_item state @@ fun item ->
+        let item = Item.set_rarity Rare item in
+        return @@ Item.reforge_rare ~tag ~tag_more_common: (tag, 10.) item
     | Harvest_reforge_keep_prefixes ->
         with_item state @@ fun item ->
         return @@ Item.reforge_rare_suffixes (Item.set_rarity Rare item)
