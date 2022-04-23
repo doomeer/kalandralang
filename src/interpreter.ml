@@ -388,6 +388,14 @@ let apply_currency state (currency: AST.currency) =
     | Harvest_reforge_keep_suffixes ->
         with_item state @@ fun item ->
         return @@ Item.reforge_rare_prefixes (Item.set_rarity Rare item)
+    | Harvest_reforge_more_likely ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        return @@ Item.reforge_with_mod_group_multiplier 90. item
+    | Harvest_reforge_less_likely ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        return @@ Item.reforge_with_mod_group_multiplier 0.01 item
     | Beastcraft_aspect_of_the_avian ->
         with_item state @@ fun item ->
         return @@ Item.add_mod Mod.(by_id beastcrafted_avian_aspect_id) item

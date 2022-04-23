@@ -214,7 +214,8 @@ let full_mod_pool = memoize @@ fun (domain, item_tags) ->
   List.filter_map can_spawn_mod !Mod.pool
 
 (* If [tag] is specified, restrict the mod pool to mods with this tag. *)
-let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffixes) item =
+let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffixes)
+    ?(mod_groups = Id.Set.empty) ?mod_group_multiplier item =
   let item_tags = tags item in
   let prefix_count = prefix_count item in
   let suffix_count = suffix_count item in
@@ -319,7 +320,18 @@ let mod_pool ?(fossils = []) ?tag ?(crafted = false) ?(only = Prefixes_and_suffi
                     Some (weight, modifier)
   in
   let domain = if crafted then Base_item.Crafted else item.base.domain in
-  List.filter_map can_spawn_mod (full_mod_pool (domain, item_tags))
+  let mod_pool = List.filter_map can_spawn_mod (full_mod_pool (domain, item_tags)) in
+  match mod_group_multiplier with
+    | None ->
+        mod_pool
+    | Some multiplier ->
+        let adjust_weight (weight, modifier) =
+          if Id.Set.mem modifier.Mod.group mod_groups then
+            int_of_float (float weight *. multiplier), modifier
+          else
+            weight, modifier
+        in
+        List.map adjust_weight mod_pool
 
 let add_mod_force ?(fractured = false) modifier item =
   { item with mods = { modifier; fractured } :: item.mods }
@@ -341,8 +353,12 @@ let add_mod ?(fractured = false) modifier item =
   );
   add_mod_force ~fractured modifier item
 
-let spawn_random_mod ?(fail_if_impossible = true) ?fossils ?tag ?only item =
-  match random_from_pool (mod_pool ?fossils ?tag ?only item) with
+let spawn_random_mod ?(fail_if_impossible = true) ?fossils ?tag ?only
+    ?mod_groups ?mod_group_multiplier item =
+  match
+    random_from_pool
+      (mod_pool ?fossils ?tag ?only ?mod_groups ?mod_group_multiplier item)
+  with
     | None ->
         if fail_if_impossible then
           match tag with
@@ -475,8 +491,11 @@ let set_to_lowest_possible_rarity item =
   in
   { item with rarity }
 
-let spawn_additional_random_mods ?fossils ?only item =
-  let spawn_random_mod = spawn_random_mod ~fail_if_impossible: false ?fossils ?only in
+let spawn_additional_random_mods ?fossils ?only ?mod_groups ?mod_group_multiplier item =
+  let spawn_random_mod =
+    spawn_random_mod ~fail_if_impossible: false ?fossils ?only
+      ?mod_groups ?mod_group_multiplier
+  in
   let final_mod_count =
     if Base_item.is_jewel item.base then
       let w3 = 65 in
@@ -508,7 +527,9 @@ let reforge_magic item =
 
 (* If [modifier] is specified, [tag] cannot be specified; [modifier] is added first. *)
 (* [tag] is only applied to the first added mod. *)
-let reforge_rare ?(respect_cannot_be_changed = true) ?fossils ?tag ?modifier item =
+(* [mod_group_multiplier] multiplies the weight of all [mod_groups]. *)
+let reforge_rare ?(respect_cannot_be_changed = true) ?fossils ?tag
+    ?mod_groups ?mod_group_multiplier ?modifier item =
   let item =
     remove_all_mods item
       ~respect_cannot_be_changed
@@ -517,13 +538,13 @@ let reforge_rare ?(respect_cannot_be_changed = true) ?fossils ?tag ?modifier ite
   let item =
     match tag, modifier with
       | _, None ->
-          spawn_random_mod ?fossils ?tag item
+          spawn_random_mod ?fossils ?tag ?mod_groups ?mod_group_multiplier item
       | None, Some modifier ->
           add_mod modifier item
       | Some _, Some _ ->
           invalid_arg "Item.reforge_rare cannot take both ?tag and ?modifier"
   in
-  spawn_additional_random_mods ?fossils item
+  spawn_additional_random_mods ?fossils ?mod_groups ?mod_group_multiplier item
 
 let reforge_rare_suffixes ?(can_add_prefixes = true) item =
   let item = remove_all_suffixes item in
@@ -737,3 +758,15 @@ let apply_eldritch_chaos item =
   with_dominance item @@ function
   | Exarch -> reforge_rare_prefixes ~can_add_suffixes: false item
   | Eater -> reforge_rare_suffixes ~can_add_prefixes: false item
+
+let reforge_with_mod_group_multiplier mod_group_multiplier item =
+  let mod_groups =
+    let get_group { modifier; _ } =
+      if Mod.is_prefix_or_suffix modifier then
+        Some modifier.group
+      else
+        None
+    in
+    List.filter_map get_group item.mods |> Id.Set.of_list
+  in
+  reforge_rare ~mod_groups ~mod_group_multiplier item

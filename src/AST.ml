@@ -89,6 +89,8 @@ type currency =
   | Harvest_reforge of Mod.harvest_tag
   | Harvest_reforge_keep_prefixes
   | Harvest_reforge_keep_suffixes
+  | Harvest_reforge_more_likely
+  | Harvest_reforge_less_likely
   | Beastcraft_aspect_of_the_avian
   | Beastcraft_aspect_of_the_cat
   | Beastcraft_aspect_of_the_crab
@@ -141,6 +143,8 @@ let show_currency = function
   | Harvest_reforge tag -> "harvest_reforge_" ^ Id.show (Mod.tag_id tag)
   | Harvest_reforge_keep_prefixes -> "harvest_reforge_keep_prefixes"
   | Harvest_reforge_keep_suffixes -> "harvest_reforge_keep_suffixes"
+  | Harvest_reforge_more_likely -> "harvest_reforge_more_likely"
+  | Harvest_reforge_less_likely -> "harvest_reforge_less_likely"
   | Beastcraft_aspect_of_the_avian -> "beastcraft_aspect_of_the_avian"
   | Beastcraft_aspect_of_the_cat -> "beastcraft_aspect_of_the_cat"
   | Beastcraft_aspect_of_the_crab -> "beastcraft_aspect_of_the_crab"

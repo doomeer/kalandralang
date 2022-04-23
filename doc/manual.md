@@ -812,6 +812,8 @@ The following keywords are instructions to perform harvest crafts on the current
 | `harvest_reforge_speed` | **Reforge** an item as a rare item with random modifiers, including a **Speed** modifier |
 | `harvest_reforge_keep_prefixes` | **Reforge** a rare item, keeping all **Prefixes** |
 | `harvest_reforge_keep_suffixes` | **Reforge** a rare item, keeping all **Suffixes** |
+| `harvest_reforge_more_likely` | **Reforge** a rare item, being much **more likely** to receive the same modifier types |
+| `harvest_reforge_less_likely` | **Reforge** a rare item, being much **less likely** to receive the same modifier types |
 
 #### Beastcrafting
 

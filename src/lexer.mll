@@ -153,6 +153,8 @@
     | "harvest_reforge_speed" -> CURRENCY (Harvest_reforge `speed)
     | "harvest_reforge_keep_prefixes" -> CURRENCY Harvest_reforge_keep_prefixes
     | "harvest_reforge_keep_suffixes" -> CURRENCY Harvest_reforge_keep_suffixes
+    | "harvest_reforge_more_likely" -> CURRENCY Harvest_reforge_more_likely
+    | "harvest_reforge_less_likely" -> CURRENCY Harvest_reforge_less_likely
     | "beastcraft_aspect_of_the_avian" -> CURRENCY Beastcraft_aspect_of_the_avian
     | "beastcraft_aspect_of_the_cat" -> CURRENCY Beastcraft_aspect_of_the_cat
     | "beastcraft_aspect_of_the_crab" -> CURRENCY Beastcraft_aspect_of_the_crab

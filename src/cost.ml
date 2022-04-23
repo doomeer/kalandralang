@@ -378,6 +378,12 @@ let harvest_reforge_keep_prefixes: field =
 let harvest_reforge_keep_suffixes: field =
   h "Reforge keep Suffix" "harvest_reforge_keep_suffixes" (1.5 *. ex)
 
+let harvest_reforge_more_likely: field =
+  h "Reforge Rare More Likely" "harvest_reforge_more_likely" 30.
+
+let harvest_reforge_less_likely: field =
+  h "Reforge Rare Less Likely" "harvest_reforge_less_likely" 15.
+
 let beastcraft_aspect_of_the_avian: field =
   b "Saqawal, First of the Sky" "beastcraft_aspect_of_the_avian" 6.
 
@@ -603,6 +609,10 @@ let get_currency (currency: AST.currency) =
         get harvest_reforge_keep_prefixes
     | Harvest_reforge_keep_suffixes ->
         get harvest_reforge_keep_suffixes
+    | Harvest_reforge_more_likely ->
+        get harvest_reforge_more_likely
+    | Harvest_reforge_less_likely ->
+        get harvest_reforge_less_likely
     | Beastcraft_aspect_of_the_avian ->
         get beastcraft_aspect_of_the_avian
     | Beastcraft_aspect_of_the_cat ->
