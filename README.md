@@ -51,3 +51,5 @@ Kalandralang does not support in particular:
 - flasks (unless you like the idea of having rare flasks);
 - cluster jewels;
 - implicits other than Eldritch implicits.
+
+See also the [Changelog](CHANGES.md).
