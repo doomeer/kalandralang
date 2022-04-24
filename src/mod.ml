@@ -349,7 +349,7 @@ let show ?(indentation = 0) ?(fractured = false) mode modifier =
   let fractured = if fractured then "{fractured} " else "" in
   let domain =
     match modifier.domain with
-      | Item | Misc | Abyss_jewel | Unveiled -> ""
+      | Item | Misc | Abyss_jewel | Unveiled | Flask -> ""
       | Crafted -> "{crafted} "
       | Veiled -> "{veiled} "
   in
