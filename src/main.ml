@@ -50,7 +50,7 @@ let parse_recipe filename =
     | None -> parse_recipe_stdin ()
     | Some filename -> parse_recipe_file filename
 
-let run_recipe recipe ~count ~verbose =
+let run_recipe recipe ~count ~verbose ~onlycosts =
   let debug s = if verbose then print_endline s in
   let module A = Interpreter.Amount in
   let paid = ref A.zero in
@@ -65,7 +65,7 @@ let run_recipe recipe ~count ~verbose =
   let histogram = Histogram.create () in
   try
     for i = 1 to count do
-      if i > 1 then echo "";
+      if i > 1 && not onlycosts then echo "";
       let state = Interpreter.(run (start ~echo: print_endline ~debug recipe)) in
       paid := A.add !paid state.paid;
       gained := A.add !gained state.gained;
@@ -80,19 +80,22 @@ let run_recipe recipe ~count ~verbose =
           worst_loss := min !worst_loss profit;
           incr loss_count;
         );
-      Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
-      echo "Cost:";
-      (
-        A.iter state.paid @@ fun currency amount ->
-        echo "%6d × %s" amount (AST.show_currency currency)
-      );
-      if A.is_zero state.gained then
-        echo "Total: %s" (show_amount state.paid)
-      else
-        echo "Total: %s — Profit: %s"
-          (show_amount state.paid)
-          (show_amount (A.sub state.gained state.paid));
-      Histogram.add histogram (A.to_exalt state.paid);
+      if not onlycosts || count == 1 then
+        (
+          Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
+          echo "Cost2:";
+          (
+            A.iter state.paid @@ fun currency amount ->
+            echo "%6d × %s" amount (AST.show_currency currency)
+          );
+          if A.is_zero state.gained then
+            echo "Total: %s" (show_amount state.paid)
+          else
+            echo "Total: %s — Profit: %s"
+              (show_amount state.paid)
+              (show_amount (A.sub state.gained state.paid));
+          Histogram.add histogram (A.to_exalt state.paid);
+        );
     done;
     if count >= 2 then
       let show_average = show_amount ~divide_by: count in
@@ -109,7 +112,8 @@ let run_recipe recipe ~count ~verbose =
           (show_average !paid)
           (show_average (A.sub !gained !paid));
       echo "";
-      Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
+      if not onlycosts then 
+        Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
   with Interpreter.Failed (state, exn) ->
     Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
     echo "Error: %s" (Printexc.to_string exn)
@@ -237,6 +241,12 @@ let main () =
             ~description: "Print each operation that is performed."
             false
         in
+        let onlycosts =
+          Clap.flag
+            ~set_long: "onlycosts"
+            ~description: "Hides the item after each craft. Does only show the final cost."
+            false
+        in
         let seed =
           Clap.optional_int
             ~long: "seed"
@@ -265,7 +275,7 @@ let main () =
                unspecified, read the recipe from stdin."
             ()
         in
-        `run (filename, count, verbose, seed, show_seed)
+        `run (filename, count, verbose, seed, show_seed, onlycosts)
       );
       (
         Clap.case "format"
@@ -359,7 +369,7 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, count, verbose, seed, show_seed) ->
+    | `run (filename, count, verbose, seed, show_seed, onlycosts) ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
         load ();
@@ -378,7 +388,7 @@ let main () =
           in
           echo "Seed: %d" seed
         );
-        run_recipe compiled_recipe ~count ~verbose
+        run_recipe compiled_recipe ~count ~verbose ~onlycosts
     | `compile filename ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
