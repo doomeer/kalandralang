@@ -59,6 +59,7 @@ type display_options =
     no_total: bool;
     no_echo: bool;
     no_histogram: bool;
+    no_time:bool;
     summary: bool;
   }
 
@@ -317,6 +318,12 @@ let main () =
             ~description: "Do not output the histogram at the end of batch runs."
             false
         in
+        let no_time =
+          Clap.flag
+            ~set_long: "no-time"
+            ~description: "Do not output the time the execution needs at the end of batch runs."
+            false
+        in
         let summary =
           Clap.flag
             ~set_long: "summary"
@@ -354,6 +361,7 @@ let main () =
             no_total = no_total || summary;
             no_echo = no_echo || summary || short;
             no_histogram;
+            no_time;
             summary;
           }
         in
@@ -452,6 +460,9 @@ let main () =
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
     | `run (filename, count, seed, display_options) ->
+        if count <= 0 then
+          fail "Count can't be smaller then 1";
+        let run_time_start = Unix.gettimeofday () in
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
         load ();
@@ -470,7 +481,19 @@ let main () =
           in
           echo "Seed: %d" seed
         );
-        run_recipe compiled_recipe ~count ~display_options
+
+        let exec_time_start = Unix.gettimeofday () in
+        let () = run_recipe compiled_recipe ~count ~display_options in
+        let time_end = Unix.gettimeofday () in
+        if not display_options.no_time then (
+          echo "";
+          if display_options.verbose then 
+            echo "Overhead time:         %12fs%!" (exec_time_start -. run_time_start);
+          if count > 0 then
+            echo "Average crafting time: %12fs%!" ((time_end -. exec_time_start) /. float_of_int count);
+          echo "Total crafting time:   %12fs%!" (time_end -. exec_time_start);
+        );
+
     | `compile filename ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
