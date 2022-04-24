@@ -399,9 +399,9 @@ let rec pp_condition ?(ctx = `top) condition =
         seq [ atom "affix_count"; space; int a ]
     | Affix_count (a, b) ->
         seq [ atom "affix_count"; space; int a; atom "-"; int b ]
-    | Open_suffix ->
+    | Open_affix ->
         atom "open_affix"
-    | Full_suffixes ->
+    | Full_affixes ->
         atom "full_affixes"
 
 type simple_instruction =
