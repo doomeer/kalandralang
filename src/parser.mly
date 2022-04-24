@@ -8,7 +8,7 @@
     }
 %}
 
-%token COLON AND OR NOT PLUS DOT_DOT TRUE FALSE EOF
+%token COLON AND OR NOT PLUS MINUS TRUE FALSE EOF
 %token BUY ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL
 %token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD EXARCH EATER SYNTHESIZED
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN HAS
@@ -77,7 +77,7 @@ condition:
   { Has (Id.make $2) }
 | PREFIX_COUNT INT
   { Prefix_count ($2, $2) }
-| PREFIX_COUNT INT DOT_DOT INT
+| PREFIX_COUNT INT MINUS INT
   { Prefix_count ($2, $4) }
 | NO_PREFIX
   { Prefix_count (0, 0) }
@@ -87,7 +87,7 @@ condition:
   { Full_prefixes }
 | SUFFIX_COUNT INT
   { Suffix_count ($2, $2) }
-| SUFFIX_COUNT INT DOT_DOT INT
+| SUFFIX_COUNT INT MINUS INT
   { Suffix_count ($2, $4) }
 | NO_SUFFIX
   { Suffix_count (0, 0) }
@@ -97,7 +97,7 @@ condition:
   { Full_suffixes }
 | AFFIX_COUNT INT
   { Affix_count ($2, $2) }
-| AFFIX_COUNT INT DOT_DOT INT
+| AFFIX_COUNT INT MINUS INT
   { Affix_count ($2, $4) }
 | NO_AFFIX
   { Affix_count (0, 0) }

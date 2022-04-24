@@ -214,7 +214,7 @@ rule token = parse
   | '.' ['a'-'z' 'A'-'Z' '0'-'9' '_']+ as x { LABEL x }
   | '"' ([^'"' '\n']* as x) '"' { STRING x }
   | ['a'-'z' '_']+ as x { keyword x }
-  | ".." { DOT_DOT }
+  | "-" { MINUS }
   | '(' { LPAR }
   | ')' { RPAR }
   | '{' { LBRACE }
