@@ -100,6 +100,16 @@ let show item =
 let set_rarity rarity item =
   { item with rarity }
 
+let get_max_rarity item =
+  if item.base.domain = Flask then
+    Magic
+  else
+    Rare
+
+let set_max_rarity item =
+  let rar = get_max_rarity item in
+  set_rarity rar item 
+
 let is_fractured item =
   List.exists (fun { fractured; _ } -> fractured) item.mods
 
@@ -513,7 +523,12 @@ let spawn_additional_random_mods ?fossils ?tag_more_common ?only
       ?mod_groups ?mod_group_multiplier
   in
   let final_mod_count =
-    if Base_item.is_jewel item.base then
+    if item.base.domain == Flask then
+          let w1 = 50 in
+          let w2 = 50 in
+          let i = Random.int (w1 + w2) in
+          if i < w1 then 1 else 2
+    else if Base_item.is_jewel item.base then
       let w3 = 65 in
       let w4 = 35 in
       let i = Random.int (w3 + w4) in
@@ -595,16 +610,17 @@ let add_influence influence item =
     | Not_influenced | Fractured | Synthesized | Exarch | Eater | Exarch_and_eater ->
         item
 
-let make base level rarity influence =
+let make base level influence =
   {
     base;
     level;
-    rarity;
+    rarity = Rare;
     tags = Id.Set.empty;
     mods = [];
     split = false;
     influence = Not_influenced;
   }
+  |> set_max_rarity
   |> add_influence influence
 
 let is_influence_mod influence_tag modifier =

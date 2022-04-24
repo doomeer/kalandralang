@@ -150,6 +150,11 @@ let goto state label =
 let goto_next state =
   { state with point = state.point + 1 }
 
+let item_can_be_rare (item: Item.t) =
+  match item.base.domain with
+    | Flask -> fail "item can't be rare"
+    | _ -> ()
+
 let item_must_be_normal (item: Item.t) =
   match item.rarity with
     | Normal -> ()
@@ -216,10 +221,12 @@ let apply_currency state (currency: AST.currency) =
         return @@ Item.reforge_magic item
     | Regal_orb ->
         with_item state @@ fun item ->
+        item_can_be_rare item;
         item_must_be_magic item;
         return @@ Item.spawn_random_mod (Item.set_rarity Rare item)
     | Orb_of_alchemy ->
         with_item state @@ fun item ->
+        item_can_be_rare item;
         item_must_be_normal item;
         return @@ Item.reforge_rare (Item.set_rarity Rare item)
     | Orb_of_scouring ->
@@ -290,6 +297,7 @@ let apply_currency state (currency: AST.currency) =
         if count < 1 then fail "must use at least 1 fossil"; (* cannot happen *)
         if count > 4 then fail "cannot use more than 4 fossils at the same time";
         with_item state @@ fun item ->
+        item_can_be_rare item;
         return @@ Item.reforge_rare ~fossils (Item.set_rarity Rare item)
     | Awakeners_orb ->
         with_item state @@ fun item ->
@@ -381,17 +389,17 @@ let apply_currency state (currency: AST.currency) =
         return @@ Item.spawn_random_mod ~tag item
     | Harvest_reforge tag ->
         with_item state @@ fun item ->
-        return @@ Item.reforge_rare ~tag (Item.set_rarity Rare item)
+        return @@ Item.reforge_rare ~tag (Item.set_max_rarity item)
     | Harvest_reforge_more_common tag ->
         with_item state @@ fun item ->
-        let item = Item.set_rarity Rare item in
+        let item = Item.set_max_rarity item in
         return @@ Item.reforge_rare ~tag ~tag_more_common: (tag, 10.) item
     | Harvest_reforge_keep_prefixes ->
         with_item state @@ fun item ->
-        return @@ Item.reforge_rare_suffixes (Item.set_rarity Rare item)
+        return @@ Item.reforge_rare_suffixes (Item.set_max_rarity item)
     | Harvest_reforge_keep_suffixes ->
         with_item state @@ fun item ->
-        return @@ Item.reforge_rare_prefixes (Item.set_rarity Rare item)
+        return @@ Item.reforge_rare_prefixes (Item.set_max_rarity item)
     | Harvest_reforge_more_likely ->
         with_item state @@ fun item ->
         item_must_be_rare item;
@@ -496,7 +504,9 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         (* TODO: check that [mods] are compatible with influences.
            More generally, check that [mods] can actually exist on the item. *)
         state.debug ("buy " ^ Id.show base);
-        let item = Item.make (Base_item.by_id base) ilvl Rare influence in
+
+        let base_obj = Base_item.by_id base in
+        let item = Item.make base_obj ilvl influence in
         let item =
           let add_mod item ({ modifier; fractured }: AST.buy_with) =
             let item = if fractured then Item.add_influence Fractured item else item in
