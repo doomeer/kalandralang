@@ -116,8 +116,3 @@ let abyss_jewel_class = Id.make "AbyssJewel"
 let is_jewel { item_class; _ } =
   Id.compare item_class jewel_class = 0 ||
   Id.compare item_class abyss_jewel_class = 0
-
-let flask_class = Id.make "Flask"
-
-let is_flask { item_class; _ } =
-  Id.compare item_class flask_class = 0

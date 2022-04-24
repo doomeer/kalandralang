@@ -128,7 +128,6 @@ let o_base_item_domain o (x: Base_item.domain) =
     | Abyss_jewel -> o_byte o 4
     | Flask -> o_byte o 5
 
-
 let i_base_item_domain i: Base_item.domain =
   match i_byte i with
     | 0 -> Item
