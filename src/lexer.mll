@@ -49,6 +49,10 @@
     | "no_suffix" -> NO_SUFFIX
     | "open_suffix" -> OPEN_SUFFIX
     | "full_suffixes" -> FULL_SUFFIXES
+    | "no_affix" -> NO_AFFIX
+    | "affix_count" -> AFFIX_COUNT
+    | "open_affix" -> OPEN_AFFIX
+    | "full_affixes" -> FULL_AFFIXES
     (* Currencies *)
     | "transmute" -> CURRENCY Orb_of_transmutation
     | "augment" -> CURRENCY Orb_of_augmentation

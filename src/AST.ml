@@ -331,6 +331,9 @@ type condition =
   | Suffix_count of int * int
   | Open_suffix
   | Full_suffixes
+  | Affix_count of int * int
+  | Open_affix
+  | Full_affixes
 
 let maybe_parentheses use_parentheses document =
   let open Pretext in
@@ -390,6 +393,16 @@ let rec pp_condition ?(ctx = `top) condition =
         atom "open_suffix"
     | Full_suffixes ->
         atom "full_suffixes"
+    | Affix_count (0, 0) ->
+        atom "no_affix"
+    | Affix_count (a, b) when a = b ->
+        seq [ atom "affix_count"; space; int a ]
+    | Affix_count (a, b) ->
+        seq [ atom "affix_count"; space; int a; atom "-"; int b ]
+    | Open_suffix ->
+        atom "open_affix"
+    | Full_suffixes ->
+        atom "full_affixes"
 
 type simple_instruction =
   | Goto of Label.t

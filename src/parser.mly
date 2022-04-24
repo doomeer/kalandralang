@@ -14,6 +14,7 @@
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN HAS
 %token PREFIX_COUNT NO_PREFIX OPEN_PREFIX FULL_PREFIXES
 %token SUFFIX_COUNT NO_SUFFIX OPEN_SUFFIX FULL_SUFFIXES
+%token AFFIX_COUNT NO_AFFIX OPEN_AFFIX FULL_AFFIXES
 %token LPAR RPAR LBRACE RBRACE
 %token <AST.currency> CURRENCY
 %token <Fossil.t> FOSSIL
@@ -94,6 +95,16 @@ condition:
   { Open_suffix }
 | FULL_SUFFIXES
   { Full_suffixes }
+| AFFIX_COUNT INT
+  { Affix_count ($2, $2) }
+| AFFIX_COUNT INT DOT_DOT INT
+  { Affix_count ($2, $4) }
+| NO_AFFIX
+  { Affix_count (0, 0) }
+| OPEN_AFFIX
+  { Open_affix }
+| FULL_AFFIXES
+  { Full_affixes }
 | LPAR condition RPAR
   { $2 }
 
