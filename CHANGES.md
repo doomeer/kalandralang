@@ -68,6 +68,10 @@
 - Significantly improved performance. Quick experiments show a 10× to 20× speedup
   depending on the recipe.
 
+- Added options to configure the output: --no-item, --no-cost, --no-total, --no-echo,
+  --no-histogram, --short (short-hand: -s), --summary (short-hand: -S).
+  Run `kalandralang run --help` to see a description of these options.
+
 ## Version 0.1.0
 
 First released version.

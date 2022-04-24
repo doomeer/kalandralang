@@ -50,8 +50,20 @@ let parse_recipe filename =
     | None -> parse_recipe_stdin ()
     | Some filename -> parse_recipe_file filename
 
-let run_recipe recipe ~count ~verbose =
-  let debug s = if verbose then print_endline s in
+type display_options =
+  {
+    verbose: bool;
+    show_seed: bool;
+    no_item: bool;
+    no_cost: bool;
+    no_total: bool;
+    no_echo: bool;
+    no_histogram: bool;
+    summary: bool;
+  }
+
+let run_recipe recipe ~count ~display_options =
+  let debug s = if display_options.verbose then print_endline s in
   let module A = Interpreter.Amount in
   let paid = ref A.zero in
   let gained = ref A.zero in
@@ -63,10 +75,22 @@ let run_recipe recipe ~count ~verbose =
     Cost.show_chaos_amount (A.to_chaos amount /. float divide_by)
   in
   let histogram = Histogram.create () in
+  let user_echo_function =
+    if display_options.no_echo then
+      fun _ -> ()
+    else
+      print_endline
+  in
   try
     for i = 1 to count do
-      if i > 1 then echo "";
-      let state = Interpreter.(run (start ~echo: print_endline ~debug recipe)) in
+      if
+        i > 1 && (
+          not display_options.no_item ||
+          not display_options.no_cost
+        )
+      then
+        echo "";
+      let state = Interpreter.(run (start ~echo: user_echo_function ~debug recipe)) in
       paid := A.add !paid state.paid;
       gained := A.add !gained state.gained;
       let profit = A.sub state.gained state.paid |> A.to_chaos in
@@ -80,21 +104,25 @@ let run_recipe recipe ~count ~verbose =
           worst_loss := min !worst_loss profit;
           incr loss_count;
         );
-      Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
-      echo "Cost:";
-      (
+      if not display_options.no_item then
+        Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
+      if not display_options.no_cost then (
+        echo "Cost:";
         A.iter state.paid @@ fun currency amount ->
         echo "%6d × %s" amount (AST.show_currency currency)
       );
-      if A.is_zero state.gained then
-        echo "Total: %s" (show_amount state.paid)
-      else
-        echo "Total: %s — Profit: %s"
-          (show_amount state.paid)
-          (show_amount (A.sub state.gained state.paid));
-      Histogram.add histogram (A.to_exalt state.paid);
+      if not display_options.no_total then (
+        if A.is_zero state.gained then
+          echo "Total: %s" (show_amount state.paid)
+        else
+          echo "Total: %s — Profit: %s"
+            (show_amount state.paid)
+            (show_amount (A.sub state.gained state.paid));
+      );
+      if not display_options.no_histogram then
+        Histogram.add histogram (A.to_exalt state.paid);
     done;
-    if count >= 2 then
+    if display_options.summary || count >= 2 then
       let show_average = show_amount ~divide_by: count in
       echo "";
       echo "Average cost (out of %d):" count;
@@ -108,8 +136,10 @@ let run_recipe recipe ~count ~verbose =
         echo "Total: %s — Profit: %s"
           (show_average !paid)
           (show_average (A.sub !gained !paid));
-      echo "";
-      Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
+      if not display_options.no_histogram && count >= 2 then (
+        echo "";
+        Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
+      )
   with Interpreter.Failed (state, exn) ->
     Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
     echo "Error: %s" (Printexc.to_string exn)
@@ -257,6 +287,56 @@ let main () =
                to then reproduce it with --seed."
             false
         in
+        let no_item =
+          Clap.flag
+            ~set_long: "no-item"
+            ~description: "Do not print the item at the end of each craft."
+            false
+        in
+        let no_cost =
+          Clap.flag
+            ~set_long: "no-cost"
+            ~description: "Do not print the cost breakdown at the end of each craft."
+            false
+        in
+        let no_total =
+          Clap.flag
+            ~set_long: "no-total"
+            ~description: "Do not print the total cost and profit at the end of each craft."
+            false
+        in
+        let no_echo =
+          Clap.flag
+            ~set_long: "no-echo"
+            ~description: "Ignore instructions that output, such as echo and show."
+            false
+        in
+        let no_histogram =
+          Clap.flag
+            ~set_long: "no-histogram"
+            ~description: "Do not output the histogram at the end of batch runs."
+            false
+        in
+        let summary =
+          Clap.flag
+            ~set_long: "summary"
+            ~set_short: 'S'
+            ~description:
+              "Same as --no-item --no-cost --no-total \
+               --no-echo. In other words, only output the average cost \
+               and histogram. Causes the average cost (but not the \
+               histogram) to be displayed even with --count 1."
+            false
+        in
+        let short =
+          Clap.flag
+            ~set_long: "short"
+            ~set_short: 's'
+            ~description:
+              "Same as --no-item --no-cost --no-echo. In other words, \
+               only output the total cost and profit after each craft."
+            false
+        in
         let filename =
           Clap.optional_string
             ~placeholder: "FILE"
@@ -265,7 +345,19 @@ let main () =
                unspecified, read the recipe from stdin."
             ()
         in
-        `run (filename, count, verbose, seed, show_seed)
+        let display_options =
+          {
+            verbose;
+            show_seed;
+            no_item = no_item || summary || short;
+            no_cost = no_cost || summary || short;
+            no_total = no_total || summary;
+            no_echo = no_echo || summary || short;
+            no_histogram;
+            summary;
+          }
+        in
+        `run (filename, count, seed, display_options)
       );
       (
         Clap.case "format"
@@ -359,12 +451,12 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, count, verbose, seed, show_seed) ->
+    | `run (filename, count, seed, display_options) ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
         load ();
         Option.iter Random.init seed;
-        if show_seed then (
+        if display_options.show_seed then (
           let seed =
             match seed with
               | None ->
@@ -378,7 +470,7 @@ let main () =
           in
           echo "Seed: %d" seed
         );
-        run_recipe compiled_recipe ~count ~verbose
+        run_recipe compiled_recipe ~count ~display_options
     | `compile filename ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
