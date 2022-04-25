@@ -378,7 +378,7 @@ let rec pp_condition ?(ctx = `top) condition =
     | Prefix_count (a, b) when a = b ->
         seq [ atom "prefix_count"; space; int a ]
     | Prefix_count (a, b) ->
-        seq [ atom "prefix_count"; space; int a; atom "-"; int b ]
+        seq [ atom "prefix_count"; space; int a; atom ".."; int b ]
     | Open_prefix ->
         atom "open_prefix"
     | Full_prefixes ->
@@ -388,7 +388,7 @@ let rec pp_condition ?(ctx = `top) condition =
     | Suffix_count (a, b) when a = b ->
         seq [ atom "suffix_count"; space; int a ]
     | Suffix_count (a, b) ->
-        seq [ atom "suffix_count"; space; int a; atom "-"; int b ]
+        seq [ atom "suffix_count"; space; int a; atom ".."; int b ]
     | Open_suffix ->
         atom "open_suffix"
     | Full_suffixes ->
@@ -398,7 +398,7 @@ let rec pp_condition ?(ctx = `top) condition =
     | Affix_count (a, b) when a = b ->
         seq [ atom "affix_count"; space; int a ]
     | Affix_count (a, b) ->
-        seq [ atom "affix_count"; space; int a; atom "-"; int b ]
+        seq [ atom "affix_count"; space; int a; atom ".."; int b ]
     | Open_affix ->
         atom "open_affix"
     | Full_affixes ->
