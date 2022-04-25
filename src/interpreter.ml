@@ -496,6 +496,19 @@ let apply_currency state (currency: AST.currency) =
         in
         return item
 
+let show_mod_pool pool =
+  let total_weight = List.fold_left (fun acc (w, _) -> acc + w) 0 pool |> float in
+  let prefixes, suffixes = List.partition (fun (_, m) -> Mod.is_prefix m) pool in
+  let show_mod (w, (m: Mod.t)) =
+    let weight = Printf.sprintf "%.3f%%" (float w *. 100. /. total_weight) in
+    let padding = String.make (max 0 (6 - String.length weight)) ' ' in
+    echo "%s%s %s" padding weight
+      (Mod.show ~indentation: (String.length padding + String.length weight + 1)
+         With_ranges m)
+  in
+  List.iter show_mod prefixes;
+  List.iter show_mod suffixes
+
 let run_simple_instruction state (instruction: AST.simple_instruction) =
   match instruction with
     | Goto label ->
@@ -569,17 +582,12 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
     | Show_mod_pool ->
         with_item state @@ fun item ->
         let pool = Item.mod_pool item in
-        let total_weight = List.fold_left (fun acc (w, _) -> acc + w) 0 pool |> float in
-        let prefixes, suffixes = List.partition (fun (_, m) -> Mod.is_prefix m) pool in
-        let show_mod (w, (m: Mod.t)) =
-          let weight = Printf.sprintf "%.3f%%" (float w *. 100. /. total_weight) in
-          let padding = String.make (max 0 (6 - String.length weight)) ' ' in
-          echo "%s%s %s" padding weight
-            (Mod.show ~indentation: (String.length padding + String.length weight + 1)
-               With_ranges m)
-        in
-        List.iter show_mod prefixes;
-        List.iter show_mod suffixes;
+        show_mod_pool pool;
+        goto_next state
+    | Show_unveil_mod_pool ->
+        with_item state @@ fun item ->
+        let _, pool = Item.prepare_unveil item in
+        show_mod_pool pool;
         goto_next state
 
 let run_instruction state (instruction: Linear.instruction AST.node) =

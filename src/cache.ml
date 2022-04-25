@@ -1,4 +1,4 @@
-let version = "KKASH001"
+let version = "KKASH002"
 
 exception Wrong_version
 
@@ -126,6 +126,7 @@ let o_base_item_domain o (x: Base_item.domain) =
     | Veiled -> o_byte o 2
     | Misc -> o_byte o 3
     | Abyss_jewel -> o_byte o 4
+    | Unveiled -> o_byte o 5
 
 let i_base_item_domain i: Base_item.domain =
   match i_byte i with
@@ -134,6 +135,7 @@ let i_base_item_domain i: Base_item.domain =
     | 2 -> Veiled
     | 3 -> Misc
     | 4 -> Abyss_jewel
+    | 5 -> Unveiled
     | _ -> failwith "invalid base item domain"
 
 let o_base_item o ({ id; domain; item_class; name; tags }: Base_item.t) =

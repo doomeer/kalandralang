@@ -1146,6 +1146,22 @@ echo "Modifiers that can be added:"
 show_mod_pool
 ```
 
+#### Show Unveil Mod Pool
+
+`show_unveil_mod_pool` causes Kalandralang to output the mods that could be unveiled
+on the current item. This also shows the [Identifier](#identifiers) of each mod.
+
+This does not show mods that are blocked by other existing modifiers.
+It requires a veiled mod to be present and it only shows prefixes or suffixes, depending
+on whether the veiled mod is a prefix or suffix.
+
+Example:
+```sh
+veiled_chaos
+echo "Modifiers that can be unveiled:"
+show_unveil_mod_pool
+```
+
 ### Amounts
 
 Amounts are sequences of numbers followed by currencies.

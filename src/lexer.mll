@@ -34,6 +34,7 @@
     | "echo" -> ECHO
     | "show" -> SHOW
     | "show_mod_pool" -> SHOW_MOD_POOL
+    | "show_unveil_mod_pool" -> SHOW_UNVEIL_MOD_POOL
     (* Conditions *)
     | "true" -> TRUE
     | "false" -> FALSE

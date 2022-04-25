@@ -54,7 +54,6 @@ let eldritch_tier_of_currency: eldritch_currency_tier -> Mod.eldritch_tier = fun
   | Exceptional -> Exceptional
 
 (* TODO: orb of conflict (or is it dominance? the maven one) *)
-(* TODO: show_veiled_mod_pool *)
 (* TODO: harvest reforge lucky *)
 (* TODO: harvest reforge keep prefix/suffix lucky *)
 (* TODO: conditions on rarity *)
@@ -416,6 +415,7 @@ type simple_instruction =
   | Echo of string
   | Show
   | Show_mod_pool
+  | Show_unveil_mod_pool
 
 let pp_simple_instruction instruction =
   let open Pretext in
@@ -442,6 +442,8 @@ let pp_simple_instruction instruction =
         atom "show"
     | Show_mod_pool ->
         atom "show_mod_pool"
+    | Show_unveil_mod_pool ->
+        atom "show_unveil_mod_pool"
 
 type instruction_node =
   | Noop

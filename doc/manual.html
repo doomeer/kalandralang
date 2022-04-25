@@ -167,6 +167,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#echo">Echo</a></li>
 <li><a href="#show">Show</a></li>
 <li><a href="#show-mod-pool">Show Mod Pool</a></li>
+<li><a href="#show-unveil-mod-pool">Show Unveil Mod Pool</a></li>
 </ul></li>
 <li><a href="#amounts">Amounts</a></li>
 <li><a href="#conditions">Conditions</a><ul>
@@ -1320,6 +1321,13 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <p>Example:</p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb61-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be added:&quot;</span></a>
 <a class="sourceLine" id="cb61-2" title="2"><span class="ex">show_mod_pool</span></a></code></pre></div>
+<h4 id="show-unveil-mod-pool">Show Unveil Mod Pool</h4>
+<p><code>show_unveil_mod_pool</code> causes Kalandralang to output the mods that could be unveiled on the current item. This also shows the <a href="#identifiers">Identifier</a> of each mod.</p>
+<p>This does not show mods that are blocked by other existing modifiers. It requires a veiled mod to be present and it only shows prefixes or suffixes, depending on whether the veiled mod is a prefix or suffix.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="ex">veiled_chaos</span></a>
+<a class="sourceLine" id="cb62-2" title="2"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be unveiled:&quot;</span></a>
+<a class="sourceLine" id="cb62-3" title="3"><span class="ex">show_unveil_mod_pool</span></a></code></pre></div>
 <h3 id="amounts">Amounts</h3>
 <p>Amounts are sequences of numbers followed by currencies. More precisely, amounts are of the form <code>(&lt;number&gt; &lt;currency&gt;)*</code>. For instance:</p>
 <ul>
@@ -1379,11 +1387,11 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </table>
 <h4 id="parentheses">Parentheses</h4>
 <p><code>not</code> has higher precedence than <code>and</code>, which has higher precedence than <code>or</code>. What this means is that the following expression:</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
 <p>Is equivalent to:</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="kw">((</span>not open_suffix) or (no_prefix and full_prefixes))</a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" title="1"><span class="kw">((</span>not open_suffix) or (no_prefix and full_prefixes))</a></code></pre></div>
 <p>Parentheses <code>( ... )</code> can be used around any condition. If operator precedence does not result in what you want, use parentheses. For instance:</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" title="1"><span class="ex">not</span> ((open_suffix or no_prefix) <span class="ex">and</span> full_prefixes)</a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb65-1" title="1"><span class="ex">not</span> ((open_suffix or no_prefix) <span class="ex">and</span> full_prefixes)</a></code></pre></div>
 <p>gives a completely different meaning to the expression. If you don't understand precedence, just use parentheses everywhere!</p>
 <h4 id="predicates-on-current-item">Predicates on Current Item</h4>
 <p>The following expressions are conditions that hold depending on the current item.</p>
