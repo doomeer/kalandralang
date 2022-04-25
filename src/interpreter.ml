@@ -136,6 +136,16 @@ let rec eval_condition state (condition: AST.condition) =
     | Full_suffixes ->
         with_item state @@ fun item ->
         Item.suffix_count item >= Item.max_suffix_count item
+    | Affix_count (min, max) ->
+        with_item state @@ fun item ->
+        let count = Item.prefix_count item + Item.suffix_count item in
+        min <= count && count <= max
+    | Open_affix ->
+        with_item state @@ fun item ->
+        Item.prefix_count item + Item.suffix_count item < Item.max_prefix_count item + Item.max_suffix_count item
+    | Full_affixes ->
+        with_item state @@ fun item ->
+        Item.prefix_count item + Item.suffix_count item >= Item.max_prefix_count item + Item.max_suffix_count item
 
 let is_done state =
   state.point < 0 || state.point >= Array.length state.program.instructions
