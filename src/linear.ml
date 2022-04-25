@@ -119,6 +119,24 @@ let rec compile ({ node; loc }: AST.t): program =
           body;
           if_ loc (Not condition) repeat_label;
         ]
+    | Unveil_else ([], else_) ->
+        let else_ = compile else_ in
+        seql [
+          single loc (Simple (Unveil []));
+          else_;
+        ]
+    | Unveil_else (head :: tail as mods, else_) ->
+        let endunveil_label = AST.Label.fresh "endunveil" in
+        let else_ = compile else_ in
+        let has_one_of_the_mods =
+          List.fold_left (fun acc modifier -> AST.Or (acc, Has modifier)) (Has head) tail
+        in
+        seql [
+          single loc (Simple (Unveil mods));
+          if_ loc has_one_of_the_mods endunveil_label;
+          else_;
+          label endunveil_label;
+        ]
 
 let decompile { instructions; labels } =
   let label_map =

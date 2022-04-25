@@ -54,7 +54,6 @@ let eldritch_tier_of_currency: eldritch_currency_tier -> Mod.eldritch_tier = fun
   | Exceptional -> Exceptional
 
 (* TODO: orb of conflict (or is it dominance? the maven one) *)
-(* TODO: show_veiled_mod_pool *)
 (* TODO: harvest reforge lucky *)
 (* TODO: harvest reforge keep prefix/suffix lucky *)
 (* TODO: conditions on rarity *)
@@ -331,6 +330,9 @@ type condition =
   | Suffix_count of int * int
   | Open_suffix
   | Full_suffixes
+  | Affix_count of int * int
+  | Open_affix
+  | Full_affixes
 
 let maybe_parentheses use_parentheses document =
   let open Pretext in
@@ -375,7 +377,7 @@ let rec pp_condition ?(ctx = `top) condition =
     | Prefix_count (a, b) when a = b ->
         seq [ atom "prefix_count"; space; int a ]
     | Prefix_count (a, b) ->
-        seq [ atom "prefix_count"; space; int a; atom "-"; int b ]
+        seq [ atom "prefix_count"; space; int a; atom ".."; int b ]
     | Open_prefix ->
         atom "open_prefix"
     | Full_prefixes ->
@@ -385,11 +387,21 @@ let rec pp_condition ?(ctx = `top) condition =
     | Suffix_count (a, b) when a = b ->
         seq [ atom "suffix_count"; space; int a ]
     | Suffix_count (a, b) ->
-        seq [ atom "suffix_count"; space; int a; atom "-"; int b ]
+        seq [ atom "suffix_count"; space; int a; atom ".."; int b ]
     | Open_suffix ->
         atom "open_suffix"
     | Full_suffixes ->
         atom "full_suffixes"
+    | Affix_count (0, 0) ->
+        atom "no_affix"
+    | Affix_count (a, b) when a = b ->
+        seq [ atom "affix_count"; space; int a ]
+    | Affix_count (a, b) ->
+        seq [ atom "affix_count"; space; int a; atom ".."; int b ]
+    | Open_affix ->
+        atom "open_affix"
+    | Full_affixes ->
+        atom "full_affixes"
 
 type simple_instruction =
   | Goto of Label.t
@@ -403,6 +415,34 @@ type simple_instruction =
   | Echo of string
   | Show
   | Show_mod_pool
+  | Show_unveil_mod_pool
+  | Unveil of Id.t list
+
+let pp_unveil mods =
+  let open Pretext in
+  let last_mod = List.length mods - 1 in
+  let pp_mod i modifier =
+    box [
+      break;
+      box [
+        Id.pp modifier;
+        if i <> last_mod then
+          seq [
+            break;
+            atom "or";
+          ]
+        else
+          empty;
+      ];
+    ]
+  in
+  seq [
+    atom "unveil";
+    indent;
+    break;
+    box (List.mapi pp_mod mods);
+    dedent;
+  ]
 
 let pp_simple_instruction instruction =
   let open Pretext in
@@ -429,6 +469,10 @@ let pp_simple_instruction instruction =
         atom "show"
     | Show_mod_pool ->
         atom "show_mod_pool"
+    | Show_unveil_mod_pool ->
+        atom "show_unveil_mod_pool"
+    | Unveil mods ->
+        box [ pp_unveil mods ]
 
 type instruction_node =
   | Noop
@@ -439,6 +483,7 @@ type instruction_node =
   | Until of condition * t
   | While of condition * t
   | Repeat of t * condition
+  | Unveil_else of Id.t list * t
 
 and t = instruction_node node
 
@@ -516,6 +561,15 @@ let rec pp_instruction_node instruction =
             atom "until";
           ];
           block (pp_condition condition);
+        ]
+    | Unveil_else (mods, else_) ->
+        box [
+          box [
+            pp_unveil mods;
+            break;
+            atom "else";
+          ];
+          block (pp_instruction else_);
         ]
 
 and pp_instruction instruction =

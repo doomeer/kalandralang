@@ -39,11 +39,11 @@ Kalandralang supports:
 - most relevant Harvest crafts;
 - beastcrafting: imprinting and splitting items;
 - Betrayal crafting: Aisling;
+- unveiling;
 - influenced items;
 - synthesized items.
 
 Kalandralang does not support in particular:
-- unveiling;
 - Hollow and Sanctified Fossils;
 - Orb of Dominance;
 - lucky Harvest crafts;

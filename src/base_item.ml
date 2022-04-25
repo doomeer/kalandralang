@@ -4,6 +4,7 @@ type domain =
   | Item
   | Crafted
   | Veiled
+  | Unveiled
   | Misc (* tree-only jewels *)
   | Abyss_jewel
   | Flask
@@ -11,6 +12,7 @@ type domain =
 let show_domain = function
   | Item -> "Item"
   | Crafted -> "Crafted"
+  | Unveiled -> "Unveiled"
   | Veiled -> "Veiled"
   | Misc -> "Misc"
   | Abyss_jewel -> "Abyss_jewel"
@@ -27,6 +29,8 @@ let as_domain json =
         Some Crafted
     | "veiled" ->
         Some Veiled
+    | "unveiled" ->
+        Some Unveiled
     | "misc" ->
         Some Misc
     | "abyss_jewel" ->
@@ -83,7 +87,7 @@ let load filename =
     in
     List.iter handle_value (JSON.as_object values);
     match !domain with
-      | None | Some Crafted | Some Veiled ->
+      | None | Some (Crafted | Veiled | Unveiled) ->
           ()
       | Some (Item | Misc | Abyss_jewel | Flask as domain) ->
           let base_item =

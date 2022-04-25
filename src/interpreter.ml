@@ -136,6 +136,16 @@ let rec eval_condition state (condition: AST.condition) =
     | Full_suffixes ->
         with_item state @@ fun item ->
         Item.suffix_count item >= Item.max_suffix_count item
+    | Affix_count (min, max) ->
+        with_item state @@ fun item ->
+        let count = Item.prefix_count item + Item.suffix_count item in
+        min <= count && count <= max
+    | Open_affix ->
+        with_item state @@ fun item ->
+        Item.prefix_count item + Item.suffix_count item < Item.max_prefix_count item + Item.max_suffix_count item
+    | Full_affixes ->
+        with_item state @@ fun item ->
+        Item.prefix_count item + Item.suffix_count item >= Item.max_prefix_count item + Item.max_suffix_count item
 
 let is_done state =
   state.point < 0 || state.point >= Array.length state.program.instructions
@@ -494,6 +504,19 @@ let apply_currency state (currency: AST.currency) =
         in
         return item
 
+let show_mod_pool pool =
+  let total_weight = List.fold_left (fun acc (w, _) -> acc + w) 0 pool |> float in
+  let prefixes, suffixes = List.partition (fun (_, m) -> Mod.is_prefix m) pool in
+  let show_mod (w, (m: Mod.t)) =
+    let weight = Printf.sprintf "%.3f%%" (float w *. 100. /. total_weight) in
+    let padding = String.make (max 0 (6 - String.length weight)) ' ' in
+    echo "%s%s %s" padding weight
+      (Mod.show ~indentation: (String.length padding + String.length weight + 1)
+         With_ranges m)
+  in
+  List.iter show_mod prefixes;
+  List.iter show_mod suffixes
+
 let run_simple_instruction state (instruction: AST.simple_instruction) =
   match instruction with
     | Goto label ->
@@ -569,17 +592,39 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
     | Show_mod_pool ->
         with_item state @@ fun item ->
         let pool = Item.mod_pool item in
-        let total_weight = List.fold_left (fun acc (w, _) -> acc + w) 0 pool |> float in
-        let prefixes, suffixes = List.partition (fun (_, m) -> Mod.is_prefix m) pool in
-        let show_mod (w, (m: Mod.t)) =
-          let weight = Printf.sprintf "%.3f%%" (float w *. 100. /. total_weight) in
-          let padding = String.make (max 0 (6 - String.length weight)) ' ' in
-          echo "%s%s %s" padding weight
-            (Mod.show ~indentation: (String.length padding + String.length weight + 1)
-               With_ranges m)
+        show_mod_pool pool;
+        goto_next state
+    | Show_unveil_mod_pool ->
+        with_item state @@ fun item ->
+        let _, pool = Item.prepare_unveil item in
+        show_mod_pool pool;
+        goto_next state
+    | Unveil mods ->
+        with_item state @@ fun item ->
+        let item, unveiled_mods = Item.unveil item in
+        let chosen_mod =
+          let rec choose = function
+            | [] ->
+                (
+                  match unveiled_mods with
+                    | [] ->
+                        fail "no unveiled mod"
+                    | first :: _ ->
+                        first
+                )
+            | best :: other ->
+                let is_best modifier = Id.compare modifier.Mod.id best = 0 in
+                match List.find_opt is_best unveiled_mods with
+                  | None ->
+                      choose other
+                  | Some modifier ->
+                      modifier
+          in
+          choose mods
         in
-        List.iter show_mod prefixes;
-        List.iter show_mod suffixes;
+        let chosen_mod = { Item.modifier = chosen_mod; fractured = false } in
+        let item = { item with mods = chosen_mod :: item.mods } in
+        let state = { state with item = Some item } in
         goto_next state
 
 let run_instruction state (instruction: Linear.instruction AST.node) =

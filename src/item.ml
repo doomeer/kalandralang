@@ -160,6 +160,15 @@ let has_veiled_mod item =
   has_mod_group Mod.veiled_prefix_group item ||
   has_mod_group Mod.veiled_suffix_group item
 
+let is_veiled { modifier; _ } =
+  Id.compare modifier.Mod.group Mod.veiled_prefix_group = 0 ||
+  Id.compare modifier.Mod.group Mod.veiled_suffix_group = 0
+
+let has_unveiled_mod item =
+  List.exists
+    (function { modifier = { domain = Unveiled; _ }; _ } -> true | _ -> false)
+    item.mods
+
 let crafted_mod_count item =
   List.length (List.filter (fun { modifier; _ } -> Mod.is_crafted modifier) item.mods)
 
@@ -225,7 +234,7 @@ let full_mod_pool = memoize @@ fun (domain, item_tags) ->
 
 (* If [tag] is specified, restrict the mod pool to mods with this tag. *)
 let mod_pool ?(fossils = []) ?tag ?tag_more_common
-    ?(crafted = false) ?(only = Prefixes_and_suffixes)
+    ?(crafted = false) ?(unveiled = false) ?(only = Prefixes_and_suffixes)
     ?(mod_groups = Id.Set.empty) ?mod_group_multiplier item =
   let item_tags = tags item in
   let prefix_count = prefix_count item in
@@ -330,7 +339,11 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
                   else
                     Some (weight, modifier)
   in
-  let domain = if crafted then Base_item.Crafted else item.base.domain in
+  let domain =
+    if crafted then Base_item.Crafted else
+    if unveiled then Unveiled else
+      item.base.domain
+  in
   let mod_pool = List.filter_map can_spawn_mod (full_mod_pool (domain, item_tags)) in
   let mod_pool =
     match mod_group_multiplier with
@@ -663,15 +676,14 @@ let add_random_veiled_mod item =
           add_mod Mod.(by_id veiled_suffix_id) item
 
 let remove_random_mod_add_veiled_mod item =
-  if has_veiled_mod item then
-    fail "item already has a veiled modifier"
-  else
-    let item =
-      remove_random_mod item
-        ~respect_cannot_be_changed: true
-        ~respect_cannot_roll: false
-    in
-    add_random_veiled_mod item
+  if has_veiled_mod item then fail "item already has a veiled modifier";
+  if has_unveiled_mod item then fail "item already has an unveiled modifier";
+  let item =
+    remove_random_mod item
+      ~respect_cannot_be_changed: true
+      ~respect_cannot_roll: false
+  in
+  add_random_veiled_mod item
 
 (* [tag] is only applied to the first added mod. *)
 let reforge_rare_with_veiled_mod item =
@@ -806,3 +818,42 @@ let reforge_with_mod_group_multiplier mod_group_multiplier item =
     List.filter_map get_group item.mods |> Id.Set.of_list
   in
   reforge_rare ~mod_groups ~mod_group_multiplier item
+
+let prepare_unveil item =
+  let veiled_mods, not_veiled_mods = List.partition is_veiled item.mods in
+  let veiled_mod =
+    match veiled_mods with
+      | [] ->
+          fail "item has no veiled mod"
+      | _ :: _ :: _ ->
+          fail "item has several veiled mods"
+      | [ x ] ->
+          x
+  in
+  let item = { item with mods = not_veiled_mods } in
+  let unveiled_mod_pool =
+    let only =
+      match veiled_mod.modifier.generation_type with
+        | Prefix -> Prefixes
+        | Suffix -> Suffixes
+        | _ -> fail "veiled mod is neither a prefix nor a suffix"
+    in
+    mod_pool ~unveiled: true ~only item
+  in
+  item, unveiled_mod_pool
+
+let remove_mod_group (modifier: Mod.t option) pool =
+  match modifier with
+    | None ->
+        pool
+    | Some { group; _ } ->
+        List.filter (fun (_, modifier) -> Id.compare modifier.Mod.group group <> 0) pool
+
+let unveil item =
+  let item, pool = prepare_unveil item in
+  let mod1 = random_from_pool pool in
+  let pool = remove_mod_group mod1 pool in
+  let mod2 = random_from_pool pool in
+  let pool = remove_mod_group mod2 pool in
+  let mod3 = random_from_pool pool in
+  item, List.filter_map Fun.id [ mod1; mod2; mod3 ]

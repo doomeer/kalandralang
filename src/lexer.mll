@@ -34,6 +34,8 @@
     | "echo" -> ECHO
     | "show" -> SHOW
     | "show_mod_pool" -> SHOW_MOD_POOL
+    | "show_unveil_mod_pool" -> SHOW_UNVEIL_MOD_POOL
+    | "unveil" -> UNVEIL
     (* Conditions *)
     | "true" -> TRUE
     | "false" -> FALSE
@@ -49,6 +51,10 @@
     | "no_suffix" -> NO_SUFFIX
     | "open_suffix" -> OPEN_SUFFIX
     | "full_suffixes" -> FULL_SUFFIXES
+    | "no_affix" -> NO_AFFIX
+    | "affix_count" -> AFFIX_COUNT
+    | "open_affix" -> OPEN_AFFIX
+    | "full_affixes" -> FULL_AFFIXES
     (* Currencies *)
     | "transmute" -> CURRENCY Orb_of_transmutation
     | "augment" -> CURRENCY Orb_of_augmentation
