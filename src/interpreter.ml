@@ -152,7 +152,7 @@ let goto_next state =
 
 let item_can_be_rare (item: Item.t) =
   match item.base.domain with
-    | Flask -> fail "item can't be rare"
+    | Flask -> fail "item cannot be rare"
     | _ -> ()
 
 let item_must_be_normal (item: Item.t) =
@@ -543,7 +543,7 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
                 fail "no imprint"
             | Some item, Some imprint ->
                 if item.split && not imprint.split then
-                    fail "can't apply imprint (can't revert to pre-split)"
+                    fail "cannot apply imprint (cannot revert to pre-split)"
                 else
                     imprint
         in

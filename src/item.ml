@@ -523,11 +523,11 @@ let spawn_additional_random_mods ?fossils ?tag_more_common ?only
       ?mod_groups ?mod_group_multiplier
   in
   let final_mod_count =
-    if item.base.domain == Flask then
-          let w1 = 50 in
-          let w2 = 50 in
-          let i = Random.int (w1 + w2) in
-          if i < w1 then 1 else 2
+    if item.base.domain = Flask then
+      let w1 = 50 in
+      let w2 = 50 in
+      let i = Random.int (w1 + w2) in
+      if i < w1 then 1 else 2
     else if Base_item.is_jewel item.base then
       let w3 = 65 in
       let w4 = 35 in
