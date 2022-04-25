@@ -589,6 +589,33 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         let _, pool = Item.prepare_unveil item in
         show_mod_pool pool;
         goto_next state
+    | Unveil mods ->
+        with_item state @@ fun item ->
+        let item, unveiled_mods = Item.unveil item in
+        let chosen_mod =
+          let rec choose = function
+            | [] ->
+                (
+                  match unveiled_mods with
+                    | [] ->
+                        fail "no unveiled mod"
+                    | first :: _ ->
+                        first
+                )
+            | best :: other ->
+                let is_best modifier = Id.compare modifier.Mod.id best = 0 in
+                match List.find_opt is_best unveiled_mods with
+                  | None ->
+                      choose other
+                  | Some modifier ->
+                      modifier
+          in
+          choose mods
+        in
+        let chosen_mod = { Item.modifier = chosen_mod; fractured = false } in
+        let item = { item with mods = chosen_mod :: item.mods } in
+        let state = { state with item = Some item } in
+        goto_next state
 
 let run_instruction state (instruction: Linear.instruction AST.node) =
   match instruction.node with

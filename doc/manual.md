@@ -636,7 +636,7 @@ The following keywords are instructions to apply currency to the current item.
 
 | Keyword | Currency |
 | --- | --- |
-| `veiled_chaos` | Veiled Chaos Orb |
+| `veiled_chaos` | Veiled Chaos Orb (see also [Unveiling](#unveiling)) |
 
 ##### Awakener's Orb
 
@@ -880,6 +880,49 @@ through the Immortal Syndicate on the current item.
 | Keyword | Craft |
 | --- | --- |
 | `aisling` | Aisling T4: remove a random modifier and add a new veiled modifier |
+
+##### Unveiling
+
+`unveil <mods> [else <instruction>]` is an instruction that unveils an item with
+a veiled modifier. `<mods>` is a list of modifier identifiers separated by `or`.
+The [Show Unveil Mod Pool](#show-unveil-mod-pool) instruction can be used to easily
+get the identifiers for the modifiers you want to unveil.
+If the first modifier in `<mods>` has been unveiled, it is chosen.
+Else, if the second modifier in this list has been unveiled, it is chosen.
+And so on. The optional `else` branch is executed if none of the modifiers were unveiled
+and another modifier had to be chosen instead.
+
+For instance, here is how to try to unveil life on an amulet:
+```sh
+buy "Metadata/Items/Amulets/Amulet9"
+veiled_chaos
+unveil "JunMasterVeiledBaseLifeAndManaRegen_"
+```
+Here is how to try to unveil life or area damage or projectile damage, in this order
+of priority:
+```sh
+buy "Metadata/Items/Amulets/Amulet9"
+veiled_chaos
+unveil
+  "JunMasterVeiledBaseLifeAndManaRegen_" or
+  "JunMasterVeiledAreaDamageAndAreaOfEffect" or
+  "JunMasterVeiledProjectileDamageAndProjectileSpeed"
+```
+Finally, here is how to unveil life or try again:
+```sh
+  buy "Metadata/Items/Amulets/Amulet9"
+.try_again:
+  veiled_chaos
+  unveil "JunMasterVeiledBaseLifeAndManaRegen_" else goto .try_again
+```
+This is equivalent to using an `if` as follows:
+```sh
+  buy "Metadata/Items/Amulets/Amulet9"
+.try_again:
+  veiled_chaos
+  unveil "JunMasterVeiledBaseLifeAndManaRegen_"
+  if not has "JunMasterVeiledBaseLifeAndManaRegen_" then goto .try_again
+```
 
 #### Set Aside
 

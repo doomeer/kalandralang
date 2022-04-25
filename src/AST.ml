@@ -416,6 +416,33 @@ type simple_instruction =
   | Show
   | Show_mod_pool
   | Show_unveil_mod_pool
+  | Unveil of Id.t list
+
+let pp_unveil mods =
+  let open Pretext in
+  let last_mod = List.length mods - 1 in
+  let pp_mod i modifier =
+    box [
+      break;
+      box [
+        Id.pp modifier;
+        if i <> last_mod then
+          seq [
+            break;
+            atom "or";
+          ]
+        else
+          empty;
+      ];
+    ]
+  in
+  seq [
+    atom "unveil";
+    indent;
+    break;
+    box (List.mapi pp_mod mods);
+    dedent;
+  ]
 
 let pp_simple_instruction instruction =
   let open Pretext in
@@ -444,6 +471,8 @@ let pp_simple_instruction instruction =
         atom "show_mod_pool"
     | Show_unveil_mod_pool ->
         atom "show_unveil_mod_pool"
+    | Unveil mods ->
+        box [ pp_unveil mods ]
 
 type instruction_node =
   | Noop
@@ -454,6 +483,7 @@ type instruction_node =
   | Until of condition * t
   | While of condition * t
   | Repeat of t * condition
+  | Unveil_else of Id.t list * t
 
 and t = instruction_node node
 
@@ -531,6 +561,15 @@ let rec pp_instruction_node instruction =
             atom "until";
           ];
           block (pp_condition condition);
+        ]
+    | Unveil_else (mods, else_) ->
+        box [
+          box [
+            pp_unveil mods;
+            break;
+            atom "else";
+          ];
+          block (pp_instruction else_);
         ]
 
 and pp_instruction instruction =

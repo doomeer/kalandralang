@@ -12,6 +12,7 @@
 %token BUY ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL SHOW_UNVEIL_MOD_POOL
 %token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD EXARCH EATER SYNTHESIZED
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN HAS
+%token UNVEIL
 %token PREFIX_COUNT NO_PREFIX OPEN_PREFIX FULL_PREFIXES
 %token SUFFIX_COUNT NO_SUFFIX OPEN_SUFFIX FULL_SUFFIXES
 %token AFFIX_COUNT NO_AFFIX OPEN_AFFIX FULL_AFFIXES
@@ -114,6 +115,18 @@ plus_fossils:
 |
   { [] }
 
+or_unveil_mods:
+| OR STRING or_unveil_mods
+  { Id.make $2 :: $3 }
+|
+  { [] }
+
+unveil_mods:
+| STRING or_unveil_mods
+  { Id.make $1 :: $2 }
+|
+  { [] }
+
 simple_instruction:
 | LABEL COLON
   { node @@ Label (AST.Label.make $1) }
@@ -147,6 +160,8 @@ simple_instruction:
   { node @@ Simple Show_unveil_mod_pool }
 | LBRACE instructions RBRACE
   { $2 }
+| UNVEIL unveil_mods
+  { node @@ Simple (Unveil $2) }
 
 instruction:
 | simple_instruction
@@ -161,6 +176,8 @@ instruction:
   { node @@ While ($2, $4) }
 | REPEAT simple_instruction UNTIL condition
   { node @@ Repeat ($2, $4) }
+| UNVEIL unveil_mods ELSE simple_instruction
+  { node @@ Unveil_else ($2, $4) }
 
 instructions:
 | instruction instructions

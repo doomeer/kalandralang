@@ -825,3 +825,19 @@ let prepare_unveil item =
     mod_pool ~unveiled: true ~only item
   in
   item, unveiled_mod_pool
+
+let remove_mod_group (modifier: Mod.t option) pool =
+  match modifier with
+    | None ->
+        pool
+    | Some { group; _ } ->
+        List.filter (fun (_, modifier) -> Id.compare modifier.Mod.group group <> 0) pool
+
+let unveil item =
+  let item, pool = prepare_unveil item in
+  let mod1 = random_from_pool pool in
+  let pool = remove_mod_group mod1 pool in
+  let mod2 = random_from_pool pool in
+  let pool = remove_mod_group mod2 pool in
+  let mod3 = random_from_pool pool in
+  item, List.filter_map Fun.id [ mod1; mod2; mod3 ]
