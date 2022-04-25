@@ -59,7 +59,7 @@ type display_options =
     no_total: bool;
     no_echo: bool;
     no_histogram: bool;
-    no_time:bool;
+    show_time:bool;
     summary: bool;
   }
 
@@ -318,10 +318,10 @@ let main () =
             ~description: "Do not output the histogram at the end of batch runs."
             false
         in
-        let no_time =
+        let show_time =
           Clap.flag
-            ~set_long: "no-time"
-            ~description: "Do not output the time the execution needs at the end of batch runs."
+            ~set_long: "show-time"
+            ~description: "Show how long the execution took."
             false
         in
         let summary =
@@ -361,7 +361,7 @@ let main () =
             no_total = no_total || summary;
             no_echo = no_echo || summary || short;
             no_histogram;
-            no_time;
+            show_time;
             summary;
           }
         in
@@ -485,7 +485,7 @@ let main () =
         let exec_time_start = Unix.gettimeofday () in
         let () = run_recipe compiled_recipe ~count ~display_options in
         let time_end = Unix.gettimeofday () in
-        if not display_options.no_time then (
+        if display_options.show_time then (
           echo "";
           if display_options.verbose then 
             echo "Overhead time:         %12fs%!" (exec_time_start -. run_time_start);
