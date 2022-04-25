@@ -1451,6 +1451,36 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td><code>full_suffixes</code></td>
 <td>Holds if the item cannot have more suffixes. This is <em>not</em> equivalent to <code>suffix_count 3</code> as it depends on the item's rarity.</td>
 </tr>
+<tr class="even">
+<td><code>has</code></td>
+<td><code>has &lt;identifier&gt;</code></td>
+<td>Holds if the item has the modifier denoted by the given identifier.</td>
+</tr>
+<tr class="odd">
+<td><code>affix_count</code></td>
+<td><code>affix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
+<td>Holds if the item has at least <code>&lt;number1&gt;</code> prefixes + suffixes and at most <code>&lt;number2&gt;</code> prefixes + suffixes.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>affix_count &lt;number&gt;</code></td>
+<td>Holds if the item has exactly the given number of prefix + suffix modifiers. Same as <code>affix_count &lt;number&gt;..&lt;number&gt;</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>no_affix</code></td>
+<td><code>no_affix</code></td>
+<td>Holds if the item has no prefix and no suffix. Same as <code>affix_count 0</code>.</td>
+</tr>
+<tr class="even">
+<td><code>open_affix</code></td>
+<td><code>open_affix</code></td>
+<td>Holds if the item has at least one open prefix or suffix. This is <em>not</em> equivalent to <code>affix_count 0..5</code> as it depends on the item's rarity.</td>
+</tr>
+<tr class="odd">
+<td><code>full_affixes</code></td>
+<td><code>full_affixes</code></td>
+<td>Holds if the item can have neither more prefixes nor more suffixes. This is <em>not</em> equivalent to <code>affix_count 6</code> as it depends on the item's rarity.</td>
+</tr>
 </tbody>
 </table>
 </body>
