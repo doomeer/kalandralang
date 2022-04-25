@@ -1282,7 +1282,6 @@ The following expressions are conditions that hold depending on the current item
 | `no_suffix` | `no_suffix` | Holds if the item has no suffixes. Same as `suffix_count 0`. |
 | `open_suffix` | `open_suffix` | Holds if the item has at least one open suffix. This is *not* equivalent to `suffix_count 0..2` as it depends on the item's rarity. |
 | `full_suffixes` | `full_suffixes` | Holds if the item cannot have more suffixes. This is *not* equivalent to `suffix_count 3` as it depends on the item's rarity. |
-| `has` | `has <identifier>` | Holds if the item has the modifier denoted by the given identifier. |
 | `affix_count` | `affix_count <number1>..<number2>` | Holds if the item has at least `<number1>` prefixes + suffixes and at most `<number2>` prefixes + suffixes. |
 | | `affix_count <number>` | Holds if the item has exactly the given number of prefix + suffix modifiers. Same as `affix_count <number>..<number>`. |
 | `no_affix` | `no_affix` | Holds if the item has no prefix and no suffix. Same as `affix_count 0`. |

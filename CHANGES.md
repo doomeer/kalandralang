@@ -10,6 +10,14 @@
 
 - You can now specify that your base item has Eldritch influence(s).
 
+### Betrayal Crafting
+
+- Added instruction `show_unveil_mod_pool` which outputs the list of mods that
+  can be unveiled on the current item.
+
+- Added instruction `unveil`, which allows you to unveil an item by specifying
+  which mods to select in priority.
+
 ### Fetching Costs
 
 - Command `write-ninja-costs` has been renamed to `update-costs`.
@@ -71,6 +79,9 @@
 - Added options to configure the output: --no-item, --no-cost, --no-total, --no-echo,
   --no-histogram, --short (short-hand: -s), --summary (short-hand: -S).
   Run `kalandralang run --help` to see a description of these options.
+
+- Added predicates `affix_count`, `no_affix`, `open_affix` and `full_affixes`.
+  (Contributed by AR-234.)
 
 ## Version 0.1.0
 
