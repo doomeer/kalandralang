@@ -323,7 +323,8 @@ let apply_currency state (currency: AST.currency) =
         in
         let item_influence = get_sec_influence "current item" item in
         let aside_influence = get_sec_influence "item set aside" aside in
-        if item_influence = aside_influence then fail "Current and item set aside have the same influence";
+        if Influence.compare_sec item_influence aside_influence = 0 then
+          fail "current item and set-aside item have the same influence";
         let random_influenced_mod_from (item: Item.t) influence =
           match Base_tag.get_influence_tag_for_tags item.base.tags influence with
             | None ->

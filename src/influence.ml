@@ -20,6 +20,8 @@ let show_sec = function
 let pp_sec sec =
   Pretext.atom (show_sec sec)
 
+let compare_sec = (Stdlib.compare: sec -> sec -> int)
+
 type t =
   | Not_influenced
   | Fractured
