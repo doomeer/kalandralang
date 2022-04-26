@@ -53,6 +53,9 @@
 
 ### Miscellaneous
 
+- Added support for flasks.
+  (Contributed by AR-234.)
+
 - You can now specify that your base is synthesized.
   You cannot specify the implicits but Kalandralang will prevent you from using
   crafts that cannot be performed on synthesized items.
@@ -80,7 +83,14 @@
   --no-histogram, --short (short-hand: -s), --summary (short-hand: -S).
   Run `kalandralang run --help` to see a description of these options.
 
+- Added option --show-time to display total and average crafting time
+  used by Kalandralang.
+  (Contributed by AR-234.)
+
 - Added predicates `affix_count`, `no_affix`, `open_affix` and `full_affixes`.
+  (Contributed by AR-234.)
+
+- You can no longer use an Awakener's Orb if both items have the same influence.
   (Contributed by AR-234.)
 
 ## Version 0.1.0
