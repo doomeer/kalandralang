@@ -487,11 +487,12 @@ let main () =
         let time_end = Unix.gettimeofday () in
         if display_options.show_time then (
           echo "";
-          if display_options.verbose then 
-            echo "Overhead time:         %12fs%!" (exec_time_start -. run_time_start);
-          if count > 0 then
-            echo "Average crafting time: %12fs%!" ((time_end -. exec_time_start) /. float_of_int count);
-          echo "Total crafting time:   %12fs%!" (time_end -. exec_time_start);
+          if display_options.verbose then
+            echo "Initialization time:   %12.3fs" (exec_time_start -. run_time_start);
+          if count > 1 then
+            echo "Average crafting time: %12.3fs"
+              ((time_end -. exec_time_start) /. float_of_int count);
+          echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
         );
 
     | `compile filename ->
