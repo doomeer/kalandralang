@@ -48,6 +48,6 @@ Kalandralang does not support in particular:
 - Orb of Dominance;
 - lucky Harvest crafts;
 - cluster jewels;
-- implicits other than Eldritch implicits.
+- implicits other than Eldritch implicits. (bless, divine and orb of conflict not implemented)
 
 See also the [Changelog](CHANGES.md).
