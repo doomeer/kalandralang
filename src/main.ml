@@ -63,7 +63,15 @@ type display_options =
     summary: bool;
   }
 
-let run_recipe recipe ~count ~display_options =
+type batch_options = 
+  {
+    count: int;
+    timeout: int;
+  }
+
+exception EndCrafting
+
+let run_recipe recipe ~batch_options ~display_options =
   let debug s = if display_options.verbose then print_endline s in
   let module A = Interpreter.Amount in
   let paid = ref A.zero in
@@ -82,68 +90,85 @@ let run_recipe recipe ~count ~display_options =
     else
       print_endline
   in
-  try
-    for i = 1 to count do
-      if
-        i > 1 && (
-          not display_options.no_item ||
-          not display_options.no_cost
-        )
-      then
-        echo "";
-      let state = Interpreter.(run (start ~echo: user_echo_function ~debug recipe)) in
-      paid := A.add !paid state.paid;
-      gained := A.add !gained state.gained;
-      let profit = A.sub state.gained state.paid |> A.to_chaos in
-      if profit >= 0. then
-        (
-          best_profit := max !best_profit profit;
-          incr profit_count;
-        )
-      else
-        (
-          worst_loss := min !worst_loss profit;
-          incr loss_count;
-        );
-      if not display_options.no_item then
-        Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
-      if not display_options.no_cost then (
-        echo "Cost:";
-        A.iter state.paid @@ fun currency amount ->
-        echo "%6d × %s" amount (AST.show_currency currency)
-      );
-      if not display_options.no_total then (
-        if A.is_zero state.gained then
-          echo "Total: %s" (show_amount state.paid)
+  let runCount = ref 0 in
+  let () = (
+    try
+      let timeout = 
+        if batch_options.timeout > 0 then
+          Unix.gettimeofday() +. float batch_options.timeout 
         else
-          echo "Total: %s — Profit: %s"
-            (show_amount state.paid)
-            (show_amount (A.sub state.gained state.paid));
+          Float.max_float
+      in
+      while !runCount<batch_options.count || ( batch_options.count = 1 && batch_options.timeout > 0 ) do
+        runCount := !runCount + 1;
+        if
+          !runCount > 1 && (
+            not display_options.no_item ||
+            not display_options.no_cost
+          )
+        then
+          echo "";
+        let state = Interpreter.(run (start ~echo: user_echo_function ~debug recipe)) in
+        paid := A.add !paid state.paid;
+        gained := A.add !gained state.gained;
+        let profit = A.sub state.gained state.paid |> A.to_chaos in
+        if profit >= 0. then
+          (
+            best_profit := max !best_profit profit;
+            incr profit_count;
+          )
+        else
+          (
+            worst_loss := min !worst_loss profit;
+            incr loss_count;
+          );
+        if not display_options.no_item then
+          Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
+        if not display_options.no_cost then (
+          echo "Cost:";
+          A.iter state.paid @@ fun currency amount ->
+          echo "%6d × %s" amount (AST.show_currency currency)
+        );
+        if not display_options.no_total then (
+          if A.is_zero state.gained then
+            echo "Total: %s" (show_amount state.paid)
+          else
+            echo "Total: %s — Profit: %s"
+              (show_amount state.paid)
+              (show_amount (A.sub state.gained state.paid));
+        );
+        if not display_options.no_histogram then
+          Histogram.add histogram (A.to_exalt state.paid);
+        if Unix.gettimeofday() > timeout then
+          raise EndCrafting;
+      done;
+      raise EndCrafting;
+    with 
+      | EndCrafting -> (
+        if display_options.summary || !runCount >= 2 then
+          let show_average = show_amount ~divide_by: !runCount in
+          echo "";
+          echo "Average cost (out of %d):" !runCount;
+          (
+            A.iter !paid @@ fun currency amount ->
+            echo "%9.2f × %s" (float amount /. float !runCount) (AST.show_currency currency)
+          );
+          if A.is_zero !gained then
+            echo "Total: %s" (show_average !paid)
+          else
+            echo "Total: %s — Profit: %s"
+              (show_average !paid)
+              (show_average (A.sub !gained !paid));
+          if not display_options.no_histogram && !runCount >= 2 then (
+            echo "";
+            Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
+          );
       );
-      if not display_options.no_histogram then
-        Histogram.add histogram (A.to_exalt state.paid);
-    done;
-    if display_options.summary || count >= 2 then
-      let show_average = show_amount ~divide_by: count in
-      echo "";
-      echo "Average cost (out of %d):" count;
-      (
-        A.iter !paid @@ fun currency amount ->
-        echo "%9.2f × %s" (float amount /. float count) (AST.show_currency currency)
-      );
-      if A.is_zero !gained then
-        echo "Total: %s" (show_average !paid)
-      else
-        echo "Total: %s — Profit: %s"
-          (show_average !paid)
-          (show_average (A.sub !gained !paid));
-      if not display_options.no_histogram && count >= 2 then (
-        echo "";
-        Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
-      )
-  with Interpreter.Failed (state, exn) ->
-    Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
-    echo "Error: %s" (Printexc.to_string exn)
+      | Interpreter.Failed (state, exn) ->
+          Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
+          echo "Error: %s" (Printexc.to_string exn);
+  ) in
+  !runCount
 
 let cache_filename = "data/kalandralang.cache"
 
@@ -261,6 +286,16 @@ let main () =
             ~description: "How many times to run the recipe."
             1
         in
+        let timeout =
+          Clap.default_int
+            ~long: "timeout"
+            ~short: 't'
+            ~description: 
+              "Safly terminate crafting when timeout in seconds is reached. \
+               When count is not provided or 1 recepies will be simulated till \
+               timeout is reached."
+            0
+        in
         let verbose =
           Clap.flag
             ~set_long: "verbose"
@@ -365,7 +400,13 @@ let main () =
             summary;
           }
         in
-        `run (filename, count, seed, display_options)
+        let batch_options = 
+          {
+            count;
+            timeout;
+          }
+        in
+        `run (filename, batch_options, seed, display_options)
       );
       (
         Clap.case "format"
@@ -459,8 +500,10 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, count, seed, display_options) ->
-        if count <= 0 then
+    | `run (filename, batch_options, seed, display_options) ->
+        if batch_options.timeout < 0 then
+          fail "Timeout needs to be a positive number";
+        if batch_options.count <= 0 then
           fail "Count can't be smaller then 1";
         let run_time_start = Unix.gettimeofday () in
         let recipe = parse_recipe filename in
@@ -483,15 +526,15 @@ let main () =
         );
 
         let exec_time_start = Unix.gettimeofday () in
-        let () = run_recipe compiled_recipe ~count ~display_options in
+        let runCount = run_recipe compiled_recipe ~batch_options ~display_options in
         let time_end = Unix.gettimeofday () in
         if display_options.show_time then (
           echo "";
           if display_options.verbose then
             echo "Initialization time:   %12.3fs" (exec_time_start -. run_time_start);
-          if count > 1 then
+          if runCount > 1 then
             echo "Average crafting time: %12.3fs"
-              ((time_end -. exec_time_start) /. float_of_int count);
+              ((time_end -. exec_time_start) /. float runCount);
           echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
         );
 
