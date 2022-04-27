@@ -31,7 +31,7 @@ You can also find more examples in the
 
 Kalandralang supports:
 - basic currencies;
-- Eldricht currencies;
+- Eldricht currencies except Orb of Conflict;
 - Awakener's Orb;
 - essences;
 - most fossils;
@@ -46,8 +46,11 @@ Kalandralang supports:
 Kalandralang does not support in particular:
 - Hollow and Sanctified Fossils;
 - Orb of Dominance;
-- lucky Harvest crafts;
 - cluster jewels;
-- implicits other than Eldritch implicits. (bless, divine and orb of conflict not implemented)
+- implicits other than Eldritch implicits;
+- actual modifier values and currencies and crafts that affect those values
+  (Blessed Orb, Divine Orb, Harvest rerolls, lucky Harvest reforges) — currently
+  Kalandralang just displays a random value in the range of possible values;
+- Orb of Conflict.
 
 See also the [Changelog](CHANGES.md).
