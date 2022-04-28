@@ -66,7 +66,8 @@ type display_options =
 type batch_options = 
   {
     count: int;
-    timeout: int;
+    timeout: int option;
+    loop: bool;
   }
 
 let run_recipe recipe ~batch_options ~display_options =
@@ -89,15 +90,39 @@ let run_recipe recipe ~batch_options ~display_options =
       print_endline
   in
   let runCount = ref 0 in
+  let display_summary () = 
+    if display_options.summary || !runCount >= 2 then
+      let show_average = show_amount ~divide_by: !runCount in
+      echo "";
+      echo "Average cost (out of %d):" !runCount;
+      (
+        A.iter !paid @@ fun currency amount ->
+        echo "%9.2f × %s" (float amount /. float !runCount) (AST.show_currency currency)
+      );
+      if A.is_zero !gained then
+        echo "Total: %s" (show_average !paid)
+      else
+        echo "Total: %s — Profit: %s"
+          (show_average !paid)
+          (show_average (A.sub !gained !paid));
+      if not display_options.no_histogram && !runCount >= 2 then (
+        echo "";
+        Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
+      );
+  in
   let () = (
     try
       let timeout = 
-        if batch_options.timeout > 0 then
-          Unix.gettimeofday() +. float batch_options.timeout 
-        else
-          Float.max_float
+        match batch_options.timeout with
+          | None ->
+            Float.max_float
+          | Some timeout -> 
+            if timeout > 0 then
+              Unix.gettimeofday() +. float timeout
+            else
+              fail "Timeout needs to be a possitve number."
       in
-      while !runCount<batch_options.count || ( batch_options.count = 1 && batch_options.timeout > 0 ) do
+      while !runCount < batch_options.count || batch_options.loop do
         if
           !runCount > 1 && (
             not display_options.no_item ||
@@ -139,28 +164,14 @@ let run_recipe recipe ~batch_options ~display_options =
         
         runCount := !runCount + 1;
       done;
-      raise Interpreter.EndCrafting;
+      display_summary()
     with 
-      | Interpreter.EndCrafting -> (
-        if display_options.summary || !runCount >= 2 then
-          let show_average = show_amount ~divide_by: !runCount in
-          echo "";
-          echo "Average cost (out of %d):" !runCount;
-          (
-            A.iter !paid @@ fun currency amount ->
-            echo "%9.2f × %s" (float amount /. float !runCount) (AST.show_currency currency)
-          );
-          if A.is_zero !gained then
-            echo "Total: %s" (show_average !paid)
-          else
-            echo "Total: %s — Profit: %s"
-              (show_average !paid)
-              (show_average (A.sub !gained !paid));
-          if not display_options.no_histogram && !runCount >= 2 then (
-            echo "";
-            Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
-          );
-      );
+      | Interpreter.Timeout ->
+        echo "Timeout reached";
+        display_summary()
+      | Interpreter.Abort ->
+        echo "Aborted";
+        display_summary()
       | Interpreter.Failed (state, exn) ->
           Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
           echo "Error: %s" (Printexc.to_string exn);
@@ -284,14 +295,23 @@ let main () =
             1
         in
         let timeout =
-          Clap.default_int
+          Clap.optional_int
             ~long: "timeout"
             ~short: 't'
-            ~description: 
-              "Safly terminate crafting when timeout in seconds is reached. \
-               When count is not provided or 1 recepies will be simulated till \
-               timeout is reached."
-            0
+            ~placeholder: "SECONDS"
+            ~description:
+              "Stop running after SECONDS, possibly interrupting the current craft. \
+               But still display the summary as usual."
+            ()
+        in
+        let loop =
+          Clap.flag
+            ~set_long: "loop"
+            ~description:
+              "Runs recipies in an infinite loop, until either manually aborted \
+              by the User (CTRL+C) or until the set timeout is reached. \
+              --count will be ignored!"
+            false
         in
         let verbose =
           Clap.flag
@@ -401,6 +421,7 @@ let main () =
           {
             count;
             timeout;
+            loop;
           }
         in
         `run (filename, batch_options, seed, display_options)
@@ -498,8 +519,6 @@ let main () =
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
     | `run (filename, batch_options, seed, display_options) ->
-        if batch_options.timeout < 0 then
-          fail "Timeout needs to be a positive number";
         if batch_options.count <= 0 then
           fail "Count can't be smaller then 1";
         let run_time_start = Unix.gettimeofday () in

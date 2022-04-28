@@ -646,16 +646,17 @@ let step state =
     Some (run_instruction state state.program.instructions.(state.point))
 
 exception Failed of state * exn
-exception EndCrafting
+exception Abort
+exception Timeout
 
 let run state timeout =
   let state = ref state in
   let exception Stop in
+  Sys.(set_signal sigint) (Signal_handle (fun _ -> raise Abort));
   try
-    Sys.(set_signal sigint) (Signal_handle (fun _ -> raise EndCrafting));
     while true do
       if Unix.gettimeofday() > timeout then
-        raise EndCrafting;
+        raise Timeout;
       match step !state with
         | None ->
             raise Stop
@@ -666,7 +667,9 @@ let run state timeout =
   with
     | Stop ->
         !state
-    | EndCrafting ->
-        raise EndCrafting
+    | Timeout ->
+        raise Timeout
+    | Abort ->
+        raise Abort
     | exn ->
         raise (Failed (!state, exn))
