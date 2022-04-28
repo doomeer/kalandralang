@@ -69,8 +69,6 @@ type batch_options =
     timeout: int;
   }
 
-exception EndCrafting
-
 let run_recipe recipe ~batch_options ~display_options =
   let debug s = if display_options.verbose then print_endline s in
   let module A = Interpreter.Amount in
@@ -100,7 +98,6 @@ let run_recipe recipe ~batch_options ~display_options =
           Float.max_float
       in
       while !runCount<batch_options.count || ( batch_options.count = 1 && batch_options.timeout > 0 ) do
-        runCount := !runCount + 1;
         if
           !runCount > 1 && (
             not display_options.no_item ||
@@ -108,7 +105,7 @@ let run_recipe recipe ~batch_options ~display_options =
           )
         then
           echo "";
-        let state = Interpreter.(run (start ~echo: user_echo_function ~debug recipe)) in
+        let state = Interpreter.(run (start ~echo: user_echo_function ~debug recipe) timeout) in
         paid := A.add !paid state.paid;
         gained := A.add !gained state.gained;
         let profit = A.sub state.gained state.paid |> A.to_chaos in
@@ -139,12 +136,12 @@ let run_recipe recipe ~batch_options ~display_options =
         );
         if not display_options.no_histogram then
           Histogram.add histogram (A.to_exalt state.paid);
-        if Unix.gettimeofday() > timeout then
-          raise EndCrafting;
+        
+        runCount := !runCount + 1;
       done;
-      raise EndCrafting;
+      raise Interpreter.EndCrafting;
     with 
-      | EndCrafting -> (
+      | Interpreter.EndCrafting -> (
         if display_options.summary || !runCount >= 2 then
           let show_average = show_amount ~divide_by: !runCount in
           echo "";
