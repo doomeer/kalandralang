@@ -120,7 +120,7 @@ let run_recipe recipe ~batch_options ~display_options =
             if timeout > 0 then
               Unix.gettimeofday() +. float timeout
             else
-              fail "Timeout needs to be a possitve number."
+              fail "Timeout must be positive."
       in
       while !runCount < batch_options.count || batch_options.loop do
         if
@@ -308,9 +308,9 @@ let main () =
           Clap.flag
             ~set_long: "loop"
             ~description:
-              "Runs recipies in an infinite loop, until either manually aborted \
-              by the User (CTRL+C) or until the set timeout is reached. \
-              --count will be ignored!"
+              "Run recipe in an infinite loop, until either manually aborted \
+              with CTRL+C or until --timeout is reached. \
+              Causes --count to be ignored."
             false
         in
         let verbose =
