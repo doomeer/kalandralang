@@ -1,4 +1,4 @@
-let version = "KKASH003"
+let version = "KKASH004"
 
 exception Wrong_version
 

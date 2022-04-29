@@ -179,6 +179,9 @@ let no_tier_3_eldritch_implicit_tag = Id.make "no_tier_3_eldritch_implicit"
 let no_tier_2_eldritch_implicit_tag = Id.make "no_tier_2_eldritch_implicit"
 let no_tier_1_eldritch_implicit_tag = Id.make "no_tier_1_eldritch_implicit"
 
+let chosen_name = Id.make "Chosen"
+let of_the_order_name = Id.make "of the Order"
+
 let load filename =
   let as_spawn_weight json =
     let tag = ref None in
@@ -214,6 +217,7 @@ let load filename =
       let tags = ref Id.Set.empty in
       let adds_tags = ref Id.Set.empty in
       let stats = ref [] in
+      let name = ref Id.empty in
       let handle_value (field, value) =
         match field with
           | "domain" ->
@@ -234,6 +238,8 @@ let load filename =
               )
           | "group" ->
               group := JSON.as_id value
+          | "name" ->
+              name := JSON.as_id value
           | "required_level" ->
               required_level := JSON.as_int value
           | "spawn_weights" ->
@@ -273,56 +279,67 @@ let load filename =
             ()
         | Some generation_type,
           Some domain ->
-            let spawn_weights = !spawn_weights in
-            let generation_type =
-              match generation_type with
-                | `Prefix -> Some Prefix
-                | `Suffix -> Some Suffix
-                | `Eater_implicit | `Exarch_implicit as generation_type ->
-                    let no_tier tag =
-                      List.exists (fun (t, w) -> w = 0 && Id.compare t tag = 0) spawn_weights
-                    in
-                    let tier =
-                      if no_tier no_tier_6_eldritch_implicit_tag then Some Lesser else
-                      if no_tier no_tier_5_eldritch_implicit_tag then Some Greater else
-                      if no_tier no_tier_4_eldritch_implicit_tag then Some Grand else
-                      if no_tier no_tier_3_eldritch_implicit_tag then Some Exceptional else
-                      if no_tier no_tier_2_eldritch_implicit_tag then Some Exquisite else
-                      if no_tier no_tier_1_eldritch_implicit_tag then Some Perfect else
-                        None
-                    in
-                    match tier with
-                      | None ->
-                          None
-                      | Some tier ->
-                          match generation_type with
-                            | `Eater_implicit -> Some (Eater_implicit tier)
-                            | `Exarch_implicit -> Some (Exarch_implicit tier)
+            let ignored_unveiled_mod =
+              match domain with
+                | Unveiled ->
+                    Id.compare !name chosen_name <> 0 &&
+                    Id.compare !name of_the_order_name <> 0
+                | _ ->
+                    false
             in
-            match generation_type with
-              | None ->
-                  ()
-              | Some generation_type ->
-                  let modifier =
-                    {
-                      id;
-                      domain;
-                      generation_type;
-                      group = !group;
-                      required_level = !required_level;
-                      spawn_weights;
-                      generation_weights = !generation_weights;
-                      tags = !tags;
-                      adds_tags = !adds_tags;
-                      stats = !stats;
-                    }
-                  in
-                  match Id.Map.find_opt id !id_map with
-                    | Some _ ->
-                        fail "%s: two items with id %s" filename (Id.show id)
-                    | None ->
-                        pool := modifier :: !pool;
-                        id_map := Id.Map.add id modifier !id_map
+            if not ignored_unveiled_mod then
+              let spawn_weights = !spawn_weights in
+              let generation_type =
+                match generation_type with
+                  | `Prefix -> Some Prefix
+                  | `Suffix -> Some Suffix
+                  | `Eater_implicit | `Exarch_implicit as generation_type ->
+                      let no_tier tag =
+                        List.exists
+                          (fun (t, w) -> w = 0 && Id.compare t tag = 0)
+                          spawn_weights
+                      in
+                      let tier =
+                        if no_tier no_tier_6_eldritch_implicit_tag then Some Lesser else
+                        if no_tier no_tier_5_eldritch_implicit_tag then Some Greater else
+                        if no_tier no_tier_4_eldritch_implicit_tag then Some Grand else
+                        if no_tier no_tier_3_eldritch_implicit_tag then Some Exceptional else
+                        if no_tier no_tier_2_eldritch_implicit_tag then Some Exquisite else
+                        if no_tier no_tier_1_eldritch_implicit_tag then Some Perfect else
+                          None
+                      in
+                      match tier with
+                        | None ->
+                            None
+                        | Some tier ->
+                            match generation_type with
+                              | `Eater_implicit -> Some (Eater_implicit tier)
+                              | `Exarch_implicit -> Some (Exarch_implicit tier)
+              in
+              match generation_type with
+                | None ->
+                    ()
+                | Some generation_type ->
+                    let modifier =
+                      {
+                        id;
+                        domain;
+                        generation_type;
+                        group = !group;
+                        required_level = !required_level;
+                        spawn_weights;
+                        generation_weights = !generation_weights;
+                        tags = !tags;
+                        adds_tags = !adds_tags;
+                        stats = !stats;
+                      }
+                    in
+                    match Id.Map.find_opt id !id_map with
+                      | Some _ ->
+                          fail "%s: two mods with id %s" filename (Id.show id)
+                      | None ->
+                          pool := modifier :: !pool;
+                          id_map := Id.Map.add id modifier !id_map
   in
   List.iter add_entry JSON.(parse_file filename |> as_object)
 
