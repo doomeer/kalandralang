@@ -63,7 +63,7 @@ type display_options =
     summary: bool;
   }
 
-type batch_options = 
+type batch_options =
   {
     count: int;
     timeout: int option;
@@ -90,7 +90,7 @@ let run_recipe recipe ~batch_options ~display_options =
       print_endline
   in
   let run_index = ref 0 in
-  let display_summary () = 
+  let display_summary () =
     if display_options.summary || !run_index >= 2 then
       let show_average = show_amount ~divide_by: !run_index in
       echo "";
@@ -112,15 +112,15 @@ let run_recipe recipe ~batch_options ~display_options =
   in
   let () = (
     try
-      let timeout = 
+      let timeout =
         match batch_options.timeout with
           | None ->
-            Float.max_float
-          | Some timeout -> 
-            if timeout > 0 then
-              Unix.gettimeofday() +. float timeout
-            else
-              fail "Timeout must be positive."
+              Float.max_float
+          | Some timeout ->
+              if timeout > 0 then
+                Unix.gettimeofday() +. float timeout
+              else
+                fail "Timeout must be positive."
       in
       while !run_index < batch_options.count || batch_options.loop do
         if
@@ -161,17 +161,17 @@ let run_recipe recipe ~batch_options ~display_options =
         );
         if not display_options.no_histogram then
           Histogram.add histogram (A.to_exalt state.paid);
-        
+
         run_index := !run_index + 1;
       done;
       display_summary()
-    with 
+    with
       | Interpreter.Timeout ->
-        echo "Timeout reached";
-        display_summary()
+          echo "Timeout reached";
+          display_summary()
       | Interpreter.Abort ->
-        echo "Aborted";
-        display_summary()
+          echo "Aborted";
+          display_summary()
       | Interpreter.Failed (state, exn) ->
           Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
           echo "Error: %s" (Printexc.to_string exn);
@@ -417,7 +417,7 @@ let main () =
             summary;
           }
         in
-        let batch_options = 
+        let batch_options =
           {
             count;
             timeout;
@@ -520,7 +520,7 @@ let main () =
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
     | `run (filename, batch_options, seed, display_options) ->
         if batch_options.count <= 0 then
-          fail "Count can't be smaller then 1";
+          fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
