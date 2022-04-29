@@ -89,15 +89,15 @@ let run_recipe recipe ~batch_options ~display_options =
     else
       print_endline
   in
-  let runCount = ref 0 in
+  let run_index = ref 0 in
   let display_summary () = 
-    if display_options.summary || !runCount >= 2 then
-      let show_average = show_amount ~divide_by: !runCount in
+    if display_options.summary || !run_index >= 2 then
+      let show_average = show_amount ~divide_by: !run_index in
       echo "";
-      echo "Average cost (out of %d):" !runCount;
+      echo "Average cost (out of %d):" !run_index;
       (
         A.iter !paid @@ fun currency amount ->
-        echo "%9.2f × %s" (float amount /. float !runCount) (AST.show_currency currency)
+        echo "%9.2f × %s" (float amount /. float !run_index) (AST.show_currency currency)
       );
       if A.is_zero !gained then
         echo "Total: %s" (show_average !paid)
@@ -105,7 +105,7 @@ let run_recipe recipe ~batch_options ~display_options =
         echo "Total: %s — Profit: %s"
           (show_average !paid)
           (show_average (A.sub !gained !paid));
-      if not display_options.no_histogram && !runCount >= 2 then (
+      if not display_options.no_histogram && !run_index >= 2 then (
         echo "";
         Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
       );
@@ -122,9 +122,9 @@ let run_recipe recipe ~batch_options ~display_options =
             else
               fail "Timeout must be positive."
       in
-      while !runCount < batch_options.count || batch_options.loop do
+      while !run_index < batch_options.count || batch_options.loop do
         if
-          !runCount > 1 && (
+          !run_index > 1 && (
             not display_options.no_item ||
             not display_options.no_cost
           )
@@ -162,7 +162,7 @@ let run_recipe recipe ~batch_options ~display_options =
         if not display_options.no_histogram then
           Histogram.add histogram (A.to_exalt state.paid);
         
-        runCount := !runCount + 1;
+        run_index := !run_index + 1;
       done;
       display_summary()
     with 
@@ -176,7 +176,7 @@ let run_recipe recipe ~batch_options ~display_options =
           Option.iter (fun item -> echo "%s" (Item.show item)) state.item;
           echo "Error: %s" (Printexc.to_string exn);
   ) in
-  !runCount
+  !run_index
 
 let cache_filename = "data/kalandralang.cache"
 
@@ -542,15 +542,15 @@ let main () =
         );
 
         let exec_time_start = Unix.gettimeofday () in
-        let runCount = run_recipe compiled_recipe ~batch_options ~display_options in
+        let run_index = run_recipe compiled_recipe ~batch_options ~display_options in
         let time_end = Unix.gettimeofday () in
         if display_options.show_time then (
           echo "";
           if display_options.verbose then
             echo "Initialization time:   %12.3fs" (exec_time_start -. run_time_start);
-          if runCount > 1 then
+          if run_index > 1 then
             echo "Average crafting time: %12.3fs"
-              ((time_end -. exec_time_start) /. float runCount);
+              ((time_end -. exec_time_start) /. float run_index);
           echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
         );
 
