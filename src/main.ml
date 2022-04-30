@@ -178,58 +178,6 @@ let run_recipe recipe ~batch_options ~display_options =
   ) in
   !run_index
 
-let cache_filename = "data/kalandralang.cache"
-
-let load_from_json () =
-  echo "Loading base_items.json...";
-  Base_item.load "data/base_items.json";
-  echo "Loading mods.json...";
-  Mod.load "data/mods.json";
-  echo "Loading stat_translations.json...";
-  Stat_translation.load "data/stat_translations.json";
-  echo "Loading essences.json...";
-  Essence.load "data/essences.json"
-
-let save_to_data () =
-  echo "Writing %s to speed up future loadings..." cache_filename;
-  Cache.export cache_filename;
-  echo "You can delete the JSON files now if you want."
-
-let load_from_data () =
-  echo "Loading %s..." cache_filename;
-  match Cache.import cache_filename with
-    | Failed_to_load ->
-        echo "Failed to read cache from: %s" cache_filename;
-        false
-    | Wrong_version ->
-        echo "%s is from a different version and cannot be loaded." cache_filename;
-        false
-    | Loaded ->
-        true
-
-let costs_json_filename = "data/costs.json"
-
-let load () =
-  if Sys.file_exists cache_filename then (
-    if not (load_from_data ()) then (
-      load_from_json ();
-      save_to_data ();
-    )
-  )
-  else (
-    load_from_json ();
-    save_to_data ();
-  );
-  if Sys.file_exists costs_json_filename then (
-    echo "Loading %s..." costs_json_filename;
-    Cost.load costs_json_filename;
-  )
-  else (
-    echo "%s does not exist, will use default values." costs_json_filename;
-    echo "Use the 'write-default-costs' or 'update-costs' command to create it.";
-  );
-  echo "Ready."
-
 let find pattern =
   let rex = rex_glob (String.lowercase_ascii pattern) in
   let matches s = String.lowercase_ascii s =~ rex in
@@ -404,6 +352,19 @@ let main () =
                unspecified, read the recipe from stdin."
             ()
         in
+        let data_dir =
+          let dir = Clap.optional_string
+            ~long: "data-dir"
+            ~placeholder: "PATH"
+            ~description: "Path to custom data directory."
+            ()
+          in
+          match dir with
+            | None ->
+                String.empty
+            | Some dir ->
+                dir
+        in
         let display_options =
           {
             verbose;
@@ -424,7 +385,7 @@ let main () =
             loop;
           }
         in
-        `run (filename, batch_options, seed, display_options)
+        `run (data_dir, filename, batch_options, seed, display_options)
       );
       (
         Clap.case "format"
@@ -477,7 +438,20 @@ let main () =
                case-insensitive."
             ()
         in
-        `find pattern
+        let data_dir =
+          let dir = Clap.optional_string
+            ~long: "data-dir"
+            ~placeholder: "PATH"
+            ~description: "Path to custom data directory."
+            ()
+          in
+          match dir with
+            | None ->
+                String.empty
+            | Some dir ->
+                dir
+        in
+        `find (data_dir,pattern)
       );
       (
         Clap.case "write-default-costs"
@@ -485,7 +459,20 @@ let main () =
             "Output default costs to data/costs.json. Warning: if you \
              customized this file, all your changes will be lost."
         @@ fun () ->
-        `write_default_costs
+        let data_dir =
+          let dir = Clap.optional_string
+            ~long: "data-dir"
+            ~placeholder: "PATH"
+            ~description: "Path to custom data directory."
+            ()
+          in
+          match dir with
+            | None ->
+                String.empty
+            | Some dir ->
+                dir
+        in
+        `write_default_costs (data_dir)
       );
       (
         Clap.case "update-costs"
@@ -509,7 +496,40 @@ let main () =
             ~description: "Folder name in The Forbidden Trove's repository."
             "lsc"
         in
-        `update_costs (ninja_league, tft_league)
+        let data_dir =
+          let dir = Clap.optional_string
+            ~long: "data-dir"
+            ~placeholder: "PATH"
+            ~description: "Path to custom data directory."
+            ()
+          in
+          match dir with
+            | None ->
+                String.empty
+            | Some dir ->
+                dir
+        in
+        `update_costs (data_dir, ninja_league, tft_league)
+      );
+      (
+        Clap.case "update-cache"
+          ~description:
+            "TODO-ADD description"
+        @@ fun () ->
+        let data_dir =
+          let dir = Clap.optional_string
+            ~long: "data-dir"
+            ~placeholder: "PATH"
+            ~description: "Path to custom data directory."
+            ()
+          in
+          match dir with
+            | None ->
+                String.empty
+            | Some dir ->
+                dir
+        in
+        `update_cache (data_dir)
       );
     ]
   in
@@ -518,13 +538,13 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, batch_options, seed, display_options) ->
+    | `run (data_dir, filename, batch_options, seed, display_options) ->
         if batch_options.count <= 0 then
           fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in
-        load ();
+        Data.load data_dir;
         Option.iter Random.init seed;
         if display_options.show_seed then (
           let seed =
@@ -562,15 +582,15 @@ let main () =
           Pretext.to_channel ~starting_level: 2 stdout (AST.pp decompiled_recipe)
         in
         Option.iter output decompiled_recipe
-    | `find pattern ->
-        load ();
+    | `find (data_dir, pattern) ->
+        Data.load data_dir;
         find pattern
-    | `write_default_costs ->
-        if not (Sys.file_exists "data") then Sys.mkdir "data" 0755;
-        Cost.write_defaults costs_json_filename
-    | `update_costs (ninja_league, tft_league) ->
-        if not (Sys.file_exists "data") then Sys.mkdir "data" 0755;
-        Ninja.write_costs ~ninja_league ~tft_league ~filename: costs_json_filename
+    | `write_default_costs (data_dir) ->
+        Data.write_default_costs data_dir
+    | `update_costs (data_dir, ninja_league, tft_league) ->
+        Data.update_costs data_dir ~ninja_league: ninja_league ~tft_league: tft_league
+    | `update_cache (data_dir) ->
+        Data.update_cache data_dir
 
 let backtrace = false
 
