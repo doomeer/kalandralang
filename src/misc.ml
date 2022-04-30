@@ -57,3 +57,14 @@ let memoize f =
           let y = f x in
           Hashtbl.add table x y;
           y
+
+let mkdir_p ~path ~perms =
+  let ps = String.split_on_char '/' path in
+  let rec aux acc = function [] -> ()
+  | p::ps ->
+      let this = String.concat Filename.dir_sep (List.rev (p::acc)) in
+      if this <> String.empty && not (Sys.file_exists this) then
+        Sys.mkdir this perms;
+      aux (p::acc) ps
+  in
+  aux [] ps

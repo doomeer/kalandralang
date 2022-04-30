@@ -1,26 +1,6 @@
 (* USES uri *)
-(* USES tls *)
-(* USES cohttp-lwt-unix *)
-(* USES lwt *)
 
 open Misc
-
-let (let*) = Lwt.bind
-let return = Lwt.return
-
-let http_get uri =
-  Lwt_main.run @@
-  let* (response, response_body) = Cohttp_lwt_unix.Client.call `GET uri in
-  let* response_body = Cohttp_lwt.Body.to_string response_body in
-  match response.status with
-    | #Cohttp.Code.success_status ->
-        return (Some (JSON.parse ~origin: "poe.ninja's response" response_body))
-    | status ->
-        echo "failed to fetch %s: %s - %s"
-          (Uri.to_string uri)
-          (Cohttp.Code.string_of_status status)
-          response_body;
-        return None
 
 let as_currencies = function
   | None ->
@@ -44,7 +24,7 @@ let get_currencies league =
     "type", "Currency";
     "language", "en";
   ]
-  |> http_get
+  |> Http_request.get_json "poe.ninja response"
   |> as_currencies
 
 let as_items = function
@@ -69,7 +49,7 @@ let get_items ~league item_type =
     "type", item_type;
     "language", "en";
   ]
-  |> http_get
+  |> Http_request.get_json "poe.ninja response"
   |> as_items
 
 let get_essences league =
@@ -104,7 +84,7 @@ let get_tft league filename =
   Uri.of_string
     ("https://raw.githubusercontent.com/The-Forbidden-Trove/tft-data-prices/master/" ^
      league ^ "/" ^ filename)
-  |> http_get
+  |> Http_request.get_json "TFT response"
   |> as_tft
 
 let write_costs ~ninja_league ~tft_league ~filename =
