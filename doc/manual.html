@@ -175,8 +175,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#conditions">Conditions</a><ul>
 <li><a href="#constants">Constants</a></li>
 <li><a href="#boolean-operators">Boolean Operators</a></li>
-<li><a href="#parentheses">Parentheses</a></li>
+<li><a href="#parentheses-in-conditions">Parentheses in Conditions</a></li>
 <li><a href="#predicates-on-current-item">Predicates on Current Item</a></li>
+<li><a href="#comparisons">Comparisons</a></li>
+</ul></li>
+<li><a href="#arithmetic-expressions">Arithmetic Expressions</a><ul>
+<li><a href="#constants-1">Constants</a></li>
+<li><a href="#operators">Operators</a></li>
+<li><a href="#parentheses-in-arithmetic-expressions">Parentheses in Arithmetic Expressions</a></li>
+<li><a href="#item-properties">Item Properties</a><ul>
+<li><a href="#modifier-tiers">Modifier Tiers</a></li>
+</ul></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1411,7 +1420,7 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </tr>
 </tbody>
 </table>
-<h4 id="parentheses">Parentheses</h4>
+<h4 id="parentheses-in-conditions">Parentheses in Conditions</h4>
 <p><code>not</code> has higher precedence than <code>and</code>, which has higher precedence than <code>or</code>. What this means is that the following expression:</p>
 <div class="sourceCode" id="cb67"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb67-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
 <p>Is equivalent to:</p>
@@ -1436,16 +1445,6 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Holds if the item has the modifier denoted by the given identifier.</td>
 </tr>
 <tr class="even">
-<td><code>prefix_count</code></td>
-<td><code>prefix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
-<td>Holds if the item has at least <code>&lt;number1&gt;</code> prefixes and at most <code>&lt;number2&gt;</code> prefixes.</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><code>prefix_count &lt;number&gt;</code></td>
-<td>Holds if the item has exactly the given number of prefix modifiers. Same as <code>prefix_count &lt;number&gt;..&lt;number&gt;</code>.</td>
-</tr>
-<tr class="even">
 <td><code>no_prefix</code></td>
 <td><code>no_prefix</code></td>
 <td>Holds if the item has no prefixes. Same as <code>prefix_count 0</code>.</td>
@@ -1461,16 +1460,6 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Holds if the item cannot have more prefixes. This is <em>not</em> equivalent to <code>prefix_count 3</code> as it depends on the item's rarity.</td>
 </tr>
 <tr class="odd">
-<td><code>suffix_count</code></td>
-<td><code>suffix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
-<td>Holds if the item has at least <code>&lt;number1&gt;</code> suffixes and at most <code>&lt;number2&gt;</code> suffixes.</td>
-</tr>
-<tr class="even">
-<td></td>
-<td><code>suffix_count &lt;number&gt;</code></td>
-<td>Holds if the item has exactly the given number of suffix modifiers. Same as <code>suffix_count &lt;number&gt;..&lt;number&gt;</code>.</td>
-</tr>
-<tr class="odd">
 <td><code>no_suffix</code></td>
 <td><code>no_suffix</code></td>
 <td>Holds if the item has no suffixes. Same as <code>suffix_count 0</code>.</td>
@@ -1484,16 +1473,6 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td><code>full_suffixes</code></td>
 <td><code>full_suffixes</code></td>
 <td>Holds if the item cannot have more suffixes. This is <em>not</em> equivalent to <code>suffix_count 3</code> as it depends on the item's rarity.</td>
-</tr>
-<tr class="even">
-<td><code>affix_count</code></td>
-<td><code>affix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
-<td>Holds if the item has at least <code>&lt;number1&gt;</code> prefixes + suffixes and at most <code>&lt;number2&gt;</code> prefixes + suffixes.</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td><code>affix_count &lt;number&gt;</code></td>
-<td>Holds if the item has exactly the given number of prefix + suffix modifiers. Same as <code>affix_count &lt;number&gt;..&lt;number&gt;</code>.</td>
 </tr>
 <tr class="even">
 <td><code>no_affix</code></td>
@@ -1512,5 +1491,186 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </tr>
 </tbody>
 </table>
+<p>The following expressions are deprecated and may be removed in future versions, use <a href="#comparisons">Comparisons</a> on <a href="#item-properties">Item Properties</a> instead:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Keyword</th>
+<th>Usage</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>prefix_count</code></td>
+<td><code>prefix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
+<td>Same as <code>&lt;number1&gt; &lt;= prefix_count &lt;= &lt;number2&gt;</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>prefix_count &lt;number&gt;</code></td>
+<td>Same as <code>prefix_count = &lt;number&gt;</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>suffix_count</code></td>
+<td><code>suffix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
+<td>Same as <code>&lt;number1&gt; &lt;= suffix_count &lt;= &lt;number2&gt;</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>suffix_count &lt;number&gt;</code></td>
+<td>Same as <code>suffix_count = &lt;number&gt;</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>affix_count</code></td>
+<td><code>affix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
+<td>Same as <code>&lt;number1&gt; &lt;= affix_count &lt;= &lt;number2&gt;</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>affix_count &lt;number&gt;</code></td>
+<td>Same as <code>affix_count = &lt;number&gt;</code>.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="comparisons">Comparisons</h4>
+<p>The following expressions allow to compare the result of <a href="#arithmetic-expressions">Arithmetic Expressions</a> together.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Usage</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>=</code></td>
+<td><code>&lt;expr1&gt; = &lt;expr2&gt;</code></td>
+<td><code>&lt;expr1&gt;</code> is equal to <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>&lt;&gt;</code></td>
+<td><code>&lt;expr1&gt; &lt;&gt; &lt;expr2&gt;</code></td>
+<td><code>&lt;expr1&gt;</code> is not equal to <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="odd">
+<td><code>&lt;</code></td>
+<td><code>&lt;expr1&gt; &lt; &lt;expr2&gt;</code></td>
+<td><code>&lt;expr1&gt;</code> is smaller than <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>&lt;=</code></td>
+<td><code>&lt;expr1&gt; &lt;= &lt;expr2&gt;</code></td>
+<td><code>&lt;expr1&gt;</code> is smaller than, or equal to <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="odd">
+<td><code>&gt;</code></td>
+<td><code>&lt;expr1&gt; &gt; &lt;expr2&gt;</code></td>
+<td><code>&lt;expr1&gt;</code> is greater than <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>&gt;=</code></td>
+<td><code>&lt;expr1&gt; &gt;= &lt;expr2&gt;</code></td>
+<td><code>&lt;expr1&gt;</code> is greater than, or equal to <code>&lt;expr2&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p>You can also write double comparisons <code>&lt;expr1&gt; &lt;operator1&gt; &lt;expr2&gt; &lt;operator2&gt; &lt;expr3&gt;</code>. Those are equivalent to <code>&lt;expr1&gt; &lt;operator1&gt; &lt;expr2&gt; and &lt;expr2&gt; &lt;operator2&gt; &lt;expr3&gt;</code>. For instance:</p>
+<pre><code>1 &lt;= prefix_count &lt;= 3
+</code></pre>
+<p>is a condition that holds if the current item has between 1 and 3 prefixes.</p>
+<h3 id="arithmetic-expressions">Arithmetic Expressions</h3>
+<p>Arithmetic expressions are expressions that evaluate into numbers. They can be used in <a href="#comparisons">Comparisons</a>.</p>
+<h4 id="constants-1">Constants</h4>
+<p>Integer constants are sequences of digits (<code>0</code> to <code>9</code>). Negative numbers are prefixed by a minus character (<code>-</code>). For instance, <code>1234</code>, <code>01</code> and <code>-32</code> are integer constants.</p>
+<h4 id="operators">Operators</h4>
+<p>The following expressions allow to perform arithmetic operations on arithmetic expressions.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Usage</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>-</code> (unary)</td>
+<td><code>- &lt;expr1&gt;</code></td>
+<td>Negation of <code>&lt;expr1&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>+</code></td>
+<td><code>&lt;expr1&gt; + &lt;expr2&gt;</code></td>
+<td>Addition of <code>&lt;expr1&gt;</code> and <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="odd">
+<td><code>-</code> (binary)</td>
+<td><code>&lt;expr1&gt; - &lt;expr2&gt;</code></td>
+<td>Subtraction of <code>&lt;expr1&gt;</code> and <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>*</code></td>
+<td><code>&lt;expr1&gt; * &lt;expr2&gt;</code></td>
+<td>Multiplication of <code>&lt;expr1&gt;</code> and <code>&lt;expr2&gt;</code></td>
+</tr>
+<tr class="odd">
+<td><code>/</code></td>
+<td><code>&lt;expr1&gt; / &lt;expr2&gt;</code></td>
+<td>Division of <code>&lt;expr1&gt;</code> by <code>&lt;expr2&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="parentheses-in-arithmetic-expressions">Parentheses in Arithmetic Expressions</h4>
+<p>Operators follow the usual precedence rules: <code>*</code> and <code>/</code> have higher precedence than <code>+</code> and <code>-</code> (binary). <code>-</code> (unary) have the highest precedence. All operators are left-associative.</p>
+<p>Parentheses <code>( ... )</code> can be used around any arithmetic expression.</p>
+<p>See also <a href="#parentheses-in-conditions">Parentheses in Conditions</a>.</p>
+<h4 id="item-properties">Item Properties</h4>
+<p>The following expressions allow to get numeric properties from the current item.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Keyword</th>
+<th>Usage</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>prefix_count</code></td>
+<td><code>prefix_count</code></td>
+<td>Evaluates to the number of prefixes the current item has.</td>
+</tr>
+<tr class="even">
+<td><code>suffix_count</code></td>
+<td><code>suffix_count</code></td>
+<td>Evaluates to the number of suffixes the current item has.</td>
+</tr>
+<tr class="odd">
+<td><code>affix_count</code></td>
+<td><code>affix_count</code></td>
+<td>Evaluates to the number of affixes (prefixes + suffixes) the current item has.</td>
+</tr>
+<tr class="even">
+<td><code>tier</code></td>
+<td><code>tier &lt;mod_group&gt;</code></td>
+<td>See <a href="#modifier-tiers">Modifier Tiers</a>.</td>
+</tr>
+</tbody>
+</table>
+<h5 id="modifier-tiers">Modifier Tiers</h5>
+<p>Mod groups are <a href="#identifiers">Identifiers</a> that are shared by several modifiers. For instance, all modifiers that add Strength are part of mod group <code>&quot;Strength&quot;</code>. The <a href="#finding-identifiers">Find Command</a> can tell you the mod group of modifiers.</p>
+<p>If the current item has a modifier from group <code>&lt;mod_group&gt;</code>, expression <code>tier &lt;mod_group&gt;</code> evaluates to the tier that this modifier has in this group. If the current item has no modifier from this group, this expression evaluates to 999.</p>
+<p>For instance, if the item has the best possible Strength modifier that can spawn on the current item, <code>tier &quot;Strength&quot;</code> evaluates to 1. If the item has the second best possible Strength modifier, this expression evaluates to 2, and so on.</p>
+<p>Note that tiers depend on the item. For instance, the best +#-# to Maximum Life modifier is not the same modifier for Body Armours and for Gloves. Tier 1 Life on Gloves adds 80 to 89 Life, while this mod is only Tier 5 on Body Armours.</p>
+<p>For instance, here is how to chaos spam an item until it has three attribute modifiers, either Tier 1 + Tier 1 + Tier 4 or better, or Tier 1 + Tier 2 + Tier 3 or better, or Tier 2 + Tier 2 + Tier 2 or better:</p>
+<pre><code>until
+  tier &quot;Dexterity&quot; +
+  tier &quot;Intelligence&quot; +
+  tier &quot;Strength&quot; &lt;= 6
+do
+  chaos
+</code></pre>
 </body>
 </html>

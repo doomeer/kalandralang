@@ -1244,7 +1244,7 @@ The following operators can be used to combine conditions:
 | `and` | `<condition> and <condition>` | Conjunction of two conditions: holds if both conditions hold |
 | `or` | `<condition> or <condition>` | Disjunction of two conditions: holds if at least one of the two conditions hold |
 
-#### Parentheses
+#### Parentheses in Conditions
 
 `not` has higher precedence than `and`, which has higher precedence than `or`.
 What this means is that the following expression:
@@ -1272,18 +1272,126 @@ The following expressions are conditions that hold depending on the current item
 | Keyword | Usage | Meaning |
 | --- | --- | --- |
 | `has` | `has <identifier>` | Holds if the item has the modifier denoted by the given identifier. |
-| `prefix_count` | `prefix_count <number1>..<number2>` | Holds if the item has at least `<number1>` prefixes and at most `<number2>` prefixes. |
-| | `prefix_count <number>` | Holds if the item has exactly the given number of prefix modifiers. Same as `prefix_count <number>..<number>`. |
 | `no_prefix` | `no_prefix` | Holds if the item has no prefixes. Same as `prefix_count 0`. |
 | `open_prefix` | `open_prefix` | Holds if the item has at least one open prefix. This is *not* equivalent to `prefix_count 0..2` as it depends on the item's rarity. |
 | `full_prefixes` | `full_prefixes` | Holds if the item cannot have more prefixes. This is *not* equivalent to `prefix_count 3` as it depends on the item's rarity. |
-| `suffix_count` | `suffix_count <number1>..<number2>` | Holds if the item has at least `<number1>` suffixes and at most `<number2>` suffixes. |
-| | `suffix_count <number>` | Holds if the item has exactly the given number of suffix modifiers. Same as `suffix_count <number>..<number>`. |
 | `no_suffix` | `no_suffix` | Holds if the item has no suffixes. Same as `suffix_count 0`. |
 | `open_suffix` | `open_suffix` | Holds if the item has at least one open suffix. This is *not* equivalent to `suffix_count 0..2` as it depends on the item's rarity. |
 | `full_suffixes` | `full_suffixes` | Holds if the item cannot have more suffixes. This is *not* equivalent to `suffix_count 3` as it depends on the item's rarity. |
-| `affix_count` | `affix_count <number1>..<number2>` | Holds if the item has at least `<number1>` prefixes + suffixes and at most `<number2>` prefixes + suffixes. |
-| | `affix_count <number>` | Holds if the item has exactly the given number of prefix + suffix modifiers. Same as `affix_count <number>..<number>`. |
 | `no_affix` | `no_affix` | Holds if the item has no prefix and no suffix. Same as `affix_count 0`. |
 | `open_affix` | `open_affix` | Holds if the item has at least one open prefix or suffix. This is *not* equivalent to `affix_count 0..5` as it depends on the item's rarity. |
 | `full_affixes` | `full_affixes` | Holds if the item can have neither more prefixes nor more suffixes. This is *not* equivalent to `affix_count 6` as it depends on the item's rarity. |
+
+The following expressions are deprecated and may be removed in future versions,
+use [Comparisons](#comparisons) on [Item Properties](#item-properties) instead:
+
+| Keyword | Usage | Meaning |
+| --- | --- | --- |
+| `prefix_count` | `prefix_count <number1>..<number2>` | Same as `<number1> <= prefix_count <= <number2>`. |
+| | `prefix_count <number>` | Same as `prefix_count = <number>`. |
+| `suffix_count` | `suffix_count <number1>..<number2>` | Same as `<number1> <= suffix_count <= <number2>`. |
+| | `suffix_count <number>` | Same as `suffix_count = <number>`. |
+| `affix_count` | `affix_count <number1>..<number2>` | Same as `<number1> <= affix_count <= <number2>`. |
+| | `affix_count <number>` | Same as `affix_count = <number>`. |
+
+#### Comparisons
+
+The following expressions allow to compare the result of
+[Arithmetic Expressions](#arithmetic-expressions) together.
+
+| Operator | Usage | Meaning |
+| --- | --- | --- |
+| `=` | `<expr1> = <expr2>` | `<expr1>` is equal to `<expr2>` |
+| `<>` | `<expr1> <> <expr2>` | `<expr1>` is not equal to `<expr2>` |
+| `<` | `<expr1> < <expr2>` | `<expr1>` is smaller than `<expr2>` |
+| `<=` | `<expr1> <= <expr2>` | `<expr1>` is smaller than, or equal to `<expr2>` |
+| `>` | `<expr1> > <expr2>` | `<expr1>` is greater than `<expr2>` |
+| `>=` | `<expr1> >= <expr2>` | `<expr1>` is greater than, or equal to `<expr2>` |
+
+You can also write double comparisons `<expr1> <operator1> <expr2> <operator2> <expr3>`.
+Those are equivalent to `<expr1> <operator1> <expr2> and <expr2> <operator2> <expr3>`.
+For instance:
+```
+1 <= prefix_count <= 3
+```
+is a condition that holds if the current item has between 1 and 3 prefixes.
+
+### Arithmetic Expressions
+
+Arithmetic expressions are expressions that evaluate into numbers.
+They can be used in [Comparisons](#comparisons).
+
+#### Constants
+
+Integer constants are sequences of digits (`0` to `9`).
+Negative numbers are prefixed by a minus character (`-`).
+For instance, `1234`, `01` and `-32` are integer constants.
+
+#### Operators
+
+The following expressions allow to perform arithmetic operations on
+arithmetic expressions.
+
+| Operator | Usage | Meaning |
+| --- | --- | --- |
+| `-` (unary) | `- <expr1>` | Negation of `<expr1>` |
+| `+` | `<expr1> + <expr2>` | Addition of `<expr1>` and `<expr2>` |
+| `-` (binary) | `<expr1> - <expr2>` | Subtraction of `<expr1>` and `<expr2>` |
+| `*` | `<expr1> * <expr2>` | Multiplication of `<expr1>` and `<expr2>` |
+| `/` | `<expr1> / <expr2>` | Division of `<expr1>` by `<expr2>` |
+
+#### Parentheses in Arithmetic Expressions
+
+Operators follow the usual precedence rules:
+`*` and `/` have higher precedence than `+` and `-` (binary).
+`-` (unary) have the highest precedence.
+All operators are left-associative.
+
+Parentheses `( ... )` can be used around any arithmetic expression.
+
+See also [Parentheses in Conditions](#parentheses-in-conditions).
+
+#### Item Properties
+
+The following expressions allow to get numeric properties from the current item.
+
+| Keyword | Usage | Meaning |
+| --- | --- | --- |
+| `prefix_count` | `prefix_count` | Evaluates to the number of prefixes the current item has. |
+| `suffix_count` | `suffix_count` | Evaluates to the number of suffixes the current item has. |
+| `affix_count` | `affix_count` | Evaluates to the number of affixes (prefixes + suffixes) the current item has. |
+| `tier` | `tier <mod_group>` | See [Modifier Tiers](#modifier-tiers). |
+
+##### Modifier Tiers
+
+Mod groups are [Identifiers](#identifiers) that are shared by several modifiers.
+For instance, all modifiers that add Strength are part of mod group `"Strength"`.
+The [Find Command](#finding-identifiers) can tell you the mod group of modifiers.
+
+If the current item has a modifier from group `<mod_group>`,
+expression `tier <mod_group>` evaluates to the tier that this modifier has in this group.
+If the current item has no modifier from this group, this expression
+evaluates to 999.
+
+For instance, if the item has the best possible Strength modifier that can spawn
+on the current item, `tier "Strength"` evaluates to 1.
+If the item has the second best possible Strength modifier,
+this expression evaluates to 2, and so on.
+
+Note that tiers depend on the item. For instance, the best +#-# to Maximum Life
+modifier is not the same modifier for Body Armours and for Gloves.
+Tier 1 Life on Gloves adds 80 to 89 Life, while this mod is only Tier 5 on
+Body Armours.
+
+For instance, here is how to chaos spam an item until it has three attribute
+modifiers, either Tier 1 + Tier 1 + Tier 4 or better,
+or Tier 1 + Tier 2 + Tier 3 or better,
+or Tier 2 + Tier 2 + Tier 2 or better:
+```
+until
+  tier "Dexterity" +
+  tier "Intelligence" +
+  tier "Strength" <= 6
+do
+  chaos
+```
