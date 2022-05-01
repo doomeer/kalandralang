@@ -30,6 +30,7 @@ let pp id =
 module Set =
 struct
   include Set.Make (M)
+  let show set = String.concat ", " (List.map show (elements set))
   let pp set = Pretext.OCaml.list pp (elements set)
 end
 

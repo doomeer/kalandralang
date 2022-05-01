@@ -48,55 +48,6 @@ let pp { base; level; tags; rarity; mods; split; influence } =
     "influence", Influence.pp influence;
   ]
 
-let show_modifier { modifier; fractured } =
-  Mod.show ~fractured With_random_values modifier
-
-let show item =
-  let compare_mods
-      { modifier = a; fractured = _ }
-      { modifier = b; fractured = _ } =
-    match a.Mod.domain, b.Mod.domain with
-      | Item, Crafted -> -1
-      | Crafted, Item -> 1
-      | _ ->
-          let int_of_generation_type = function
-            | Mod.Exarch_implicit _ -> 0
-            | Mod.Eater_implicit _ -> 1
-            | Mod.Prefix -> 2
-            | Mod.Suffix -> 3
-          in
-          let c =
-            Int.compare
-              (int_of_generation_type a.Mod.generation_type)
-              (int_of_generation_type b.Mod.generation_type)
-          in
-          if c <> 0 then c else Id.compare a.id b.id
-  in
-  let mods = List.sort compare_mods item.mods in
-  let rarity = show_rarity item.rarity in
-  let influence =
-    match item.influence with
-      | Not_influenced ->
-          ""
-      | Fractured ->
-          " (Fractured)"
-      | Synthesized ->
-          " (Synthesized)"
-      | SEC sec ->
-          " (" ^ Influence.show_sec sec ^ ")"
-      | SEC_pair (sec1, sec2) ->
-          " (" ^ Influence.show_sec sec1 ^ " / " ^ Influence.show_sec sec2 ^ ")"
-      | Exarch ->
-          " (Exarch)"
-      | Eater ->
-          " (Eater)"
-      | Exarch_and_eater ->
-          " (Exarch / Eater)"
-  in
-  let split = if item.split then [ "Split" ] else [] in
-  "--------\n" ^ Id.show item.base.name ^ " (" ^ rarity ^ ")" ^ influence ^ "\n--------\n" ^
-  String.concat "\n" (List.map show_modifier mods @ split) ^ "\n--------"
-
 let set_rarity rarity item =
   { item with rarity }
 
@@ -231,6 +182,109 @@ let full_mod_pool = memoize @@ fun (domain, item_tags) ->
                     Some (weight, modifier)
   in
   List.filter_map can_spawn_mod !Mod.pool
+
+let mod_tier =
+  let sort_mod_group = memoize @@ fun (domain, item_tags, mod_group) ->
+    let pool =
+      let has_mod_group (_, modifier) =
+        if Id.compare modifier.Mod.group mod_group = 0 then
+          Some modifier
+        else
+          None
+      in
+      full_mod_pool (domain, item_tags)
+      |> List.filter_map has_mod_group
+    in
+    let exception Same in
+    (* [mod2] and [mod1] are reversed because we want to sort in reverse order. *)
+    let by_ilvl_or_stat (mod2: Mod.t) (mod1: Mod.t) =
+      let c = Int.compare mod1.required_level mod2.required_level in
+      if c <> 0 then c else
+        (* Both mods require the same ilvl.
+           So we try to sort by stats instead. *)
+        let sum_stats (modifier: Mod.t) =
+          let add_stats acc ({ id = _; min; max }: Mod.stat) = acc + min + max in
+          List.fold_left add_stats 0 modifier.stats
+        in
+        let c = Int.compare (sum_stats mod1) (sum_stats mod2) in
+        if c <> 0 then c else raise Same
+    in
+    try
+      Some (List.sort by_ilvl_or_stat pool)
+    with Same ->
+      None
+  in
+  let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_group, mod_id) ->
+    match sort_mod_group (domain, item_tags, mod_group) with
+      | None ->
+          None
+      | Some sorted_group ->
+          let rec find_mod tier = function
+            | [] ->
+                None
+            | head :: tail ->
+                if Id.compare head.Mod.id mod_id = 0 then
+                  Some tier
+                else
+                  find_mod (tier + 1) tail
+          in
+          find_mod 1 sorted_group
+  in
+  fun item (modifier: Mod.t) ->
+    (* We use [item.base.tags] and not the [tags] function
+       because we don't want the mod pool to be modified by added tags such as
+       [has_flat_intelligence_mod] when computing tiers. *)
+    mod_tier_memoized (modifier.domain, item.base.tags, modifier.group, modifier.id)
+
+let show_modifier item { modifier; fractured } =
+  let tier = mod_tier item modifier in
+  Mod.show ?tier ~fractured With_random_values modifier
+
+let show item =
+  let compare_mods
+      { modifier = a; fractured = _ }
+      { modifier = b; fractured = _ } =
+    match a.Mod.domain, b.Mod.domain with
+      | Item, Crafted -> -1
+      | Crafted, Item -> 1
+      | _ ->
+          let int_of_generation_type = function
+            | Mod.Exarch_implicit _ -> 0
+            | Mod.Eater_implicit _ -> 1
+            | Mod.Prefix -> 2
+            | Mod.Suffix -> 3
+          in
+          let c =
+            Int.compare
+              (int_of_generation_type a.Mod.generation_type)
+              (int_of_generation_type b.Mod.generation_type)
+          in
+          if c <> 0 then c else Id.compare a.id b.id
+  in
+  let mods = List.sort compare_mods item.mods in
+  let rarity = show_rarity item.rarity in
+  let influence =
+    match item.influence with
+      | Not_influenced ->
+          ""
+      | Fractured ->
+          " (Fractured)"
+      | Synthesized ->
+          " (Synthesized)"
+      | SEC sec ->
+          " (" ^ Influence.show_sec sec ^ ")"
+      | SEC_pair (sec1, sec2) ->
+          " (" ^ Influence.show_sec sec1 ^ " / " ^ Influence.show_sec sec2 ^ ")"
+      | Exarch ->
+          " (Exarch)"
+      | Eater ->
+          " (Eater)"
+      | Exarch_and_eater ->
+          " (Exarch / Eater)"
+  in
+  let split = if item.split then [ "Split" ] else [] in
+  "--------\n" ^ Id.show item.base.name ^ " (" ^ rarity ^ ")" ^ influence ^ "\n--------\n" ^
+  String.concat "\n" (List.map (show_modifier item) mods @ split) ^ "\n--------"
 
 (* If [tag] is specified, restrict the mod pool to mods with this tag. *)
 let mod_pool ?(fossils = []) ?tag ?tag_more_common

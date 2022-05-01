@@ -355,7 +355,7 @@ type show_mode =
   | With_ranges
   | With_random_values
 
-let show ?(indentation = 0) ?(fractured = false) mode modifier =
+let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
   let generation_type =
     match modifier.generation_type with
       | Prefix -> "(prefix) "
@@ -370,8 +370,22 @@ let show ?(indentation = 0) ?(fractured = false) mode modifier =
       | Crafted -> "{crafted} "
       | Veiled -> "{veiled} "
   in
+  let tier =
+    match tier with
+      | None ->
+          ""
+      | Some tier ->
+          "[T" ^ string_of_int tier ^ "] "
+  in
   let margin =
-    String.make (indentation + String.length generation_type + String.length domain) ' '
+    String.make
+      (
+        indentation +
+        String.length generation_type +
+        String.length domain +
+        String.length tier
+      )
+      ' '
   in
   let translated_mod =
     match modifier.domain with
@@ -404,7 +418,8 @@ let show ?(indentation = 0) ?(fractured = false) mode modifier =
           let strings = deduplicate String.compare strings in
           String.concat ("\n" ^ margin) strings
   in
-  generation_type ^ fractured ^ domain ^ translated_mod ^ " (" ^ Id.show modifier.id ^ ")"
+  generation_type ^ fractured ^ domain ^ tier ^
+  translated_mod ^ " (" ^ Id.show modifier.id ^ ")"
 
 let multimod_id = Id.make "StrIntMasterItemGenerationCanHaveMultipleCraftedMods"
 let prefixes_cannot_be_changed_id = Id.make "StrMasterItemGenerationCannotChangePrefixes"

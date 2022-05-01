@@ -9,6 +9,7 @@ val compare: t -> t -> int
 module Set:
 sig
   include Set.S with type elt = t
+  val show: t -> string
   val pp: t -> Pretext.t
 end
 
