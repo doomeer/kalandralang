@@ -74,10 +74,21 @@
 
 ### Miscellaneous
 
+- The default data directory on Linux is now ~/.kalandralang/data
+  (instead of ./data).
+  (Contributed by AR-234.)
+
+- Added command `update-data` which downloads data from RePoE.
+  It only downloads files if they have changed.
+  Thanks to this command you do not have to download data yourself anymore.
+  (Contributed by AR-234.)
+
 - Added support for arithmetic operations.
   Those can involve affix counts and modifier tiers.
   For instance: `tier "Intelligence" <= 3` is a condition meaning
   that the item has at tier 3 intelligence or better.
+  (With help from AR-234 and nebuchenazarr
+  even though I'm not sure nebuchenazarr is aware of it.)
 
 - Added support for flasks.
   (Contributed by AR-234.)

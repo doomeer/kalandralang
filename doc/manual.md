@@ -6,8 +6,6 @@ https://fdopen.github.io/opam-repository-mingw/ but you're on your own.
 
 ### Installation
 
-#### Compile
-
 Install [opam](http://opam.ocaml.org/).
 Create an Opam switch if you didn't already, with:
 ```sh
@@ -34,35 +32,9 @@ If this doesn't work, try running this instead:
 ```
 If this works but `kalandralang` doesn't, it means that you need to fix your `PATH`.
 
-#### Setup a Working Directory
-
-Kalandralang requires data files from the [RePoE](https://github.com/brather1ng/RePoE)
-project to run. Those data files contain the list of base items, modifiers etc.
-Kalandralang looks for those files in a `data` subdirectory of the current directory.
-
-First, create a directory for Kalandralang somewhere and `cd` into it, for instance:
-```sh
-mkdir ~/kalandralang-recipes
-cd ~/kalandralang-recipes
-```
-Then, create the `data` subdirectory and download data files into it:
-```sh
-mkdir data
-cd data
-wget https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/base_items.json
-wget https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/mods.json
-wget https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/stat_translations.json
-wget https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/essences.json
-cd ..
-```
-You can now put your recipes in `~/kalandralang-recipes` if you want.
-You can put them somewhere else, but since Kalandralang must be ran from this directory
-to find data files, it will make it easier for you.
-
-Note that the first time Kalandralang reads the data files (e.g. the first time you
-run a recipe), it will create a file named `kalandralang.cache` with the same data
-but in binary format instead of JSON. Using this makes Kalandralang load faster.
-Once you have this cache, you can delete the JSON files in the `data` directory if you want.
+Once Kalandralang is installed, you probably want to:
+- [Update Game Data](#update-game-data);
+- [Update Cost Data](#update-cost-data).
 
 ### Usage
 
@@ -77,6 +49,55 @@ You can request help for a given subcommand, such as `run` or `find`:
 kalandralang run --help
 kalandralang find --help
 ```
+
+#### Update Game Data
+
+Kalandralang requires data files from the [RePoE](https://github.com/brather1ng/RePoE)
+project to run. Those data files contain the list of base items, modifiers etc.
+Kalandralang looks for those files:
+- on Linux: in `~/.kalandralang/data`;
+- on other platforms: in `./data`.
+
+Kalandralang can download those files for you; just run:
+```
+kalandralang update-data
+```
+
+You probably also want to [Update Cost Data](#update-cost-data).
+
+#### Update Cost Data
+
+Kalandralang reads the cost of currencies, harvest crafts etc. from file `data/costs.json`.
+It is a good idea to regularly update this file.
+See [Costs](#costs) for more information.
+
+##### From poe.ninja and TFT
+
+The following command uses [poe.ninja](https://poe.ninja)'s API
+and reads from The Forbidden Trove's
+[repository](https://github.com/The-Forbidden-Trove/tft-data-prices/tree/master/lsc)
+to generate file `data/costs.json` :
+```sh
+kalandralang update-costs
+```
+If you are from the future, you may need to specify the league name:
+```sh
+kalandralang update-costs --ninja-league Archnemesis
+```
+You can also specify the folder to read from TFT's repository:
+```
+kalandralang update-costs --tft-league lsc
+```
+
+##### Use Default Values
+
+The following command generates file `data/costs.json` with default values:
+```sh
+kalandralang write-default-costs
+```
+If for some reason `update-costs` does not work for you, you can use
+`write-default-costs` to start with a base file that you can then edit manually
+(see [Costs](#costs)).
 
 #### Running a Recipe
 
@@ -129,37 +150,6 @@ buy "Metadata/Items/Amulets/Amulet9"
 # Orbs of Annulments keep the item rare.
 until no_prefix && no_suffix do annul
 show_mod_pool
-```
-
-#### Generate Cost Data
-
-Kalandralang reads the cost of currencies, harvest crafts etc. from file `data/costs.json`.
-It is a good idea to regularly update this file.
-See [Costs](#costs) for more information.
-
-##### From poe.ninja and TFT
-
-The following command uses [poe.ninja](https://poe.ninja)'s API
-and reads from The Forbidden Trove's
-[repository](https://github.com/The-Forbidden-Trove/tft-data-prices/tree/master/lsc)
-to generate file `data/costs.json` :
-```sh
-kalandralang update-costs
-```
-If you are from the future, you may need to specify the league name:
-```sh
-kalandralang update-costs --ninja-league Archnemesis
-```
-You can also specify the folder to read from TFT's repository:
-```
-kalandralang update-costs --tft-league lsc
-```
-
-##### With Default Values
-
-The following command generates file `data/costs.json` with default values:
-```sh
-kalandralang write-default-costs
 ```
 
 ## Example Recipe
@@ -361,7 +351,7 @@ a lot over time. You can customize those values by creating a file named
 
 To customize costs, it is recommended to generate `data/costs.json`
 using `write-default-costs` or `update-costs`
-(see [Generate Cost Data](#generate-cost-data)).
+(see [Update Cost Data](#update-cost-data)).
 You can then edit the values in this file manually.
 
 This file is a [JSON](https://www.json.org) file composed of one JSON object.
