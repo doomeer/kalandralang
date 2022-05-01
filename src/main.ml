@@ -231,6 +231,15 @@ let main () =
     echo "0.1.0";
     exit 0
   );
+  let data_dir =
+    Clap.optional_string
+      ~long: "data-dir"
+      ~placeholder: "PATH"
+      ~description: "Path to data directory. \
+      On Linux, this defaults to: `~/.kalandralang/data/` \
+      On other Platforms, this currently defaults to `./data/`"
+      ()
+  in
   let command =
     Clap.subcommand [
       (
@@ -352,19 +361,6 @@ let main () =
                unspecified, read the recipe from stdin."
             ()
         in
-        let data_dir =
-          let dir = Clap.optional_string
-            ~long: "data-dir"
-            ~placeholder: "PATH"
-            ~description: "Path to custom data directory."
-            ()
-          in
-          match dir with
-            | None ->
-                String.empty
-            | Some dir ->
-                dir
-        in
         let display_options =
           {
             verbose;
@@ -438,19 +434,6 @@ let main () =
                case-insensitive."
             ()
         in
-        let data_dir =
-          let dir = Clap.optional_string
-            ~long: "data-dir"
-            ~placeholder: "PATH"
-            ~description: "Path to custom data directory."
-            ()
-          in
-          match dir with
-            | None ->
-                String.empty
-            | Some dir ->
-                dir
-        in
         `find (data_dir,pattern)
       );
       (
@@ -459,19 +442,6 @@ let main () =
             "Output default costs to data/costs.json. Warning: if you \
              customized this file, all your changes will be lost."
         @@ fun () ->
-        let data_dir =
-          let dir = Clap.optional_string
-            ~long: "data-dir"
-            ~placeholder: "PATH"
-            ~description: "Path to custom data directory."
-            ()
-          in
-          match dir with
-            | None ->
-                String.empty
-            | Some dir ->
-                dir
-        in
         `write_default_costs (data_dir)
       );
       (
@@ -496,40 +466,14 @@ let main () =
             ~description: "Folder name in The Forbidden Trove's repository."
             "lsc"
         in
-        let data_dir =
-          let dir = Clap.optional_string
-            ~long: "data-dir"
-            ~placeholder: "PATH"
-            ~description: "Path to custom data directory."
-            ()
-          in
-          match dir with
-            | None ->
-                String.empty
-            | Some dir ->
-                dir
-        in
         `update_costs (data_dir, ninja_league, tft_league)
       );
       (
-        Clap.case "update-cache"
+        Clap.case "update-data"
           ~description:
-            "TODO-ADD description"
+            "Updates RePoE Data (Datamined PoE Files) and creates a cached version."
         @@ fun () ->
-        let data_dir =
-          let dir = Clap.optional_string
-            ~long: "data-dir"
-            ~placeholder: "PATH"
-            ~description: "Path to custom data directory."
-            ()
-          in
-          match dir with
-            | None ->
-                String.empty
-            | Some dir ->
-                dir
-        in
-        `update_cache (data_dir)
+        `update_data (data_dir)
       );
     ]
   in
@@ -589,8 +533,8 @@ let main () =
         Data.write_default_costs data_dir
     | `update_costs (data_dir, ninja_league, tft_league) ->
         Data.update_costs data_dir ~ninja_league: ninja_league ~tft_league: tft_league
-    | `update_cache (data_dir) ->
-        Data.update_cache data_dir
+    | `update_data (data_dir) ->
+        Data.update_data data_dir
 
 let backtrace = false
 

@@ -14,80 +14,40 @@ let poe_data = [
   ( (Essence.load),          "essences.json" );
 ]
 
-let getPaths data_dir =
+let get_paths data_dir =
   let data_path = 
-    if data_dir = String.empty then
-      match Sys.os_type with
-        | "Unix" ->
-            let userid = Unix.getuid () in
-            let home = (Unix.getpwuid userid).pw_dir in
-            let kld_path = Filename.concat home ".kalandralang" in
-            let result = Filename.concat kld_path "data/" in
-            result
-        | "Win32" ->
-            (* Not implemented, use current folder for data *)
-            "data/"
-        | "Cygwin" ->
-            (* Not implemented, use current folder for data *)
-            "data/"
-        | _ ->
-            "data/"
-    else
-      data_dir
+    match data_dir with
+      | Some data_dir -> data_dir
+      | None -> 
+          match Sys.os_type with
+            | "Unix" ->
+                let userid = Unix.getuid () in
+                let home = (Unix.getpwuid userid).pw_dir in
+                let kld_path = home // ".kalandralang" in
+                let result = kld_path // "data/" in
+                result
+            | "Win32" ->
+                (* Not implemented, use current folder for data *)
+                "data/"
+            | "Cygwin" ->
+                (* Not implemented, use current folder for data *)
+                "data/"
+            | _ ->
+                "data/"
   in
   let () = 
-    Misc.mkdir_p ~path:data_path ~perms:0o755;
+    Misc.mkdir_p data_path;
   in
-  let genPath file = Filename.concat data_path file in
-  let cache = genPath "kalandralang.cache" in
-  let costs = genPath "costs.json" in
+  let cache = data_path // "kalandralang.cache" in
+  let costs = data_path // "costs.json" in
   {
     data_path; 
     cache; 
     costs;
   }
 
-let update_poe_data_file filepath =
-  let filename = Filename.basename filepath in
-  let etag_file = filepath ^ ".etag" in
-    let etag =
-      if Sys.file_exists etag_file then (
-        let ic = open_in etag_file in
-        let etag = input_line ic in
-        close_in ic;
-        etag
-      ) else
-        ""
-    in
-    let request_etag =
-      let headers = 
-        Http_request.header_create()
-        |>Http_request.header_add "If-None-Match" etag
-      in
-      echo "Checking/Downloading %s" filename;
-      Uri.of_string("https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/" ^ filename)
-      |>Http_request.download ~headers filepath 
-      |>Http_request.get_header "etag"
-    in
-    let write_etag etag = 
-      let oc = open_out etag_file in
-      Printf.fprintf oc "%s" etag;
-      close_out oc;
-    in
-    match request_etag with
-      | Some request_etag -> 
-        if request_etag <> etag then (
-          echo " - %s got updated." filename;
-          write_etag request_etag
-        ) else (
-          echo " - %s is up to date." filename
-        )
-      | _ -> 
-        (* Should never happen *)
-        fail "Could not retrieve ETag from download.."
-
 let load_data data_dir = 
-  let path = getPaths data_dir in
+  let path = get_paths data_dir in
     let module_load mdl filepath = 
       let filename = Filename.basename filepath in
       echo "Loading %s..." filename;
@@ -95,17 +55,13 @@ let load_data data_dir =
     in
     let load_from_json () =
       (* Loads all files and modules specified in poe_data *)
-      let rec module_load_json list =
-        match list with
-          | [] -> ()
-          | x :: xs ->
-              let (mdl, file) = x in
-              let filepath = Filename.concat path.data_path file in
-              update_poe_data_file filepath;
-              module_load mdl filepath;
-              module_load_json xs
+      let module_load_json (mdl, file) =
+        let filepath = path.data_path // file in
+        if not (Sys.file_exists filepath) then
+          fail "PoE-Data: %s does not exist.\nRun `kalandralang --update-data` to initilize data." file;
+        module_load mdl filepath;
       in 
-      module_load_json poe_data
+      List.iter module_load_json poe_data
     in
     let save_to_data () =
       (* Saving cache data to harddrive *)
@@ -139,7 +95,7 @@ let load_data data_dir =
 
 let load data_dir = (
     load_data data_dir;
-    let path = getPaths data_dir in
+    let path = get_paths data_dir in
     if Sys.file_exists path.costs then (
       echo "Loading %s..." path.costs;
       Cost.load path.costs;
@@ -150,16 +106,66 @@ let load data_dir = (
     echo "Ready.";
   )
 
-let update_cache data_dir = 
-  let path = getPaths data_dir in
-  Sys.remove path.cache;
-  load_data data_dir;
-  echo "Done."
-
 let update_costs data_dir ~ninja_league ~tft_league =
-  let path = getPaths data_dir in
+  let path = get_paths data_dir in
   Ninja.write_costs ~ninja_league ~tft_league ~filename: path.costs
 
 let write_default_costs data_dir =
-  let path = getPaths data_dir in
+  let path = get_paths data_dir in
   Cost.write_defaults path.costs 
+
+let update_poe_data data_dir = 
+  let update_poe_data_file filepath =
+  let filename = Filename.basename filepath in
+  let etag_file = filepath ^ ".etag" in
+    let etag =
+      if Sys.file_exists etag_file then (
+        let ic = open_in etag_file in
+        let etag = input_line ic in
+        close_in ic;
+        etag
+      ) else
+        ""
+    in
+    let request_etag =
+      let headers = 
+        if Sys.file_exists filepath then
+          (* file already exists, attach etag to only get the file data if there is an update*)
+          Http_request.header_create()
+          |>Http_request.header_add "If-None-Match" etag
+        else
+          Http_request.header_create()
+      in
+      echo "Checking/Downloading %s" filename;
+      Uri.of_string("https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/" ^ filename)
+      |>Http_request.download ~headers filepath 
+      |>Http_request.get_header "etag"
+    in
+    match request_etag with
+      | Some request_etag -> 
+        if request_etag <> etag then (
+          echo " - %s got updated." filename;
+          let oc = open_out etag_file in
+          Printf.fprintf oc "%s" request_etag;
+          close_out oc;
+        ) else (
+          echo " - %s is up to date." filename
+        )
+      | _ -> 
+        (* Should never happen *)
+        fail "Could not retrieve ETag from download.."
+  in
+  let path = get_paths data_dir in
+  let update_poe_data_files (_, file) =
+    let filepath = path.data_path // file in
+    update_poe_data_file filepath;
+  in 
+  List.iter update_poe_data_files poe_data
+
+let update_data data_dir = 
+  let path = get_paths data_dir in
+  update_poe_data data_dir;
+  if Sys.file_exists path.cache then
+    Sys.remove path.cache;
+  load_data data_dir
+  

@@ -13,6 +13,7 @@ let fail x = Printf.ksprintf failwith x
 let default x = function None -> x | Some x -> x
 let echo x = Format.kasprintf print_endline x
 let sf = Printf.sprintf
+let (//) = Filename.concat
 
 let random_from_pool pool =
   let total_weight = List.fold_left (fun acc (weight, _) -> acc + weight) 0 pool in
@@ -58,13 +59,8 @@ let memoize f =
           Hashtbl.add table x y;
           y
 
-let mkdir_p ~path ~perms =
-  let ps = String.split_on_char '/' path in
-  let rec aux acc = function [] -> ()
-  | p::ps ->
-      let this = String.concat Filename.dir_sep (List.rev (p::acc)) in
-      if this <> String.empty && not (Sys.file_exists this) then
-        Sys.mkdir this perms;
-      aux (p::acc) ps
-  in
-  aux [] ps
+let rec mkdir_p ?(perms = 0o755) path =
+  if not (Sys.file_exists path) then
+    let parent = Filename.dirname path in
+    if String.length parent < String.length path then mkdir_p ~perms parent;
+    Sys.mkdir path perms
