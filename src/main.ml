@@ -236,8 +236,8 @@ let main () =
       ~long: "data-dir"
       ~placeholder: "PATH"
       ~description: "Path to data directory. \
-      On Linux, this defaults to: `~/.kalandralang/data/` \
-      On other Platforms, this currently defaults to `./data/`"
+      On Linux, this defaults to: `~/.kalandralang/data/`. \
+      On other Platforms, this currently defaults to `./data/`."
       ()
   in
   let command =
@@ -381,7 +381,7 @@ let main () =
             loop;
           }
         in
-        `run (data_dir, filename, batch_options, seed, display_options)
+        `run (filename, batch_options, seed, display_options)
       );
       (
         Clap.case "format"
@@ -434,7 +434,7 @@ let main () =
                case-insensitive."
             ()
         in
-        `find (data_dir,pattern)
+        `find pattern
       );
       (
         Clap.case "write-default-costs"
@@ -442,7 +442,7 @@ let main () =
             "Output default costs to data/costs.json. Warning: if you \
              customized this file, all your changes will be lost."
         @@ fun () ->
-        `write_default_costs (data_dir)
+        `write_default_costs
       );
       (
         Clap.case "update-costs"
@@ -466,14 +466,14 @@ let main () =
             ~description: "Folder name in The Forbidden Trove's repository."
             "lsc"
         in
-        `update_costs (data_dir, ninja_league, tft_league)
+        `update_costs (ninja_league, tft_league)
       );
       (
         Clap.case "update-data"
           ~description:
-            "Updates RePoE Data (Datamined PoE Files) and creates a cached version."
+            "Download datamined PoE data from RePoE and create a cached version."
         @@ fun () ->
-        `update_data (data_dir)
+        `update_data
       );
     ]
   in
@@ -482,7 +482,7 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (data_dir, filename, batch_options, seed, display_options) ->
+    | `run (filename, batch_options, seed, display_options) ->
         if batch_options.count <= 0 then
           fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
@@ -526,14 +526,14 @@ let main () =
           Pretext.to_channel ~starting_level: 2 stdout (AST.pp decompiled_recipe)
         in
         Option.iter output decompiled_recipe
-    | `find (data_dir, pattern) ->
+    | `find pattern ->
         Data.load data_dir;
         find pattern
-    | `write_default_costs (data_dir) ->
+    | `write_default_costs ->
         Data.write_default_costs data_dir
-    | `update_costs (data_dir, ninja_league, tft_league) ->
+    | `update_costs (ninja_league, tft_league) ->
         Data.update_costs data_dir ~ninja_league: ninja_league ~tft_league: tft_league
-    | `update_data (data_dir) ->
+    | `update_data ->
         Data.update_data data_dir
 
 let backtrace = false
@@ -546,5 +546,5 @@ let () =
   with exn ->
     echo "Entering directory '%s'" (Sys.getcwd ());
     if backtrace then Printf.eprintf "%s\n" (Printexc.get_backtrace ());
-    Printf.eprintf "%s" (Printexc.to_string exn);
+    Printf.eprintf "%s\n%!" (Printexc.to_string exn);
     exit 1
