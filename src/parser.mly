@@ -69,18 +69,18 @@ buy_arguments:
 |
   { [] }
 
-arithmetic_operation:
+arithmetic_expression:
 | INT
   { Int $1 }
-| MINUS arithmetic_operation %prec unary_minus
+| MINUS arithmetic_expression %prec unary_minus
   { Neg $2 }
-| arithmetic_operation PLUS arithmetic_operation
+| arithmetic_expression PLUS arithmetic_expression
   { Binary_arithmetic_operator ($1, Add, $3) }
-| arithmetic_operation MINUS arithmetic_operation
+| arithmetic_expression MINUS arithmetic_expression
   { Binary_arithmetic_operator ($1, Sub, $3) }
-| arithmetic_operation STAR arithmetic_operation
+| arithmetic_expression STAR arithmetic_expression
   { Binary_arithmetic_operator ($1, Mul, $3) }
-| arithmetic_operation SLASH arithmetic_operation
+| arithmetic_expression SLASH arithmetic_expression
   { Binary_arithmetic_operator ($1, Div, $3) }
 | PREFIX_COUNT
   { Prefix_count }
@@ -90,6 +90,8 @@ arithmetic_operation:
   { Affix_count }
 | TIER STRING
   { Tier (Id.make $2) }
+| LPAR arithmetic_expression RPAR
+  { $2 }
 
 condition:
 | TRUE
@@ -102,10 +104,10 @@ condition:
   { And ($1, $3) }
 | condition OR condition
   { Or ($1, $3) }
-| arithmetic_operation COMPARISON_OPERATOR arithmetic_operation
+| arithmetic_expression COMPARISON_OPERATOR arithmetic_expression
   { Comparison ($1, $2, $3) }
-| arithmetic_operation COMPARISON_OPERATOR arithmetic_operation
-  COMPARISON_OPERATOR arithmetic_operation
+| arithmetic_expression COMPARISON_OPERATOR arithmetic_expression
+  COMPARISON_OPERATOR arithmetic_expression
   { Double_comparison ($1, $2, $3, $4, $5) }
 | HAS STRING
   { Has (Id.make $2) }
