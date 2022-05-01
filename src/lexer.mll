@@ -55,6 +55,7 @@
     | "affix_count" -> AFFIX_COUNT
     | "open_affix" -> OPEN_AFFIX
     | "full_affixes" -> FULL_AFFIXES
+    | "tier" -> TIER
     (* Currencies *)
     | "transmute" -> CURRENCY Orb_of_transmutation
     | "augment" -> CURRENCY Orb_of_augmentation
@@ -223,5 +224,14 @@ rule token = parse
   | '}' { RBRACE }
   | ':' { COLON }
   | '+' { PLUS }
+  | '-' { MINUS }
+  | '*' { STAR }
+  | '/' { SLASH }
+  | '=' { COMPARISON_OPERATOR EQ }
+  | "<>" { COMPARISON_OPERATOR NE }
+  | '<' { COMPARISON_OPERATOR LT }
+  | "<=" { COMPARISON_OPERATOR LE }
+  | '>' { COMPARISON_OPERATOR GT }
+  | ">=" { COMPARISON_OPERATOR GE }
   | ('#' [^'\n']*)? eof { EOF }
   | _ { failwith "syntax error" }

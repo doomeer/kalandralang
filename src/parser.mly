@@ -8,15 +8,18 @@
     }
 %}
 
-%token COLON AND OR NOT PLUS DOT_DOT TRUE FALSE EOF
+%token COLON AND OR NOT DOT_DOT TRUE FALSE EOF
+%token PLUS MINUS STAR SLASH
 %token BUY ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL SHOW_UNVEIL_MOD_POOL
 %token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD EXARCH EATER SYNTHESIZED
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN HAS
 %token UNVEIL
+%token TIER
 %token PREFIX_COUNT NO_PREFIX OPEN_PREFIX FULL_PREFIXES
 %token SUFFIX_COUNT NO_SUFFIX OPEN_SUFFIX FULL_SUFFIXES
 %token AFFIX_COUNT NO_AFFIX OPEN_AFFIX FULL_AFFIXES
 %token LPAR RPAR LBRACE RBRACE
+%token <AST.comparison_operator> COMPARISON_OPERATOR
 %token <AST.currency> CURRENCY
 %token <Fossil.t> FOSSIL
 %token <string> STRING LABEL
@@ -25,6 +28,9 @@
 %left OR
 %left AND
 %nonassoc NOT
+%left PLUS MINUS
+%left STAR SLASH
+%nonassoc unary_minus
 
 %type <AST.t> program
 %start program
@@ -63,6 +69,28 @@ buy_arguments:
 |
   { [] }
 
+arithmetic_operation:
+| INT
+  { Int $1 }
+| MINUS arithmetic_operation %prec unary_minus
+  { Neg $2 }
+| arithmetic_operation PLUS arithmetic_operation
+  { Binary_arithmetic_operator ($1, Add, $3) }
+| arithmetic_operation MINUS arithmetic_operation
+  { Binary_arithmetic_operator ($1, Sub, $3) }
+| arithmetic_operation STAR arithmetic_operation
+  { Binary_arithmetic_operator ($1, Mul, $3) }
+| arithmetic_operation SLASH arithmetic_operation
+  { Binary_arithmetic_operator ($1, Div, $3) }
+| PREFIX_COUNT
+  { Prefix_count }
+| SUFFIX_COUNT
+  { Suffix_count }
+| AFFIX_COUNT
+  { Affix_count }
+| TIER STRING
+  { Tier (Id.make $2) }
+
 condition:
 | TRUE
   { True }
@@ -74,6 +102,11 @@ condition:
   { And ($1, $3) }
 | condition OR condition
   { Or ($1, $3) }
+| arithmetic_operation COMPARISON_OPERATOR arithmetic_operation
+  { Comparison ($1, $2, $3) }
+| arithmetic_operation COMPARISON_OPERATOR arithmetic_operation
+  COMPARISON_OPERATOR arithmetic_operation
+  { Double_comparison ($1, $2, $3, $4, $5) }
 | HAS STRING
   { Has (Id.make $2) }
 | PREFIX_COUNT INT

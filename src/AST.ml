@@ -315,13 +315,42 @@ let make_buy args =
     cost = bbm.bbm_cost |> default [];
   }
 
-type condition =
+type binary_arithmetic_operator = Add | Sub | Mul | Div
+
+type arithmetic_expression =
+  (* Constants *)
+  | Int of int
   (* Operators *)
+  | Neg of arithmetic_expression
+  | Binary_arithmetic_operator of
+      arithmetic_expression * binary_arithmetic_operator * arithmetic_expression
+  (* Item Properties *)
+  | Prefix_count
+  | Suffix_count
+  | Affix_count
+  | Tier of Id.t
+
+type boundary =
+  {
+    boundary: arithmetic_expression;
+    included: bool;
+  }
+
+type comparison_operator = EQ | NE | LT | LE | GT | GE
+
+type condition =
+  (* Constants *)
   | True
   | False
+  (* Operators *)
   | Not of condition
   | And of condition * condition
   | Or of condition * condition
+  | Comparison of arithmetic_expression * comparison_operator * arithmetic_expression
+  | Double_comparison of
+      arithmetic_expression * comparison_operator *
+      arithmetic_expression * comparison_operator *
+      arithmetic_expression
   (* Item Conditions *)
   | Has of Id.t
   | Prefix_count of int * int
@@ -340,6 +369,43 @@ let maybe_parentheses use_parentheses document =
     box [ atom "("; break0; indent; document; dedent; break0; atom ")" ]
   else
     document
+
+let pp_binary_arithmetic_operator = function
+  | Add -> Pretext.atom "+"
+  | Sub -> Pretext.atom "-"
+  | Mul -> Pretext.atom "*"
+  | Div -> Pretext.atom "/"
+
+let rec pp_arithmetic_expression ?(ctx = `top) expression =
+  let open Pretext in
+  match expression with
+    | Int i ->
+        int i
+    | Neg a ->
+        seq [ atom "-"; space; pp_arithmetic_expression ~ctx: `neg a ]
+    | Binary_arithmetic_operator (a, op, b) ->
+        let parentheses =
+          match ctx with
+            | `top -> false
+            | _ -> true (* TODO *)
+        in
+        maybe_parentheses parentheses @@ seq [
+          pp_arithmetic_expression ~ctx: (`left op) a; space;
+          pp_binary_arithmetic_operator op; break;
+          pp_arithmetic_expression ~ctx: (`right op) b
+        ]
+    | Prefix_count -> atom "prefix_count"
+    | Suffix_count -> atom "suffix_count"
+    | Affix_count -> atom "affix_count"
+    | Tier x -> box [ atom "tier"; space; Id.pp x ]
+
+let pp_comparison_operator = function
+  | EQ -> Pretext.atom "="
+  | NE -> Pretext.atom "<>"
+  | LT -> Pretext.atom "<"
+  | LE -> Pretext.atom "<="
+  | GT -> Pretext.atom ">"
+  | GE -> Pretext.atom ">="
 
 let rec pp_condition ?(ctx = `top) condition =
   let open Pretext in
@@ -369,6 +435,20 @@ let rec pp_condition ?(ctx = `top) condition =
         maybe_parentheses parentheses @@ seq [
           pp_condition ~ctx: `and_ a; space; atom "or"; break;
           pp_condition ~ctx: `and_ b
+        ]
+    | Comparison (a, op, b) ->
+        seq [
+          pp_arithmetic_expression a; space;
+          pp_comparison_operator op; break;
+          pp_arithmetic_expression b;
+        ]
+    | Double_comparison (a, op1, b, op2, c) ->
+        seq [
+          pp_arithmetic_expression a; space;
+          pp_comparison_operator op1; break;
+          pp_arithmetic_expression b; space;
+          pp_comparison_operator op2; break;
+          pp_arithmetic_expression c;
         ]
     | Has modifier ->
         seq [ atom "has"; space; Id.pp modifier ]

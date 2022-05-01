@@ -74,6 +74,11 @@
 
 ### Miscellaneous
 
+- Added support for arithmetic operations.
+  Those can involve affix counts and modifier tiers.
+  For instance: `tier "Intelligence" <= 3` is a condition meaning
+  that the item has at tier 3 intelligence or better.
+
 - Added support for flasks.
   (Contributed by AR-234.)
 

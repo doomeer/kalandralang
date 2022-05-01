@@ -86,11 +86,16 @@ let max_prefix_count item =
 
 let max_suffix_count = max_prefix_count
 
+let max_affix_count item = max_prefix_count item + max_suffix_count item
+
 let prefix_count item =
   List.length (List.filter (fun { modifier; _ } -> Mod.is_prefix modifier) item.mods)
 
 let suffix_count item =
   List.length (List.filter (fun { modifier; _ } -> Mod.is_suffix modifier) item.mods)
+
+let affix_count item =
+  prefix_count item + suffix_count item
 
 let has_a_prefix item =
   List.exists (fun { modifier; _ } -> Mod.is_prefix modifier) item.mods

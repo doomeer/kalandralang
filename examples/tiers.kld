@@ -1,0 +1,17 @@
+# This recipe shows how to use arithmetic and tiers to express complex conditions
+# on modifiers.
+
+# We start from an ilvl 100 Agate Amulet.
+buy "Metadata/Items/Amulets/Amulet9"
+
+# Then we chaos spam until the sum of the tiers of attribute modifiers
+# is 6 or less, meaning that we have all three modifiers in one of the following combinations:
+# - T1 + T1 + T4 or better
+# - T1 + T2 + T3 or better
+# - T2 + T2 + T2 or better
+until
+  tier "Dexterity" +
+  tier "Intelligence" +
+  tier "Strength" <= 6
+do
+  chaos

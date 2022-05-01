@@ -101,6 +101,131 @@ let with_aside state f =
     | Some item ->
         f item
 
+module Q:
+sig
+  type t
+  val show: t -> string
+  val make: int -> int -> t
+  val of_int: int -> t
+  val neg: t -> t
+  val inv: t -> t
+  val add: t -> t -> t
+  val sub: t -> t -> t
+  val mul: t -> t -> t
+  val div: t -> t -> t
+  val compare: t -> t -> int
+end =
+struct
+  type t = int * int (* num, denum; denum is always >= 1 *)
+
+  let show (n, d) =
+    if d = 1 then
+      string_of_int n
+    else
+      string_of_int n ^ "/" ^ string_of_int d
+
+  let rec gcd a b =
+    if b = 0 then
+      a
+    else
+      gcd b (a mod b)
+
+  let make a b =
+    if b = 0 then fail "division by zero";
+    let a, b = if b > 0 then a, b else -a, -b in
+    let g = if a < 0 then gcd (- a) b else gcd a b in
+    a / g, b / g
+
+  let of_int i = i, 1
+
+  let neg (n, d) = -n, d
+
+  let inv (n, d) =
+    if n = 0 then fail "division by zero";
+    if n > 0 then d, n else -d, -n
+
+  let add (n1, d1) (n2, d2) =
+    make (n1 * d2 + n2 * d1) (d1 * d2)
+
+  let sub a b = add a (neg b)
+
+  let mul (n1, d1) (n2, d2) =
+    make (n1 * n2) (d1 * d2)
+
+  let div a b = mul a (inv b)
+
+  let compare a b =
+    let n, _ = sub a b in
+    Int.compare n 0
+end
+
+let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression) =
+  match expression with
+    | Int i ->
+        Q.of_int i
+    | Neg a ->
+        let a = eval_arithmetic_expression state a in
+        Q.neg a
+    | Binary_arithmetic_operator (a, op, b) ->
+        let a = eval_arithmetic_expression state a in
+        let b = eval_arithmetic_expression state b in
+        (
+          match op with
+            | Add -> Q.add a b
+            | Sub -> Q.sub a b
+            | Mul -> Q.mul a b
+            | Div -> Q.div a b
+        )
+    | Prefix_count ->
+        with_item state @@ fun item ->
+        Q.of_int (Item.prefix_count item)
+    | Suffix_count ->
+        with_item state @@ fun item ->
+        Q.of_int (Item.suffix_count item)
+    | Affix_count ->
+        with_item state @@ fun item ->
+        Q.of_int (Item.affix_count item)
+    | Tier mod_group ->
+        with_item state @@ fun item ->
+        (
+          let has_mod_group { Item.modifier; fractured = _ } =
+            match modifier.generation_type with
+              | Prefix | Suffix ->
+                  Id.compare modifier.group mod_group = 0
+              | Exarch_implicit _ | Eater_implicit _ ->
+                  (* Those could have the same mod group as a prefix or suffix,
+                     and we wouldn't know what to do. So currently "tier" only
+                     supports prefixes and suffixes. *)
+                  false
+          in
+          match List.filter has_mod_group item.mods with
+            | [] ->
+                (* Item has no modifier of this group. *)
+                Q.of_int 999
+            | [ { Item.modifier; fractured = _ } ] ->
+                (
+                  match Item.mod_tier item modifier with
+                    | None ->
+                        fail "don't know how to compute tiers for mod group: %S"
+                          (Id.show mod_group)
+                    | Some tier ->
+                        Q.of_int tier
+                )
+            | _ :: _ :: _ ->
+                (* Items are not supposed to have several modifiers of the same group?? *)
+                fail "item has multiple affixes for mod group: %S" (Id.show mod_group)
+        )
+
+let eval_comparison_operator a (op: AST.comparison_operator) b =
+  let c = Q.compare a b in
+  match op with
+    | EQ -> c = 0
+    | NE -> c <> 0
+    | LT -> c < 0
+    | LE -> c <= 0
+    | GT -> c > 0
+    | GE -> c >= 0
+
 let rec eval_condition state (condition: AST.condition) =
   match condition with
     | True ->
@@ -113,6 +238,18 @@ let rec eval_condition state (condition: AST.condition) =
         eval_condition state a && eval_condition state b
     | Or (a, b) ->
         eval_condition state a || eval_condition state b
+    | Comparison (a, op, b) ->
+        let a = eval_arithmetic_expression state a in
+        let b = eval_arithmetic_expression state b in
+        eval_comparison_operator a op b
+    | Double_comparison (a, op1, b, op2, c) ->
+        let a = eval_arithmetic_expression state a in
+        let b = eval_arithmetic_expression state b in
+        if eval_comparison_operator a op1 b then
+          let c = eval_arithmetic_expression state c in
+          eval_comparison_operator b op2 c
+        else
+          false
     | Has id ->
         with_item state @@ fun item ->
         Item.has_mod_id id item
@@ -138,14 +275,14 @@ let rec eval_condition state (condition: AST.condition) =
         Item.suffix_count item >= Item.max_suffix_count item
     | Affix_count (min, max) ->
         with_item state @@ fun item ->
-        let count = Item.prefix_count item + Item.suffix_count item in
+        let count = Item.affix_count item in
         min <= count && count <= max
     | Open_affix ->
         with_item state @@ fun item ->
-        Item.prefix_count item + Item.suffix_count item < Item.max_prefix_count item + Item.max_suffix_count item
+        Item.affix_count item < Item.max_affix_count item
     | Full_affixes ->
         with_item state @@ fun item ->
-        Item.prefix_count item + Item.suffix_count item >= Item.max_prefix_count item + Item.max_suffix_count item
+        Item.affix_count item >= Item.max_affix_count item
 
 let is_done state =
   state.point < 0 || state.point >= Array.length state.program.instructions
