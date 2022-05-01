@@ -129,9 +129,14 @@ let max_crafted_mod_count item =
   else
     1
 
+(* Base tags include influence tags but not tags added by mods such as
+   [has_flat_intelligence_mod]. *)
+let base_tags item =
+  Id.Set.union item.base.tags item.tags
+
 let tags item =
   let add_mod_added_tags acc { modifier; _ } = Id.Set.union acc modifier.Mod.adds_tags in
-  List.fold_left add_mod_added_tags (Id.Set.union item.base.tags item.tags) item.mods
+  List.fold_left add_mod_added_tags (base_tags item) item.mods
 
 let has_tag tag item =
   Id.Set.mem tag (tags item)
@@ -207,7 +212,10 @@ let mod_tier =
           List.fold_left add_stats 0 modifier.stats
         in
         let c = Int.compare (sum_stats mod1) (sum_stats mod2) in
-        if c <> 0 then c else raise Same
+        if c <> 0 then c else (
+          (* echo "same: %s and %s" (Mod.show With_ranges mod2) (Mod.show With_ranges mod1); *)
+          raise Same
+        )
     in
     try
       Some (List.sort by_ilvl_or_stat pool)
@@ -221,6 +229,12 @@ let mod_tier =
       | Some sorted_group ->
           let rec find_mod tier = function
             | [] ->
+                (* echo "cannot find mod %s" (Id.show mod_id); *)
+                (* let echo_mod modifier = *)
+                (*   echo "- %s" (Mod.show With_ranges modifier) *)
+                (* in *)
+                (* echo "tags = %s" (Id.Set.show item_tags); *)
+                (* List.iter echo_mod sorted_group; *)
                 None
             | head :: tail ->
                 if Id.compare head.Mod.id mod_id = 0 then
@@ -231,10 +245,10 @@ let mod_tier =
           find_mod 1 sorted_group
   in
   fun item (modifier: Mod.t) ->
-    (* We use [item.base.tags] and not the [tags] function
+    (* We use [base_tags] and not the [tags] function
        because we don't want the mod pool to be modified by added tags such as
        [has_flat_intelligence_mod] when computing tiers. *)
-    mod_tier_memoized (modifier.domain, item.base.tags, modifier.group, modifier.id)
+    mod_tier_memoized (modifier.domain, base_tags item, modifier.group, modifier.id)
 
 let show_modifier item { modifier; fractured } =
   let tier = mod_tier item modifier in
