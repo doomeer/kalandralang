@@ -197,10 +197,15 @@ let mod_tier =
   let sort_mod_group = memoize @@ fun (domain, item_tags, mod_group) ->
     let pool =
       let has_mod_group (_, modifier) =
-        if Id.compare modifier.Mod.group mod_group = 0 then
-          Some modifier
-        else
-          None
+        match modifier.Mod.generation_type with
+          | Prefix | Suffix ->
+              if Id.compare modifier.Mod.group mod_group = 0 then
+                Some modifier
+              else
+                None
+          | Exarch_implicit _ | Eater_implicit _ ->
+              (* We don't want those in the mod pool while computing tiers. *)
+              None
       in
       full_mod_pool (domain, item_tags)
       |> List.filter_map has_mod_group
