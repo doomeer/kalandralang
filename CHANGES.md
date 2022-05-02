@@ -93,6 +93,12 @@
 - Added support for flasks.
   (Contributed by AR-234.)
 
+- Recipes are checked for errors before running.
+  Errors are: `goto` to labels that do not exist; modifier identifiers that do
+  not exist; modifier group identifiers that do not exist; base item identifiers
+  that do not exist. Additionally, defining a label but not using it with `goto`
+  causes a warning to be emitted.
+
 - You can now specify that your base is synthesized.
   You cannot specify the implicits but Kalandralang will prevent you from using
   crafts that cannot be performed on synthesized items.
