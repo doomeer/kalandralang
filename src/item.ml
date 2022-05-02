@@ -109,12 +109,25 @@ let has_mod_id modifier_id item =
 let has_mod modifier item =
   has_mod_id modifier.Mod.id item
 
-let has_mod_group group item =
-  List.exists (fun { modifier; _ } -> Id.compare modifier.Mod.group group = 0) item.mods
+(* My experiment on one mod (unveiling move speed + onslaught on boots)
+   seems to show that implicits and prefixes/suffixes are independent,
+   but this needs to be experimented on more. *)
+(* Since we can only have one of each eldritch implicits,
+   and [mod_pool] is used to *replace* mods when used with eldritch implicits,
+   we allow all eldritch implicits to be in the mod pool. *)
+let has_mod_group_prefix_or_suffix group item =
+  let is_group { modifier; _ } =
+    match modifier.generation_type with
+      | Prefix | Suffix ->
+          Id.compare modifier.Mod.group group = 0
+      | Exarch_implicit _ | Eater_implicit _ ->
+          false
+  in
+  List.exists is_group item.mods
 
 let has_veiled_mod item =
-  has_mod_group Mod.veiled_prefix_group item ||
-  has_mod_group Mod.veiled_suffix_group item
+  has_mod_group_prefix_or_suffix Mod.veiled_prefix_group item ||
+  has_mod_group_prefix_or_suffix Mod.veiled_suffix_group item
 
 let is_veiled { modifier; _ } =
   Id.compare modifier.Mod.group Mod.veiled_prefix_group = 0 ||
@@ -352,20 +365,7 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
         | _ ->
             false
     in
-    let already_has_mod_group =
-      match modifier.Mod.generation_type with
-        | Exarch_implicit _
-        | Eater_implicit _ ->
-            (* My experiment on one mod (unveiling move speed + onslaught on boots)
-               seems to show that implicits and prefixes/suffixes are independent,
-               but this needs to be experimented on more. *)
-            (* Since we can only have one of each eldritch implicits,
-               and [mod_pool] is used to *replace* mods when used with eldritch implicits,
-               we allow all eldritch implicits to be in the mod pool. *)
-            false
-        | _ ->
-            has_mod_group modifier.Mod.group item
-    in
+    let already_has_mod_group = has_mod_group_prefix_or_suffix modifier.Mod.group item in
     if
       match tag with
         | None -> false
@@ -464,7 +464,7 @@ let add_mod ?(fractured = false) modifier item =
       fail "item cannot have another crafted mod";
   )
   else (
-    if has_mod_group modifier.group item then
+    if has_mod_group_prefix_or_suffix modifier.group item then
       fail "item already has a mod for this group";
   );
   add_mod_force ~fractured modifier item
