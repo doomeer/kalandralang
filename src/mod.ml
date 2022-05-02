@@ -163,12 +163,19 @@ let pp {
 
 let pool = ref []
 let id_map = ref Id.Map.empty
+let mod_groups = ref Id.Set.empty
 
 type data = t list
+
 let export (): data = !pool
+
 let import (x: data) =
   pool := x;
-  List.iter (fun modifier -> id_map := Id.Map.add modifier.id modifier !id_map) x
+  let add modifier =
+    id_map := Id.Map.add modifier.id modifier !id_map;
+    mod_groups := Id.Set.add modifier.group !mod_groups
+  in
+  List.iter add x
 
 let royale_rex = rex "Royale"
 
@@ -339,16 +346,23 @@ let load filename =
                           fail "%s: two mods with id %s" filename (Id.show id)
                       | None ->
                           pool := modifier :: !pool;
-                          id_map := Id.Map.add id modifier !id_map
+                          id_map := Id.Map.add id modifier !id_map;
+                          mod_groups := Id.Set.add modifier.group !mod_groups
   in
   List.iter add_entry JSON.(parse_file filename |> as_object)
 
+let by_id_opt id =
+  Id.Map.find_opt id !id_map
+
 let by_id id =
-  match Id.Map.find_opt id !id_map with
+  match by_id_opt id with
     | None ->
         fail "no mod with id %S" (Id.show id)
     | Some x ->
         x
+
+let group_exists id =
+  Id.Set.mem id !mod_groups
 
 type show_mode =
   | With_placeholders

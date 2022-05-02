@@ -114,6 +114,9 @@ let by_id id =
     | Some x ->
         x
 
+let id_exists id =
+  Id.Map.mem id !id_map
+
 let jewel_class = Id.make "Jewel"
 let abyss_jewel_class = Id.make "AbyssJewel"
 

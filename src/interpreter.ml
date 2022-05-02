@@ -160,7 +160,7 @@ struct
 end
 
 let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression) =
-  match expression with
+  match expression.node with
     | Int i ->
         Q.of_int i
     | Neg a ->
@@ -227,7 +227,7 @@ let eval_comparison_operator a (op: AST.comparison_operator) b =
     | GE -> c >= 0
 
 let rec eval_condition state (condition: AST.condition) =
-  match condition with
+  match condition.node with
     | True ->
         true
     | False ->

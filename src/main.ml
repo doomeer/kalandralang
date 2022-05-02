@@ -130,7 +130,9 @@ let run_recipe recipe ~batch_options ~display_options =
           )
         then
           echo "";
-        let state = Interpreter.(run (start ~echo: user_echo_function ~debug recipe) timeout) in
+        let state =
+          Interpreter.(run (start ~echo: user_echo_function ~debug recipe)) timeout
+        in
         paid := A.add !paid state.paid;
         gained := A.add !gained state.gained;
         let profit = A.sub state.gained state.paid |> A.to_chaos in
@@ -487,8 +489,9 @@ let main () =
           fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
         let recipe = parse_recipe filename in
-        let compiled_recipe = Linear.compile recipe in
         Data.load data_dir;
+        Check.check_recipe recipe;
+        let compiled_recipe = Linear.compile recipe in
         Option.iter Random.init seed;
         if display_options.show_seed then (
           let seed =
@@ -504,7 +507,6 @@ let main () =
           in
           echo "Seed: %d" seed
         );
-
         let exec_time_start = Unix.gettimeofday () in
         let run_index = run_recipe compiled_recipe ~batch_options ~display_options in
         let time_end = Unix.gettimeofday () in
@@ -516,8 +518,7 @@ let main () =
             echo "Average crafting time: %12.3fs"
               ((time_end -. exec_time_start) /. float run_index);
           echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
-        );
-
+        )
     | `compile filename ->
         let recipe = parse_recipe filename in
         let compiled_recipe = Linear.compile recipe in

@@ -72,7 +72,7 @@ let rec compile ({ node; loc }: AST.t): program =
         let _endif_label = AST.Label.fresh "endif" in
         let then_ = compile then_ in
         seql [
-          if_ loc (Not condition) else_label;
+          if_ loc { loc; node = Not condition } else_label;
           then_;
           label else_label;
         ]
@@ -106,7 +106,7 @@ let rec compile ({ node; loc }: AST.t): program =
         let body = compile body in
         seql [
           label while_label;
-          if_ loc (Not condition) endwhile_label;
+          if_ loc { loc; node = Not condition } endwhile_label;
           body;
           goto loc while_label;
           label endwhile_label;
@@ -117,7 +117,7 @@ let rec compile ({ node; loc }: AST.t): program =
         seql [
           label repeat_label;
           body;
-          if_ loc (Not condition) repeat_label;
+          if_ loc { loc; node = Not condition } repeat_label;
         ]
     | Unveil_else ([], else_) ->
         let else_ = compile else_ in
@@ -129,7 +129,11 @@ let rec compile ({ node; loc }: AST.t): program =
         let endunveil_label = AST.Label.fresh "endunveil" in
         let else_ = compile else_ in
         let has_one_of_the_mods =
-          List.fold_left (fun acc modifier -> AST.Or (acc, Has modifier)) (Has head) tail
+          List.fold_left
+            (fun acc modifier ->
+               { AST.loc; node = AST.Or (acc, { loc; node = Has modifier }) })
+            { AST.loc; node = Has head }
+            tail
         in
         seql [
           single loc (Simple (Unveil mods));

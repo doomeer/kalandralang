@@ -71,76 +71,76 @@ buy_arguments:
 
 arithmetic_expression:
 | INT
-  { Int $1 }
+  { node @@ Int $1 }
 | MINUS arithmetic_expression %prec unary_minus
-  { Neg $2 }
+  { node @@ Neg $2 }
 | arithmetic_expression PLUS arithmetic_expression
-  { Binary_arithmetic_operator ($1, Add, $3) }
+  { node @@ Binary_arithmetic_operator ($1, Add, $3) }
 | arithmetic_expression MINUS arithmetic_expression
-  { Binary_arithmetic_operator ($1, Sub, $3) }
+  { node @@ Binary_arithmetic_operator ($1, Sub, $3) }
 | arithmetic_expression STAR arithmetic_expression
-  { Binary_arithmetic_operator ($1, Mul, $3) }
+  { node @@ Binary_arithmetic_operator ($1, Mul, $3) }
 | arithmetic_expression SLASH arithmetic_expression
-  { Binary_arithmetic_operator ($1, Div, $3) }
+  { node @@ Binary_arithmetic_operator ($1, Div, $3) }
 | PREFIX_COUNT
-  { Prefix_count }
+  { node @@ (Prefix_count: AST.arithmetic_expression_node) }
 | SUFFIX_COUNT
-  { Suffix_count }
+  { node @@ (Suffix_count: AST.arithmetic_expression_node) }
 | AFFIX_COUNT
-  { Affix_count }
+  { node @@ (Affix_count: AST.arithmetic_expression_node) }
 | TIER STRING
-  { Tier (Id.make $2) }
+  { node @@ Tier (Id.make $2) }
 | LPAR arithmetic_expression RPAR
   { $2 }
 
 condition:
 | TRUE
-  { True }
+  { node @@ True }
 | FALSE
-  { False }
+  { node @@ False }
 | NOT condition
-  { Not $2 }
+  { node @@ Not $2 }
 | condition AND condition
-  { And ($1, $3) }
+  { node @@ And ($1, $3) }
 | condition OR condition
-  { Or ($1, $3) }
+  { node @@ Or ($1, $3) }
 | arithmetic_expression COMPARISON_OPERATOR arithmetic_expression
-  { Comparison ($1, $2, $3) }
+  { node @@ Comparison ($1, $2, $3) }
 | arithmetic_expression COMPARISON_OPERATOR arithmetic_expression
   COMPARISON_OPERATOR arithmetic_expression
-  { Double_comparison ($1, $2, $3, $4, $5) }
+  { node @@ Double_comparison ($1, $2, $3, $4, $5) }
 | HAS STRING
-  { Has (Id.make $2) }
+  { node @@ Has (Id.make $2) }
 | PREFIX_COUNT INT
-  { Prefix_count ($2, $2) }
+  { node @@ Prefix_count ($2, $2) }
 | PREFIX_COUNT INT DOT_DOT INT
-  { Prefix_count ($2, $4) }
+  { node @@ Prefix_count ($2, $4) }
 | NO_PREFIX
-  { Prefix_count (0, 0) }
+  { node @@ Prefix_count (0, 0) }
 | OPEN_PREFIX
-  { Open_prefix }
+  { node @@ Open_prefix }
 | FULL_PREFIXES
-  { Full_prefixes }
+  { node @@ Full_prefixes }
 | SUFFIX_COUNT INT
-  { Suffix_count ($2, $2) }
+  { node @@ Suffix_count ($2, $2) }
 | SUFFIX_COUNT INT DOT_DOT INT
-  { Suffix_count ($2, $4) }
+  { node @@ Suffix_count ($2, $4) }
 | NO_SUFFIX
-  { Suffix_count (0, 0) }
+  { node @@ Suffix_count (0, 0) }
 | OPEN_SUFFIX
-  { Open_suffix }
+  { node @@ Open_suffix }
 | FULL_SUFFIXES
-  { Full_suffixes }
+  { node @@ Full_suffixes }
 | AFFIX_COUNT INT
-  { Affix_count ($2, $2) }
+  { node @@ Affix_count ($2, $2) }
 | AFFIX_COUNT INT DOT_DOT INT
-  { Affix_count ($2, $4) }
+  { node @@ Affix_count ($2, $4) }
 | NO_AFFIX
-  { Affix_count (0, 0) }
+  { node @@ Affix_count (0, 0) }
 | OPEN_AFFIX
-  { Open_affix }
+  { node @@ Open_affix }
 | FULL_AFFIXES
-  { Full_affixes }
+  { node @@ Full_affixes }
 | LPAR condition RPAR
   { $2 }
 

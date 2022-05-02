@@ -64,3 +64,10 @@ let rec mkdir_p ?(perms = 0o755) path =
     let parent = Filename.dirname path in
     if String.length parent < String.length path then mkdir_p ~perms parent;
     Sys.mkdir path perms
+
+let show_loc (a, b) =
+  sf "File %S, line %d, characters %d-%d"
+    a.Lexing.pos_fname
+    a.Lexing.pos_lnum
+    (a.Lexing.pos_cnum - a.Lexing.pos_bol)
+    (b.Lexing.pos_cnum - a.Lexing.pos_bol)

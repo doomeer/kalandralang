@@ -317,7 +317,7 @@ let make_buy args =
 
 type binary_arithmetic_operator = Add | Sub | Mul | Div
 
-type arithmetic_expression =
+type arithmetic_expression_node =
   (* Constants *)
   | Int of int
   (* Operators *)
@@ -330,15 +330,11 @@ type arithmetic_expression =
   | Affix_count
   | Tier of Id.t
 
-type boundary =
-  {
-    boundary: arithmetic_expression;
-    included: bool;
-  }
+and arithmetic_expression = arithmetic_expression_node node
 
 type comparison_operator = EQ | NE | LT | LE | GT | GE
 
-type condition =
+type condition_node =
   (* Constants *)
   | True
   | False
@@ -363,6 +359,8 @@ type condition =
   | Open_affix
   | Full_affixes
 
+and condition = condition_node node
+
 let maybe_parentheses use_parentheses document =
   let open Pretext in
   if use_parentheses then
@@ -378,7 +376,7 @@ let pp_binary_arithmetic_operator = function
 
 let rec pp_arithmetic_expression ?(ctx = `top) expression =
   let open Pretext in
-  match expression with
+  match expression.node with
     | Int i ->
         int i
     | Neg a ->
@@ -409,7 +407,7 @@ let pp_comparison_operator = function
 
 let rec pp_condition ?(ctx = `top) condition =
   let open Pretext in
-  match condition with
+  match condition.node with
     | True ->
         atom "true"
     | False ->
