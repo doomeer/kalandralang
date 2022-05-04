@@ -206,8 +206,8 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
                 (
                   match Item.mod_tier item modifier with
                     | None ->
-                        fail "don't know how to compute tiers for mod group: %S"
-                          (Id.show mod_group)
+                        fail "don't know how to compute tier for %S in group %S"
+                          (Id.show modifier.id) (Id.show mod_group)
                     | Some tier ->
                         Q.of_int tier
                 )
