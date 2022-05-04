@@ -1443,24 +1443,14 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Holds if the item has the modifier denoted by the given identifier.</td>
 </tr>
 <tr class="even">
-<td><code>no_prefix</code></td>
-<td><code>no_prefix</code></td>
-<td>Holds if the item has no prefixes. Same as <code>prefix_count 0</code>.</td>
-</tr>
-<tr class="odd">
 <td><code>open_prefix</code></td>
 <td><code>open_prefix</code></td>
 <td>Holds if the item has at least one open prefix. This is <em>not</em> equivalent to <code>prefix_count 0..2</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>full_prefixes</code></td>
 <td><code>full_prefixes</code></td>
 <td>Holds if the item cannot have more prefixes. This is <em>not</em> equivalent to <code>prefix_count 3</code> as it depends on the item's rarity.</td>
-</tr>
-<tr class="odd">
-<td><code>no_suffix</code></td>
-<td><code>no_suffix</code></td>
-<td>Holds if the item has no suffixes. Same as <code>suffix_count 0</code>.</td>
 </tr>
 <tr class="even">
 <td><code>open_suffix</code></td>
@@ -1473,16 +1463,11 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Holds if the item cannot have more suffixes. This is <em>not</em> equivalent to <code>suffix_count 3</code> as it depends on the item's rarity.</td>
 </tr>
 <tr class="even">
-<td><code>no_affix</code></td>
-<td><code>no_affix</code></td>
-<td>Holds if the item has no prefix and no suffix. Same as <code>affix_count 0</code>.</td>
-</tr>
-<tr class="odd">
 <td><code>open_affix</code></td>
 <td><code>open_affix</code></td>
 <td>Holds if the item has at least one open prefix or suffix. This is <em>not</em> equivalent to <code>affix_count 0..5</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>full_affixes</code></td>
 <td><code>full_affixes</code></td>
 <td>Holds if the item can have neither more prefixes nor more suffixes. This is <em>not</em> equivalent to <code>affix_count 6</code> as it depends on the item's rarity.</td>
@@ -1510,14 +1495,24 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Same as <code>prefix_count = &lt;number&gt;</code>.</td>
 </tr>
 <tr class="odd">
+<td><code>no_prefix</code></td>
+<td><code>no_prefix</code></td>
+<td>Same as <code>prefix_count = 0</code>.</td>
+</tr>
+<tr class="even">
 <td><code>suffix_count</code></td>
 <td><code>suffix_count &lt;number1&gt;..&lt;number2&gt;</code></td>
 <td>Same as <code>&lt;number1&gt; &lt;= suffix_count &lt;= &lt;number2&gt;</code>.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td><code>suffix_count &lt;number&gt;</code></td>
 <td>Same as <code>suffix_count = &lt;number&gt;</code>.</td>
+</tr>
+<tr class="even">
+<td><code>no_suffix</code></td>
+<td><code>no_suffix</code></td>
+<td>Same as <code>suffix_count = 0</code>.</td>
 </tr>
 <tr class="odd">
 <td><code>affix_count</code></td>
@@ -1528,6 +1523,11 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td></td>
 <td><code>affix_count &lt;number&gt;</code></td>
 <td>Same as <code>affix_count = &lt;number&gt;</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>no_affix</code></td>
+<td><code>no_affix</code></td>
+<td>Same as <code>affix_count = 0</code>.</td>
 </tr>
 </tbody>
 </table>

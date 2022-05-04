@@ -7,7 +7,7 @@ transmute
 
 # Then we spam.
 until has "GlobalSkillGemLevel1" do {
-  if no_prefix then {
+  if prefix_count = 0 then {
     # No prefix: we use an Orb of Augmentation to get one.
     augment
   }

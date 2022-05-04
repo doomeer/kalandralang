@@ -6,7 +6,7 @@
 
   # We spam Orbs of Alteration until we get +1 to Level of All Skill Gems
   # and no suffix (this can take a while).
-  until has "GlobalSkillGemLevel1" and no_suffix do alt
+  until has "GlobalSkillGemLevel1" and suffix_count = 0 do alt
 
 # We'll go back here if we fail to regal a suffix.
 .try_again:
@@ -18,7 +18,7 @@
   regal
 
   # If we didn't get a suffix, we use the imprint to restore the amulet and try again.
-  if prefix_count 2 then {
+  if prefix_count = 2 then {
     use_imprint
     goto .try_again
   }

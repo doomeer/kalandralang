@@ -58,7 +58,7 @@ show
 #
 # "until" does not execute the instruction (here "harvest_reforge_keep_suffixes")
 # if the condition already holds.
-until prefix_count 1 and (has "SpellDamage5" or has "SpellDamage4") do {
+until prefix_count = 1 and (has "SpellDamage5" or has "SpellDamage4") do {
   harvest_reforge_keep_suffixes
 }
 

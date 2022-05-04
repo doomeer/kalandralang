@@ -49,16 +49,34 @@ let rec check_condition ({ node; loc }: AST.condition) =
   match node with
     | True
     | False
-    | Prefix_count _
     | Open_prefix
     | Full_prefixes
-    | Suffix_count _
     | Open_suffix
     | Full_suffixes
-    | Affix_count _
     | Open_affix
     | Full_affixes ->
         ()
+    | Prefix_count (0, 0) ->
+        warn loc "no_prefix and prefix_count 0 are deprecated, use prefix_count = 0 instead"
+    | Prefix_count (a, b) when a = b ->
+        warn loc "prefix_count %d is deprecated, use prefix_count = %d instead" a a
+    | Prefix_count (a, b) ->
+        warn loc "prefix_count %d..%d is deprecated, use %d <= prefix_count <= %d instead"
+          a b a b
+    | Suffix_count (0, 0) ->
+        warn loc "no_suffix and suffix_count 0 are deprecated, use suffix_count = 0 instead"
+    | Suffix_count (a, b) when a = b ->
+        warn loc "suffix_count %d is deprecated, use suffix_count = %d instead" a a
+    | Suffix_count (a, b) ->
+        warn loc "suffix_count %d..%d is deprecated, use %d <= suffix_count <= %d instead"
+          a b a b
+    | Affix_count (0, 0) ->
+        warn loc "no_affix and affix_count 0 are deprecated, use affix_count = 0 instead"
+    | Affix_count (a, b) when a = b ->
+        warn loc "affix_count %d is deprecated, use affix_count = %d instead" a a
+    | Affix_count (a, b) ->
+        warn loc "affix_count %d..%d is deprecated, use %d <= affix_count <= %d instead"
+          a b a b
     | Not a ->
         check_condition a
     | And (a, b)

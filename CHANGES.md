@@ -90,6 +90,15 @@
   (With help from AR-234 and nebuchenazarr
   even though I'm not sure nebuchenazarr is aware of it.)
 
+- `no_prefix`, `prefix_count N`, `prefix_count N..M`,
+  `no_suffix`, `suffix_count N`, `suffix_count N..M`,
+  `no_affix`, `affix_count N` and `affix_count N..M` are now deprecated.
+  You can use the following instead:
+  `prefix_count = 0`, `prefix_count = N`, `N <= prefix_count <= M`,
+  `suffix_count = 0`, `suffix_count = N`, `N <= suffix_count <= M`,
+  `affix_count = 0`, `affix_count = N` and `N <= affix_count <= M`
+  which are instances of the more general arithmetic operation feature.
+
 - Added support for flasks.
   (Contributed by AR-234.)
 

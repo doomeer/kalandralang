@@ -1262,13 +1262,10 @@ The following expressions are conditions that hold depending on the current item
 | Keyword | Usage | Meaning |
 | --- | --- | --- |
 | `has` | `has <identifier>` | Holds if the item has the modifier denoted by the given identifier. |
-| `no_prefix` | `no_prefix` | Holds if the item has no prefixes. Same as `prefix_count 0`. |
 | `open_prefix` | `open_prefix` | Holds if the item has at least one open prefix. This is *not* equivalent to `prefix_count 0..2` as it depends on the item's rarity. |
 | `full_prefixes` | `full_prefixes` | Holds if the item cannot have more prefixes. This is *not* equivalent to `prefix_count 3` as it depends on the item's rarity. |
-| `no_suffix` | `no_suffix` | Holds if the item has no suffixes. Same as `suffix_count 0`. |
 | `open_suffix` | `open_suffix` | Holds if the item has at least one open suffix. This is *not* equivalent to `suffix_count 0..2` as it depends on the item's rarity. |
 | `full_suffixes` | `full_suffixes` | Holds if the item cannot have more suffixes. This is *not* equivalent to `suffix_count 3` as it depends on the item's rarity. |
-| `no_affix` | `no_affix` | Holds if the item has no prefix and no suffix. Same as `affix_count 0`. |
 | `open_affix` | `open_affix` | Holds if the item has at least one open prefix or suffix. This is *not* equivalent to `affix_count 0..5` as it depends on the item's rarity. |
 | `full_affixes` | `full_affixes` | Holds if the item can have neither more prefixes nor more suffixes. This is *not* equivalent to `affix_count 6` as it depends on the item's rarity. |
 
@@ -1279,10 +1276,13 @@ use [Comparisons](#comparisons) on [Item Properties](#item-properties) instead:
 | --- | --- | --- |
 | `prefix_count` | `prefix_count <number1>..<number2>` | Same as `<number1> <= prefix_count <= <number2>`. |
 | | `prefix_count <number>` | Same as `prefix_count = <number>`. |
+| `no_prefix` | `no_prefix` | Same as `prefix_count = 0`. |
 | `suffix_count` | `suffix_count <number1>..<number2>` | Same as `<number1> <= suffix_count <= <number2>`. |
 | | `suffix_count <number>` | Same as `suffix_count = <number>`. |
+| `no_suffix` | `no_suffix` | Same as `suffix_count = 0`. |
 | `affix_count` | `affix_count <number1>..<number2>` | Same as `<number1> <= affix_count <= <number2>`. |
 | | `affix_count <number>` | Same as `affix_count = <number>`. |
+| `no_affix` | `no_affix` | Same as `affix_count = 0`. |
 
 #### Comparisons
 
