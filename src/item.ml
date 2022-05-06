@@ -223,7 +223,6 @@ let mod_tier =
       full_mod_pool (domain, item_tags)
       |> List.filter_map has_mod_group
     in
-    let exception Same in
     (* [mod2] and [mod1] are reversed because we want to sort in reverse order. *)
     let by_ilvl_or_stat (mod2: Mod.t) (mod1: Mod.t) =
       let c = Int.compare mod1.required_level mod2.required_level in
@@ -234,38 +233,33 @@ let mod_tier =
           let add_stats acc ({ id = _; min; max }: Mod.stat) = acc + min + max in
           List.fold_left add_stats 0 modifier.stats
         in
-        let c = Int.compare (sum_stats mod1) (sum_stats mod2) in
-        if c <> 0 then c else (
-          (* echo "same: %s and %s" (Mod.show With_ranges mod2) (Mod.show With_ranges mod1); *)
-          raise Same
-        )
+        (* echo "same: %s and %s" (Mod.show With_ranges mod2) (Mod.show With_ranges mod1); *)
+        Int.compare (sum_stats mod1) (sum_stats mod2)
     in
-    try
-      Some (List.sort by_ilvl_or_stat pool)
-    with Same ->
-      None
+    List.sort by_ilvl_or_stat pool |> list_group by_ilvl_or_stat
   in
   let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_group, mod_id) ->
-    match sort_mod_group (domain, item_tags, mod_group) with
-      | None ->
+    let sorted_group = sort_mod_group (domain, item_tags, mod_group) in
+    let rec find_mod tier = function
+      | [] ->
+          (* echo "cannot find mod %s" (Id.show mod_id); *)
+          (* let echo_mod modifier = *)
+          (*   echo "- %s" (Mod.show With_ranges modifier) *)
+          (* in *)
+          (* echo "tags = %s" (Id.Set.show item_tags); *)
+          (* List.iter echo_mod sorted_group; *)
           None
-      | Some sorted_group ->
-          let rec find_mod tier = function
-            | [] ->
-                (* echo "cannot find mod %s" (Id.show mod_id); *)
-                (* let echo_mod modifier = *)
-                (*   echo "- %s" (Mod.show With_ranges modifier) *)
-                (* in *)
-                (* echo "tags = %s" (Id.Set.show item_tags); *)
-                (* List.iter echo_mod sorted_group; *)
-                None
-            | head :: tail ->
-                if Id.compare head.Mod.id mod_id = 0 then
-                  Some tier
-                else
-                  find_mod (tier + 1) tail
-          in
-          find_mod 1 sorted_group
+      | head :: tail ->
+          if
+            List.exists
+              (fun candidate -> Id.compare candidate.Mod.id mod_id = 0)
+              head
+          then
+            Some tier
+          else
+            find_mod (tier + 1) tail
+    in
+    find_mod 1 sorted_group
   in
   let essence_mod_tier mod_id =
     match Essence.by_mod_id_opt mod_id with

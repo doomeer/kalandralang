@@ -71,3 +71,19 @@ let show_loc (a, b) =
     a.Lexing.pos_lnum
     (a.Lexing.pos_cnum - a.Lexing.pos_bol)
     (b.Lexing.pos_cnum - a.Lexing.pos_bol)
+
+let list_group compare list =
+  let rec loop last group_acc acc = function
+    | [] ->
+        List.rev (List.rev group_acc :: acc)
+    | head :: tail ->
+        if compare head last = 0 then
+          loop head (head :: group_acc) acc tail
+        else
+          loop head [ head ] (List.rev group_acc :: acc) tail
+  in
+  match list with
+    | [] ->
+        []
+    | head :: tail ->
+        loop head [ head ] [] tail
