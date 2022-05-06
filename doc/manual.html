@@ -184,6 +184,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#item-properties">Item Properties</a><ul>
 <li><a href="#modifier-tiers">Modifier Tiers</a></li>
 </ul></li>
+<li><a href="#converting-condition-to-arithmetic-expressions">Converting Condition to Arithmetic Expressions</a></li>
 </ul></li>
 </ul></li>
 </ul>
@@ -1670,5 +1671,17 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 do
   chaos
 </code></pre>
+<h4 id="converting-condition-to-arithmetic-expressions">Converting Condition to Arithmetic Expressions</h4>
+<p>Brackets <code>[ ... ]</code> convert <a href="#conditions">Conditions</a> to arithmetic expressions. If the condition inside the brackets holds, the arithmetic expression evaluates to <code>1</code>. Else, it evaluates to <code>0</code>.</p>
+<p>For instance:</p>
+<pre><code>buy &quot;Metadata/Items/Amulets/Amulet9&quot;
+until
+  [tier &quot;Intelligence&quot; &lt;= 3] +
+  [tier &quot;Dexterity&quot; &lt;= 3] +
+  [tier &quot;Strength&quot; &lt;= 3]
+  &gt;= 2
+do chaos
+</code></pre>
+<p>is a recipe that uses Deafening Essences of Spite on an Agate Amulet until it has at least two attribute modifiers, both of them tier 3 or better.</p>
 </body>
 </html>

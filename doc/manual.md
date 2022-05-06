@@ -1385,3 +1385,22 @@ until
 do
   chaos
 ```
+
+#### Converting Condition to Arithmetic Expressions
+
+Brackets `[ ... ]` convert [Conditions](#conditions) to arithmetic expressions.
+If the condition inside the brackets holds, the arithmetic expression evaluates
+to `1`. Else, it evaluates to `0`.
+
+For instance:
+```
+buy "Metadata/Items/Amulets/Amulet9"
+until
+  [tier "Intelligence" <= 3] +
+  [tier "Dexterity" <= 3] +
+  [tier "Strength" <= 3]
+  >= 2
+do chaos
+```
+is a recipe that uses Chaos Orbs on an Agate Amulet
+until it has at least two attribute modifiers, both of them tier 3 or better.

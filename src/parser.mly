@@ -18,7 +18,7 @@
 %token PREFIX_COUNT NO_PREFIX OPEN_PREFIX FULL_PREFIXES
 %token SUFFIX_COUNT NO_SUFFIX OPEN_SUFFIX FULL_SUFFIXES
 %token AFFIX_COUNT NO_AFFIX OPEN_AFFIX FULL_AFFIXES
-%token LPAR RPAR LBRACE RBRACE
+%token LPAR RPAR LBRACE RBRACE LBRACKET RBRACKET
 %token <AST.comparison_operator> COMPARISON_OPERATOR
 %token <AST.currency> CURRENCY
 %token <Fossil.t> FOSSIL
@@ -92,6 +92,8 @@ arithmetic_expression:
   { node @@ Tier (Id.make $2) }
 | LPAR arithmetic_expression RPAR
   { $2 }
+| LBRACKET condition RBRACKET
+  { node @@ Int_of_bool $2 }
 
 condition:
 | TRUE
@@ -112,31 +114,31 @@ condition:
 | HAS STRING
   { node @@ Has (Id.make $2) }
 | PREFIX_COUNT INT
-  { node @@ Prefix_count ($2, $2) }
+  { node @@ C_prefix_count ($2, $2) }
 | PREFIX_COUNT INT DOT_DOT INT
-  { node @@ Prefix_count ($2, $4) }
+  { node @@ C_prefix_count ($2, $4) }
 | NO_PREFIX
-  { node @@ Prefix_count (0, 0) }
+  { node @@ C_prefix_count (0, 0) }
 | OPEN_PREFIX
   { node @@ Open_prefix }
 | FULL_PREFIXES
   { node @@ Full_prefixes }
 | SUFFIX_COUNT INT
-  { node @@ Suffix_count ($2, $2) }
+  { node @@ C_suffix_count ($2, $2) }
 | SUFFIX_COUNT INT DOT_DOT INT
-  { node @@ Suffix_count ($2, $4) }
+  { node @@ C_suffix_count ($2, $4) }
 | NO_SUFFIX
-  { node @@ Suffix_count (0, 0) }
+  { node @@ C_suffix_count (0, 0) }
 | OPEN_SUFFIX
   { node @@ Open_suffix }
 | FULL_SUFFIXES
   { node @@ Full_suffixes }
 | AFFIX_COUNT INT
-  { node @@ Affix_count ($2, $2) }
+  { node @@ C_affix_count ($2, $2) }
 | AFFIX_COUNT INT DOT_DOT INT
-  { node @@ Affix_count ($2, $4) }
+  { node @@ C_affix_count ($2, $4) }
 | NO_AFFIX
-  { node @@ Affix_count (0, 0) }
+  { node @@ C_affix_count (0, 0) }
 | OPEN_AFFIX
   { node @@ Open_affix }
 | FULL_AFFIXES

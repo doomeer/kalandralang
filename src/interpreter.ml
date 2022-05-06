@@ -105,6 +105,8 @@ module Q:
 sig
   type t
   val show: t -> string
+  val zero: t
+  val one: t
   val make: int -> int -> t
   val of_int: int -> t
   val neg: t -> t
@@ -138,6 +140,10 @@ struct
 
   let of_int i = i, 1
 
+  let zero = of_int 0
+
+  let one = of_int 1
+
   let neg (n, d) = -n, d
 
   let inv (n, d) =
@@ -158,6 +164,16 @@ struct
     let n, _ = sub a b in
     Int.compare n 0
 end
+
+let eval_comparison_operator a (op: AST.comparison_operator) b =
+  let c = Q.compare a b in
+  match op with
+    | EQ -> c = 0
+    | NE -> c <> 0
+    | LT -> c < 0
+    | LE -> c <= 0
+    | GT -> c > 0
+    | GE -> c >= 0
 
 let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression) =
   match expression.node with
@@ -215,18 +231,13 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
                 (* Items are not supposed to have several modifiers of the same group?? *)
                 fail "item has multiple affixes for mod group: %S" (Id.show mod_group)
         )
+    | Int_of_bool condition ->
+        if eval_condition state condition then
+          Q.one
+        else
+          Q.zero
 
-let eval_comparison_operator a (op: AST.comparison_operator) b =
-  let c = Q.compare a b in
-  match op with
-    | EQ -> c = 0
-    | NE -> c <> 0
-    | LT -> c < 0
-    | LE -> c <= 0
-    | GT -> c > 0
-    | GE -> c >= 0
-
-let rec eval_condition state (condition: AST.condition) =
+and eval_condition state (condition: AST.condition) =
   match condition.node with
     | True ->
         true
@@ -253,7 +264,7 @@ let rec eval_condition state (condition: AST.condition) =
     | Has id ->
         with_item state @@ fun item ->
         Item.has_mod_id id item
-    | Prefix_count (min, max) ->
+    | C_prefix_count (min, max) ->
         with_item state @@ fun item ->
         let count = Item.prefix_count item in
         min <= count && count <= max
@@ -263,7 +274,7 @@ let rec eval_condition state (condition: AST.condition) =
     | Full_prefixes ->
         with_item state @@ fun item ->
         Item.prefix_count item >= Item.max_prefix_count item
-    | Suffix_count (min, max) ->
+    | C_suffix_count (min, max) ->
         with_item state @@ fun item ->
         let count = Item.suffix_count item in
         min <= count && count <= max
@@ -273,7 +284,7 @@ let rec eval_condition state (condition: AST.condition) =
     | Full_suffixes ->
         with_item state @@ fun item ->
         Item.suffix_count item >= Item.max_suffix_count item
-    | Affix_count (min, max) ->
+    | C_affix_count (min, max) ->
         with_item state @@ fun item ->
         let count = Item.affix_count item in
         min <= count && count <= max

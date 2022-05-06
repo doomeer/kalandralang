@@ -222,6 +222,8 @@ rule token = parse
   | ')' { RPAR }
   | '{' { LBRACE }
   | '}' { RBRACE }
+  | '[' { LBRACKET }
+  | ']' { RBRACKET }
   | ':' { COLON }
   | '+' { PLUS }
   | '-' { MINUS }

@@ -317,6 +317,8 @@ let make_buy args =
 
 type binary_arithmetic_operator = Add | Sub | Mul | Div
 
+type comparison_operator = EQ | NE | LT | LE | GT | GE
+
 type arithmetic_expression_node =
   (* Constants *)
   | Int of int
@@ -329,12 +331,12 @@ type arithmetic_expression_node =
   | Suffix_count
   | Affix_count
   | Tier of Id.t
+  (* Conversions *)
+  | Int_of_bool of condition
 
 and arithmetic_expression = arithmetic_expression_node node
 
-type comparison_operator = EQ | NE | LT | LE | GT | GE
-
-type condition_node =
+and condition_node =
   (* Constants *)
   | True
   | False
@@ -349,13 +351,13 @@ type condition_node =
       arithmetic_expression
   (* Item Conditions *)
   | Has of Id.t
-  | Prefix_count of int * int
+  | C_prefix_count of int * int
   | Open_prefix
   | Full_prefixes
-  | Suffix_count of int * int
+  | C_suffix_count of int * int
   | Open_suffix
   | Full_suffixes
-  | Affix_count of int * int
+  | C_affix_count of int * int
   | Open_affix
   | Full_affixes
 
@@ -373,6 +375,14 @@ let pp_binary_arithmetic_operator = function
   | Sub -> Pretext.atom "-"
   | Mul -> Pretext.atom "*"
   | Div -> Pretext.atom "/"
+
+let pp_comparison_operator = function
+  | EQ -> Pretext.atom "="
+  | NE -> Pretext.atom "<>"
+  | LT -> Pretext.atom "<"
+  | LE -> Pretext.atom "<="
+  | GT -> Pretext.atom ">"
+  | GE -> Pretext.atom ">="
 
 let rec pp_arithmetic_expression ?(ctx = `top) expression =
   let open Pretext in
@@ -396,16 +406,9 @@ let rec pp_arithmetic_expression ?(ctx = `top) expression =
     | Suffix_count -> atom "suffix_count"
     | Affix_count -> atom "affix_count"
     | Tier x -> box [ atom "tier"; space; Id.pp x ]
+    | Int_of_bool x -> box [ atom "["; pp_condition x; atom "]" ]
 
-let pp_comparison_operator = function
-  | EQ -> Pretext.atom "="
-  | NE -> Pretext.atom "<>"
-  | LT -> Pretext.atom "<"
-  | LE -> Pretext.atom "<="
-  | GT -> Pretext.atom ">"
-  | GE -> Pretext.atom ">="
-
-let rec pp_condition ?(ctx = `top) condition =
+and pp_condition ?(ctx = `top) condition =
   let open Pretext in
   match condition.node with
     | True ->
@@ -450,31 +453,31 @@ let rec pp_condition ?(ctx = `top) condition =
         ]
     | Has modifier ->
         seq [ atom "has"; space; Id.pp modifier ]
-    | Prefix_count (0, 0) ->
+    | C_prefix_count (0, 0) ->
         atom "no_prefix"
-    | Prefix_count (a, b) when a = b ->
+    | C_prefix_count (a, b) when a = b ->
         seq [ atom "prefix_count"; space; int a ]
-    | Prefix_count (a, b) ->
+    | C_prefix_count (a, b) ->
         seq [ atom "prefix_count"; space; int a; atom ".."; int b ]
     | Open_prefix ->
         atom "open_prefix"
     | Full_prefixes ->
         atom "full_prefixes"
-    | Suffix_count (0, 0) ->
+    | C_suffix_count (0, 0) ->
         atom "no_suffix"
-    | Suffix_count (a, b) when a = b ->
+    | C_suffix_count (a, b) when a = b ->
         seq [ atom "suffix_count"; space; int a ]
-    | Suffix_count (a, b) ->
+    | C_suffix_count (a, b) ->
         seq [ atom "suffix_count"; space; int a; atom ".."; int b ]
     | Open_suffix ->
         atom "open_suffix"
     | Full_suffixes ->
         atom "full_suffixes"
-    | Affix_count (0, 0) ->
+    | C_affix_count (0, 0) ->
         atom "no_affix"
-    | Affix_count (a, b) when a = b ->
+    | C_affix_count (a, b) when a = b ->
         seq [ atom "affix_count"; space; int a ]
-    | Affix_count (a, b) ->
+    | C_affix_count (a, b) ->
         seq [ atom "affix_count"; space; int a; atom ".."; int b ]
     | Open_affix ->
         atom "open_affix"
