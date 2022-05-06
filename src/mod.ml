@@ -73,6 +73,7 @@ type t =
        This can thus change future spawn weights. *)
     adds_tags: Id.Set.t;
     stats: stat list;
+    is_essence_only: bool;
   }
 
 let is_prefix modifier =
@@ -146,7 +147,7 @@ let pp_stat { id; min; max } =
 let pp {
     id; domain; generation_type; group; required_level;
     spawn_weights; generation_weights;
-    tags; adds_tags; stats;
+    tags; adds_tags; stats; is_essence_only;
   } =
   Pretext.OCaml.record [
     "id", Id.pp id;
@@ -159,6 +160,7 @@ let pp {
     "tags", Id.Set.pp tags;
     "adds_tags", Id.Set.pp adds_tags;
     "stats", Pretext.OCaml.list pp_stat stats;
+    "is_essence_only", Pretext.OCaml.bool is_essence_only;
   ]
 
 let pool = ref []
@@ -225,6 +227,7 @@ let load filename =
       let adds_tags = ref Id.Set.empty in
       let stats = ref [] in
       let name = ref Id.empty in
+      let is_essence_only = ref false in
       let handle_value (field, value) =
         match field with
           | "domain" ->
@@ -277,6 +280,8 @@ let load filename =
                 }
               in
               stats := JSON.as_array value |> List.map as_stat
+          | "is_essence_only" ->
+              is_essence_only := JSON.as_bool value
           | _ ->
               ()
       in
@@ -339,6 +344,7 @@ let load filename =
                         tags = !tags;
                         adds_tags = !adds_tags;
                         stats = !stats;
+                        is_essence_only = !is_essence_only;
                       }
                     in
                     match Id.Map.find_opt id !id_map with

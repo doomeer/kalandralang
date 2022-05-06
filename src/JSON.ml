@@ -50,6 +50,13 @@ let show_origin json =
 let fail json message =
   failwith (show_origin json ^ ": " ^ message)
 
+let as_bool json =
+  match json.json with
+    | `Bool x ->
+        x
+    | _ ->
+        fail json "not a boolean"
+
 let as_int json =
   match json.json with
     | `Float x ->

@@ -1,4 +1,4 @@
-let version = "KKASH004"
+let version = "KKASH005"
 
 exception Wrong_version
 
@@ -15,6 +15,9 @@ let i_fixed_string size o = really_input_string o size
 
 let o_byte = output_byte
 let i_byte = input_byte
+
+let o_bool o b = o_byte o (if b then 1 else 0)
+let i_bool i = i_byte i <> 0
 
 let o_int = output_binary_int
 let i_int = input_binary_int
@@ -203,7 +206,7 @@ let i_mod_stat i: Mod.stat =
 
 let o_mod o (
     { id; domain; generation_type; group; required_level; spawn_weights;
-      generation_weights; tags; adds_tags; stats }: Mod.t
+      generation_weights; tags; adds_tags; stats; is_essence_only }: Mod.t
   ) =
   o_id o id;
   o_base_item_domain o domain;
@@ -214,7 +217,8 @@ let o_mod o (
   o_list (o_pair o_id o_int) o generation_weights;
   o_id_set o tags;
   o_id_set o adds_tags;
-  o_list o_mod_stat o stats
+  o_list o_mod_stat o stats;
+  o_bool o is_essence_only
 
 let i_mod i: Mod.t =
   let id = i_id i in
@@ -227,8 +231,9 @@ let i_mod i: Mod.t =
   let tags = i_id_set i in
   let adds_tags = i_id_set i in
   let stats = i_list i_mod_stat i in
+  let is_essence_only = i_bool i in
   { id; domain; generation_type; group; required_level; spawn_weights;
-    generation_weights; tags; adds_tags; stats }
+    generation_weights; tags; adds_tags; stats; is_essence_only }
 
 let o_stat_translation_condition o ({ min; max }: Stat_translation.condition) =
   o_option o_int o min;

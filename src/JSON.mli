@@ -14,6 +14,8 @@ val show_origin: t -> string
 
 val fail: t -> string -> 'a
 
+val as_bool: t -> bool
+
 val as_int: t -> int
 
 val as_float: t -> float
