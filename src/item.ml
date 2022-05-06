@@ -267,11 +267,21 @@ let mod_tier =
           in
           find_mod 1 sorted_group
   in
+  let essence_mod_tier mod_id =
+    match Essence.by_mod_id_opt mod_id with
+      | None ->
+          None
+      | Some essence ->
+          Some (Essence.tier essence.level)
+  in
   fun item (modifier: Mod.t) ->
     (* We use [base_tags] and not the [tags] function
        because we don't want the mod pool to be modified by added tags such as
        [has_flat_intelligence_mod] when computing tiers. *)
-    mod_tier_memoized (modifier.domain, base_tags item, modifier.group, modifier.id)
+    if modifier.is_essence_only then
+      essence_mod_tier modifier.id
+    else
+      mod_tier_memoized (modifier.domain, base_tags item, modifier.group, modifier.id)
 
 let show_modifier item { modifier; fractured } =
   let tier = mod_tier item modifier in

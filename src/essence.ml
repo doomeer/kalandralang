@@ -18,6 +18,16 @@ type level =
   | Deafening (* 7 *)
   | Corrupted (* 8 - Horror, Insanity, etc. *)
 
+let tier = function
+  | Whispering -> 7
+  | Muttering -> 6
+  | Weeping -> 5
+  | Wailing -> 4
+  | Screaming -> 3
+  | Shrieking -> 2
+  | Deafening
+  | Corrupted -> 1
+
 type t =
   {
     id: Id.t;
@@ -48,11 +58,76 @@ type t =
     on_wand: Id.t;
   }
 
+(* Map from essence id to essence. *)
 let id_map = ref Id.Map.empty
 
+(* Reverse map from modifier identifier to essence. *)
+let mod_id_map = ref Id.Map.empty
+
+let add_to_mod_id_map
+    (
+      {
+        id = _;
+        name = _;
+        item_level_restriction = _;
+        level = _;
+        on_amulet;
+        on_belt;
+        on_body_armour;
+        on_boots;
+        on_bow;
+        on_claw;
+        on_dagger;
+        on_gloves;
+        on_helmet;
+        on_one_hand_axe;
+        on_one_hand_mace;
+        on_one_hand_sword;
+        on_quiver;
+        on_ring;
+        on_sceptre;
+        on_shield;
+        on_staff;
+        on_thrusting_one_hand_sword;
+        on_two_hand_axe;
+        on_two_hand_mace;
+        on_two_hand_sword;
+        on_wand;
+      }
+      as essence
+    ) =
+  let add id = mod_id_map := Id.Map.add id essence !mod_id_map in
+  add on_amulet;
+  add on_belt;
+  add on_body_armour;
+  add on_boots;
+  add on_bow;
+  add on_claw;
+  add on_dagger;
+  add on_gloves;
+  add on_helmet;
+  add on_one_hand_axe;
+  add on_one_hand_mace;
+  add on_one_hand_sword;
+  add on_quiver;
+  add on_ring;
+  add on_sceptre;
+  add on_shield;
+  add on_staff;
+  add on_thrusting_one_hand_sword;
+  add on_two_hand_axe;
+  add on_two_hand_mace;
+  add on_two_hand_sword;
+  add on_wand;
+  ()
+
 type data = t Id.Map.t
+
 let export (): data = !id_map
-let import (x: data) = id_map := x
+
+let import (x: data) =
+  id_map := x;
+  Id.Map.iter (fun _ -> add_to_mod_id_map) x
 
 let load filename =
   let add_entry (id, json) =
@@ -109,6 +184,7 @@ let load filename =
             }
           in
           id_map := Id.Map.add id essence !id_map;
+          add_to_mod_id_map essence
   in
   List.iter add_entry JSON.(parse_file filename |> as_object)
 
@@ -167,6 +243,8 @@ let by_id id =
         fail "no essence with id %S" (Id.show id)
     | Some x ->
         x
+
+let by_mod_id_opt id = Id.Map.find_opt id !mod_id_map
 
 let deafening_of_anger_id = Id.make "Metadata/Items/Currency/CurrencyEssenceAnger6"
 let deafening_of_anguish_id = Id.make "Metadata/Items/Currency/CurrencyEssenceAnguish4"
