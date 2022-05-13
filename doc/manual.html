@@ -1439,9 +1439,19 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </thead>
 <tbody>
 <tr class="odd">
+<td><code>has_mod</code></td>
+<td><code>has_mod &lt;identifier&gt;</code></td>
+<td>Holds if the item has the modifier denoted by the given identifier.</td>
+</tr>
+<tr class="even">
+<td><code>has_group</code></td>
+<td><code>has_group &lt;identifier&gt;</code></td>
+<td>Holds if the item has a modifier from the modifier group denoted by the given identifier.</td>
+</tr>
+<tr class="odd">
 <td><code>has</code></td>
 <td><code>has &lt;identifier&gt;</code></td>
-<td>Holds if the item has the modifier denoted by the given identifier.</td>
+<td>Equivalent to <code>has_mod &lt;identifier&gt; or has_group &lt;identifier&gt;</code>.</td>
 </tr>
 <tr class="even">
 <td><code>open_prefix</code></td>
@@ -1682,6 +1692,6 @@ until
   &gt;= 2
 do chaos
 </code></pre>
-<p>is a recipe that uses Deafening Essences of Spite on an Agate Amulet until it has at least two attribute modifiers, both of them tier 3 or better.</p>
+<p>is a recipe that uses Chaos Orbs on an Agate Amulet until it has at least two attribute modifiers, both of them tier 3 or better.</p>
 </body>
 </html>

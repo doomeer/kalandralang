@@ -351,6 +351,8 @@ and condition_node =
       arithmetic_expression
   (* Item Conditions *)
   | Has of Id.t
+  | Has_mod of Id.t
+  | Has_group of Id.t
   | C_prefix_count of int * int
   | Open_prefix
   | Full_prefixes
@@ -453,6 +455,10 @@ and pp_condition ?(ctx = `top) condition =
         ]
     | Has modifier ->
         seq [ atom "has"; space; Id.pp modifier ]
+    | Has_mod modifier ->
+        seq [ atom "has_mod"; space; Id.pp modifier ]
+    | Has_group modifier ->
+        seq [ atom "has_group"; space; Id.pp modifier ]
     | C_prefix_count (0, 0) ->
         atom "no_prefix"
     | C_prefix_count (a, b) when a = b ->

@@ -43,6 +43,8 @@
     | "and" -> AND
     | "or" -> OR
     | "has" -> HAS
+    | "has_mod" -> HAS_MOD
+    | "has_group" -> HAS_GROUP
     | "prefix_count" -> PREFIX_COUNT
     | "no_prefix" -> NO_PREFIX
     | "open_prefix" -> OPEN_PREFIX

@@ -106,6 +106,9 @@ let has_a_suffix item =
 let has_mod_id modifier_id item =
   List.exists (fun { modifier; _ } -> Id.compare modifier.Mod.id modifier_id = 0) item.mods
 
+let has_mod_group_id group_id item =
+  List.exists (fun { modifier; _ } -> Id.compare modifier.Mod.group group_id = 0) item.mods
+
 let has_mod modifier item =
   has_mod_id modifier.Mod.id item
 

@@ -263,7 +263,13 @@ and eval_condition state (condition: AST.condition) =
           false
     | Has id ->
         with_item state @@ fun item ->
+        Item.has_mod_group_id id item || Item.has_mod_id id item
+    | Has_mod id ->
+        with_item state @@ fun item ->
         Item.has_mod_id id item
+    | Has_group id ->
+        with_item state @@ fun item ->
+        Item.has_mod_group_id id item
     | C_prefix_count (min, max) ->
         with_item state @@ fun item ->
         let count = Item.prefix_count item in

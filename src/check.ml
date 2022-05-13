@@ -30,6 +30,14 @@ let check_mod_group loc mod_group_id =
   if not (Mod.group_exists mod_group_id) then
     error loc "unknown modifier group: %S" (Id.show mod_group_id)
 
+let check_mod_or_group loc id =
+  if not (Mod.group_exists id) then
+    match Mod.by_id_opt id with
+      | None ->
+          error loc "unknown modifier or modifier group: %S" (Id.show id)
+      | Some _ ->
+          ()
+
 let rec check_arithmetic_expression ({ node; loc }: AST.arithmetic_expression) =
   match node with
     | Int _
@@ -93,7 +101,11 @@ and check_condition ({ node; loc }: AST.condition) =
         check_arithmetic_expression b;
         check_arithmetic_expression c
     | Has modifier ->
+        check_mod_or_group loc modifier
+    | Has_mod modifier ->
         check_mod loc modifier
+    | Has_group modifier ->
+        check_mod_group loc modifier
 
 let check_recipe ast =
   let rec gather_labels ((declared, used) as acc) (ast: AST.t) =

@@ -134,6 +134,13 @@
 - You can no longer use an Awakener's Orb if both items have the same influence.
   (Contributed by AR-234.)
 
+- Added predicates `has_mod <id>` and `has_group <id>`.
+  Predicate `has_mod <id>` holds if the current item has a modifier with the given
+  modifier identifier (i.e. the old behavior of `has`).
+  Predicate `has_group <id>` holds if the current item has a modifier with the given
+  modifier group identifier.
+  Predicate `has <id>` is now equivalent to `has_mod <id> or has_group <id>`.
+
 ## Version 0.1.0
 
 First released version.

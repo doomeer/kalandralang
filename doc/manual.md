@@ -1261,7 +1261,9 @@ The following expressions are conditions that hold depending on the current item
 
 | Keyword | Usage | Meaning |
 | --- | --- | --- |
-| `has` | `has <identifier>` | Holds if the item has the modifier denoted by the given identifier. |
+| `has_mod` | `has_mod <identifier>` | Holds if the item has the modifier denoted by the given identifier. |
+| `has_group` | `has_group <identifier>` | Holds if the item has a modifier from the modifier group denoted by the given identifier. |
+| `has` | `has <identifier>` | Equivalent to `has_mod <identifier> or has_group <identifier>`. |
 | `open_prefix` | `open_prefix` | Holds if the item has at least one open prefix. This is *not* equivalent to `prefix_count 0..2` as it depends on the item's rarity. |
 | `full_prefixes` | `full_prefixes` | Holds if the item cannot have more prefixes. This is *not* equivalent to `prefix_count 3` as it depends on the item's rarity. |
 | `open_suffix` | `open_suffix` | Holds if the item has at least one open suffix. This is *not* equivalent to `suffix_count 0..2` as it depends on the item's rarity. |
