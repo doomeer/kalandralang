@@ -141,6 +141,18 @@
   modifier group identifier.
   Predicate `has <id>` is now equivalent to `has_mod <id> or has_group <id>`.
 
+- Modifier identifiers are no longer shown by default.
+
+- Added command-line option `--show-mod-id` (short-hand `-m`)
+  which causes modifier identifiers to be displayed after modifiers,
+  in parentheses (i.e. it restores the previous behavior).
+
+- Added command-line option `--show-mod-group-id` (short-hand `-g`)
+  which causes modifier group identifiers to be displayed after modifiers,
+  in parentheses.
+  Tip: to show both modifier identifiers and modifier group identifiers,
+  use `-mg` (or `-gm`).
+
 ## Version 0.1.0
 
 First released version.

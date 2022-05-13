@@ -299,6 +299,23 @@ let main () =
                to then reproduce it with --seed."
             false
         in
+        Mod.show_identifiers :=
+          Clap.flag
+            ~set_long: "show-mod-id"
+            ~set_short: 'm'
+            ~unset_long: "no-mod-id"
+            ~unset_short: 'M'
+            ~description: "When displaying modifiers, also display their identifier."
+            false;
+        Mod.show_group_identifiers :=
+          Clap.flag
+            ~set_long: "show-mod-group-id"
+            ~set_short: 'g'
+            ~unset_long: "no-mod-group-id"
+            ~unset_short: 'G'
+            ~description:
+              "When displaying modifiers, also display the identifier of their mod group."
+            false;
         let no_item =
           Clap.flag
             ~set_long: "no-item"

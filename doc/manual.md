@@ -252,41 +252,41 @@ Item we bought:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) +29 to maximum Life (IncreasedLife2)
-(prefix) 20% increased maximum Energy Shield (IncreasedEnergyShieldPercent7)
-(suffix) +24% to Global Critical Strike Multiplier (CriticalMultiplier3)
-(suffix) +17% to Cold Resistance (ColdResist2)
+(prefix) +29 to maximum Life
+(prefix) 20% increased maximum Energy Shield
+(suffix) +24% to Global Critical Strike Multiplier
+(suffix) +17% to Cold Resistance
 --------
 Paid up to now: 0.01ex (1c)
 Item after essence spam:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 0.73% of Physical Attack Damage Leeched as Life (LifeLeechPermyriad2)
-(suffix) 25% increased Fire Damage (FireDamagePercent5)
-(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
-(suffix) +38% to Global Critical Strike Multiplier (CriticalMultiplier6)
+(prefix) 0.73% of Physical Attack Damage Leeched as Life
+(suffix) 25% increased Fire Damage
+(suffix) 18% increased Cast Speed
+(suffix) +38% to Global Critical Strike Multiplier
 --------
 Paid up to now: 3.49ex (604c)
 Item after harvest reforges:
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 18% increased Spell Damage (SpellDamage4)
-(suffix) 24% increased Fire Damage (FireDamagePercent5)
-(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
-(suffix) +36% to Global Critical Strike Multiplier (CriticalMultiplier6)
+(prefix) 18% increased Spell Damage
+(suffix) 24% increased Fire Damage
+(suffix) 18% increased Cast Speed
+(suffix) +36% to Global Critical Strike Multiplier
 --------
 Paid up to now: 18.49ex (3198c)
 --------
 Citrine Amulet (Rare)
 --------
-(prefix) 18% increased Spell Damage (SpellDamage4)
-(prefix) +1 to Level of all Fire Skill Gems (GlobalFireGemLevel1_)
-(suffix) 23% increased Fire Damage (FireDamagePercent5)
-(suffix) 18% increased Cast Speed (IncreasedCastSpeed4)
-(suffix) +38% to Global Critical Strike Multiplier (CriticalMultiplier6)
-(prefix) {crafted} +45 to maximum Life (EinharMasterIncreasedLife3)
+(prefix) 18% increased Spell Damage
+(prefix) +1 to Level of all Fire Skill Gems
+(suffix) 23% increased Fire Damage
+(suffix) 18% increased Cast Speed
+(suffix) +38% to Global Critical Strike Multiplier
+(prefix) {crafted} +45 to maximum Life
 --------
 Cost:
      1 × chaos

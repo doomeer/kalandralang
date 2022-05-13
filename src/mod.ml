@@ -375,6 +375,9 @@ type show_mode =
   | With_ranges
   | With_random_values
 
+let show_identifiers = ref false
+let show_group_identifiers = ref false
+
 let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
   let generation_type =
     match modifier.generation_type with
@@ -439,7 +442,9 @@ let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
           String.concat ("\n" ^ margin) strings
   in
   generation_type ^ fractured ^ domain ^ tier ^
-  translated_mod ^ " (" ^ Id.show modifier.id ^ ")"
+  translated_mod ^
+  (if !show_identifiers then " (" ^ Id.show modifier.id ^ ")" else "") ^
+  (if !show_group_identifiers then " (" ^ Id.show modifier.group ^ ")" else "")
 
 let multimod_id = Id.make "StrIntMasterItemGenerationCanHaveMultipleCraftedMods"
 let prefixes_cannot_be_changed_id = Id.make "StrMasterItemGenerationCannotChangePrefixes"
