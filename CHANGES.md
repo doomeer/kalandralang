@@ -153,6 +153,8 @@
   Tip: to show both modifier identifiers and modifier group identifiers,
   use `-mg` (or `-gm`).
 
+- The default league is now Sentinel.
+
 ## Version 0.1.0
 
 First released version.

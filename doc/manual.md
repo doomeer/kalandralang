@@ -82,7 +82,7 @@ kalandralang update-costs
 ```
 If you are from the future, you may need to specify the league name:
 ```sh
-kalandralang update-costs --ninja-league Archnemesis
+kalandralang update-costs --ninja-league Sentinel
 ```
 You can also specify the folder to read from TFT's repository:
 ```
