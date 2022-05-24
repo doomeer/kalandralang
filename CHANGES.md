@@ -155,6 +155,19 @@
 
 - The default league is now Sentinel.
 
+- Revamped the `find` command: added options to filter by identifier, group, domain,
+  or name / translation, and to only list items or only list modifiers.
+  Note that previously, commands such as `find int` would search for `int`
+  both in identifiers and mod translations. Now it only searches in mod translations,
+  but you can search in identifiers separately with `find -i int`.
+  You can combine those options, for instance `find -d crafted -g int dex` returns
+  crafted modifiers with a group that contain `int` and with `dex` in the translation
+  (so it returns all +#-# to Dexterity and Intelligence modifiers).
+  You can also use Perl regular expressions instead of shell globs.
+  For instance, `find -ri ^Recombinator` lists all modifiers that can only appear
+  using recombinators (`-r` means "use regular expressions", `-i` means "identifier",
+  and `^` means "at the beginning").
+
 ## Version 0.1.0
 
 First released version.

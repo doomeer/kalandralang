@@ -9,6 +9,17 @@ type domain =
   | Abyss_jewel
   | Flask
 
+let all_domains =
+  [
+    Item;
+    Crafted;
+    Veiled;
+    Unveiled;
+    Misc;
+    Abyss_jewel;
+    Flask;
+  ]
+
 let show_domain = function
   | Item -> "Item"
   | Crafted -> "Crafted"
@@ -21,24 +32,26 @@ let show_domain = function
 let pp_domain domain =
   Pretext.OCaml.variant (show_domain domain) []
 
+let parse_domain = function
+  | "item" ->
+      Some Item
+  | "crafted" ->
+      Some Crafted
+  | "veiled" ->
+      Some Veiled
+  | "unveiled" ->
+      Some Unveiled
+  | "misc" ->
+      Some Misc
+  | "abyss_jewel" ->
+      Some Abyss_jewel
+  | "flask" ->
+      Some Flask
+  | _ ->
+      None
+
 let as_domain json =
-  match JSON.as_string json with
-    | "item" ->
-        Some Item
-    | "crafted" ->
-        Some Crafted
-    | "veiled" ->
-        Some Veiled
-    | "unveiled" ->
-        Some Unveiled
-    | "misc" ->
-        Some Misc
-    | "abyss_jewel" ->
-        Some Abyss_jewel
-    | "flask" ->
-        Some Flask
-    | _ ->
-        None
+  JSON.as_string json |> parse_domain
 
 type t =
   {

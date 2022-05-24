@@ -180,18 +180,63 @@ let run_recipe recipe ~batch_options ~display_options =
   ) in
   !run_index
 
-let find pattern =
-  let rex = rex_glob (String.lowercase_ascii pattern) in
-  let matches s = String.lowercase_ascii s =~ rex in
+type find_filters =
+  {
+    rex: bool;
+    search_in_modifiers: bool;
+    search_in_base_items: bool;
+    domain: Base_item.domain option;
+    identifier: string option;
+    group: string option;
+    translation: string option;
+  }
+
+let find
+    {
+      rex = use_rex;
+      search_in_modifiers;
+      search_in_base_items;
+      domain;
+      identifier;
+      group;
+      translation;
+    } =
+  let rex pattern =
+    let pattern = String.lowercase_ascii pattern in
+    if use_rex then
+      rex pattern
+    else
+      rex_glob pattern
+  in
+  let identifier = Option.map rex identifier in
+  let group = Option.map rex group in
+  let translation = Option.map rex translation in
+  let (=~) s r = String.lowercase_ascii s =~ r in
+  let search_in_base_items = search_in_base_items && group = None in
   let find_in_base_item _ (base_item: Base_item.t) =
-    if matches (Id.show base_item.name) then (
+    if
+      (
+        match domain with
+          | None -> true
+          | Some x -> base_item.domain = x
+      ) &&
+      (
+        match identifier with
+          | None -> true
+          | Some x -> Id.show base_item.id =~ x
+      ) &&
+      (
+        match translation with
+          | None -> true
+          | Some x -> Id.show base_item.name =~ x
+      )
+    then (
       Pretext.to_channel stdout (Base_item.pp base_item);
       echo "";
     )
   in
-  Id.Map.iter find_in_base_item !Base_item.id_map;
   let find_in_mod (modifier: Mod.t) =
-    let stat_matches (stat: Mod.stat) =
+    let stat_matches pattern (stat: Mod.stat) =
       match Id.Map.find_opt stat.id !Stat_translation.by_id with
         | None ->
             false
@@ -207,19 +252,38 @@ let find pattern =
                 |> List.map show_part
                 |> String.concat ""
               in
-              matches string
+              string =~ pattern
             in
             List.exists translation_matches translations
     in
     if
-      matches (Id.show modifier.id) ||
-      List.exists stat_matches modifier.stats
+      (
+        match domain with
+          | None -> true
+          | Some x -> modifier.domain = x
+      ) &&
+      (
+        match identifier with
+          | None -> true
+          | Some x -> Id.show modifier.id =~ x
+      ) &&
+      (
+        match group with
+          | None -> true
+          | Some x -> Id.show modifier.group =~ x
+      ) &&
+      (
+        match translation with
+          | None -> true
+          | Some x -> List.exists (stat_matches x) modifier.stats
+      )
     then (
       echo "%s" (Mod.show With_ranges modifier);
       echo "%s" (Pretext.show (Mod.pp modifier));
     )
   in
-  List.iter find_in_mod !Mod.pool;
+  if search_in_base_items then Id.Map.iter find_in_base_item !Base_item.id_map;
+  if search_in_modifiers then List.iter find_in_mod !Mod.pool;
   ()
 
 let main () =
@@ -439,21 +503,95 @@ let main () =
       (
         Clap.case "find"
           ~description:
-            "Find the identifier of a base item from its name, or \
-             modifier from its English translation."
+            "Find item bases or modifiers.\n\
+             \n\
+             For criterias taking a PATTERN argument, PATTERN is a \
+             case-insensitive shell-like glob expression. For \
+             instance, '+1 to Level of All Fire Skill Gems' matches \
+             pattern 'to level * gem'."
         @@ fun () ->
-        let pattern =
-          Clap.mandatory_string
-            ~placeholder: "PATTERN"
+        let rex =
+          Clap.flag
+            ~set_long: "rex"
+            ~set_short: 'r'
             ~description:
-              "Pattern to look for, e.g. 'agate' or 'to skill gem \
-               level'. You can use shell-like glob expressions, \
-               e.g. 'to * level' will find all mods that contain 'to ' \
-               followed by anything followed by ' level'. Search is \
-               case-insensitive."
+              "PATTERNs are case-insensitive Perl regular expressions \
+               instead of shell-like glob expressions."
+            false
+        in
+        let only_modifiers =
+          Clap.flag
+            ~set_long: "modifier"
+            ~set_short: 'm'
+            ~description: "Only return modifiers."
+            false
+        in
+        let only_base_items =
+          Clap.flag
+            ~set_long: "base-item"
+            ~set_short: 'b'
+            ~description: "Only return base items."
+            false
+        in
+        let domain =
+          Clap.optional_string
+            ~long: "domain"
+            ~short: 'd'
+            ~placeholder: "DOMAIN"
+            ~description: (
+              "Only return entries in the given domain (one of: " ^
+              String.concat ", " (List.map Base_item.show_domain Base_item.all_domains) ^
+              ")."
+            )
             ()
         in
-        `find pattern
+        let identifier =
+          Clap.optional_string
+            ~long: "identifier"
+            ~short: 'i'
+            ~placeholder: "PATTERN"
+            ~description: "Only return entries for which the identifier matches PATTERN."
+            ()
+        in
+        let group =
+          Clap.optional_string
+            ~long: "group"
+            ~short: 'g'
+            ~placeholder: "PATTERN"
+            ~description:
+              "Only return entries for which the group matches \
+               PATTERN. Only modifiers have a group, so this implies \
+               --modifier."
+            ()
+        in
+        let translation =
+          Clap.optional_string
+            ~placeholder: "PATTERN"
+            ~description:
+              "Only return entries for which the English name / \
+               translation matches PATTERN."
+            ()
+        in
+        let domain =
+          match domain with
+            | None ->
+                None
+            | Some domain ->
+                match Base_item.parse_domain domain with
+                  | None ->
+                      fail "unknown domain: %s" domain
+                  | Some domain ->
+                      Some domain
+        in
+        `find {
+          rex;
+          search_in_modifiers = not only_base_items;
+          search_in_base_items = not only_modifiers;
+          domain;
+          identifier;
+          group;
+          translation;
+        }
       );
       (
         Clap.case "write-default-costs"
