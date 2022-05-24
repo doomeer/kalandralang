@@ -33,6 +33,7 @@ Kalandralang supports:
 - basic currencies;
 - Eldricht currencies except Orb of Conflict;
 - Awakener's Orb;
+- Orb of Dominance;
 - essences;
 - most fossils;
 - the crafting bench;
@@ -45,7 +46,6 @@ Kalandralang supports:
 
 Kalandralang does not support in particular:
 - Hollow and Sanctified Fossils;
-- Orb of Dominance;
 - cluster jewels;
 - implicits other than Eldritch implicits;
 - actual modifier values and currencies and crafts that affect those values
