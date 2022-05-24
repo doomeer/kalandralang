@@ -237,6 +237,9 @@ let powerful_resonator: field =
 let prime_resonator: field =
   r "Prime Chaotic Resonator" "prime_resonator" 40.
 
+let orb_of_dominance: field =
+  c "Orb of Dominance" "orb_of_dominance" ex
+
 let awaken: field =
   c "Awakener's Orb" "awaken" ex
 
@@ -548,6 +551,8 @@ let get_currency (currency: AST.currency) =
         in
         let fossils = List.fold_left (+.) 0. (List.map get_fossil fossils) in
         resonator +. fossils
+    | Orb_of_dominance ->
+        get orb_of_dominance
     | Awakeners_orb ->
         get awaken
     | Ember Lesser ->

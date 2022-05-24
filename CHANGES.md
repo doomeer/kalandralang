@@ -168,6 +168,8 @@
   using recombinators (`-r` means "use regular expressions", `-i` means "identifier",
   and `^` means "at the beginning").
 
+- Added Orb of Dominance.
+
 ## Version 0.1.0
 
 First released version.

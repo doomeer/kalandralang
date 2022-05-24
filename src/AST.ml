@@ -76,6 +76,7 @@ type currency =
   | Veiled_chaos_orb
   | Essence of Essence.name
   | Fossils of Fossil.t list
+  | Orb_of_dominance
   | Awakeners_orb
   | Ember of eldritch_currency_tier
   | Ichor of eldritch_currency_tier
@@ -126,6 +127,7 @@ let show_currency = function
   | Veiled_chaos_orb -> "veiled_chaos"
   | Essence name -> "essence_of_" ^ Essence.show_name name
   | Fossils fossils -> String.concat " + " (List.map Fossil.show fossils)
+  | Orb_of_dominance -> "orb_of_dominance"
   | Awakeners_orb -> "awaken"
   | Ember Lesser -> "lesser_ember"
   | Ember Greater -> "greater_ember"

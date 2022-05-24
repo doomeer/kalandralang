@@ -1,0 +1,17 @@
+# Start from boots with three influenced prefixes.
+buy hunter ilvl 86 "Metadata/Items/Armours/Boots/BootsAtlas1"
+  with "AdditionalPierceInfluence1"
+  with "SocketedChaosGemLevelInfluence1"
+  with "UnaffectedByDesecratedGroundInfluence1_"
+
+# Remove suffixes.
+until open_suffix do harvest_reforge_keep_prefixes
+prefixes_cannot_be_changed
+scour
+
+# Remove a mod, elevate a mod.
+orb_of_dominance
+
+# One of the influence mods should have been elevated.
+# If this mod is pierce, it will only reach T1 and not Elevated tier,
+# since original item had T2.

@@ -115,6 +115,7 @@
     | "shuddering" -> FOSSIL Shuddering
     | "fundamental" -> FOSSIL Fundamental
     | "deft" -> FOSSIL Deft
+    | "orb_of_dominance" -> CURRENCY Orb_of_dominance
     | "awaken" -> CURRENCY Awakeners_orb
     | "lesser_ember" -> CURRENCY (Ember Lesser)
     | "greater_ember" -> CURRENCY (Ember Greater)

@@ -180,27 +180,31 @@ type only =
    - etc. *)
 (* TODO: can improve performances further by not returning Eldritch implicits
    and treating them separately. *)
-let full_mod_pool = memoize @@ fun (domain, item_tags) ->
+let full_mod_pool = memoize @@ fun (domain, item_tags, keep_weight_0_tag) ->
   let can_spawn_mod modifier =
     if modifier.Mod.domain <> domain then
       None
     else
-      let matching_tag (tag, weight) =
-        if Id.Set.mem tag item_tags then
-          Some weight
-        else
-          None
-      in
-      match List.find_map matching_tag modifier.spawn_weights with
+      let matching_tag (tag, _) = Id.Set.mem tag item_tags in
+      match List.find_opt matching_tag modifier.spawn_weights with
         | None ->
             None
-        | Some weight when weight <= 0 && domain <> Crafted ->
-            None
-        | Some weight ->
-            match List.find_map matching_tag modifier.generation_weights with
+        | Some (tag, weight) when weight <= 0 && domain <> Crafted ->
+            (
+              match keep_weight_0_tag with
+                | None ->
+                    None
+                | Some keep_tag ->
+                    if Id.compare tag keep_tag = 0 then
+                      Some (weight, modifier)
+                    else
+                      None
+            )
+        | Some (_, weight) ->
+            match List.find_opt matching_tag modifier.generation_weights with
               | None ->
                   Some (weight, modifier)
-              | Some percent_multiplier ->
+              | Some (_, percent_multiplier) ->
                   let weight = weight * percent_multiplier / 100 in
                   if weight <= 0 && domain <> Crafted then
                     None
@@ -209,40 +213,40 @@ let full_mod_pool = memoize @@ fun (domain, item_tags) ->
   in
   List.filter_map can_spawn_mod !Mod.pool
 
-let mod_tier =
-  let sort_mod_group = memoize @@ fun (domain, item_tags, mod_group) ->
-    let pool =
-      let has_mod_group (_, modifier) =
-        match modifier.Mod.generation_type with
-          | Prefix | Suffix ->
-              if Id.compare modifier.Mod.group mod_group = 0 then
-                Some modifier
-              else
-                None
-          | Exarch_implicit _ | Eater_implicit _ ->
-              (* We don't want those in the mod pool while computing tiers. *)
+let sort_mod_group = memoize @@ fun (domain, item_tags, mod_group, keep_weight_0_tag) ->
+  let pool =
+    let has_mod_group (_, modifier) =
+      match modifier.Mod.generation_type with
+        | Prefix | Suffix ->
+            if Id.compare modifier.Mod.group mod_group = 0 then
+              Some modifier
+            else
               None
-      in
-      full_mod_pool (domain, item_tags)
-      |> List.filter_map has_mod_group
+        | Exarch_implicit _ | Eater_implicit _ ->
+            (* We don't want those in the mod pool while computing tiers. *)
+            None
     in
-    (* [mod2] and [mod1] are reversed because we want to sort in reverse order. *)
-    let by_ilvl_or_stat (mod2: Mod.t) (mod1: Mod.t) =
-      let c = Int.compare mod1.required_level mod2.required_level in
-      if c <> 0 then c else
-        (* Both mods require the same ilvl.
-           So we try to sort by stats instead. *)
-        let sum_stats (modifier: Mod.t) =
-          let add_stats acc ({ id = _; min; max }: Mod.stat) = acc + min + max in
-          List.fold_left add_stats 0 modifier.stats
-        in
-        (* echo "same: %s and %s" (Mod.show With_ranges mod2) (Mod.show With_ranges mod1); *)
-        Int.compare (sum_stats mod1) (sum_stats mod2)
-    in
-    List.sort by_ilvl_or_stat pool |> list_group by_ilvl_or_stat
+    full_mod_pool (domain, item_tags, keep_weight_0_tag)
+    |> List.filter_map has_mod_group
   in
+  (* [mod2] and [mod1] are reversed because we want to sort in reverse order. *)
+  let by_ilvl_or_stat (mod2: Mod.t) (mod1: Mod.t) =
+    let c = Int.compare mod1.required_level mod2.required_level in
+    if c <> 0 then c else
+      (* Both mods require the same ilvl.
+         So we try to sort by stats instead. *)
+      let sum_stats (modifier: Mod.t) =
+        let add_stats acc ({ id = _; min; max }: Mod.stat) = acc + min + max in
+        List.fold_left add_stats 0 modifier.stats
+      in
+      (* echo "same: %s and %s" (Mod.show With_ranges mod2) (Mod.show With_ranges mod1); *)
+      Int.compare (sum_stats mod1) (sum_stats mod2)
+  in
+  List.sort by_ilvl_or_stat pool |> list_group by_ilvl_or_stat
+
+let mod_tier =
   let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_group, mod_id) ->
-    let sorted_group = sort_mod_group (domain, item_tags, mod_group) in
+    let sorted_group = sort_mod_group (domain, item_tags, mod_group, None) in
     let rec find_mod tier = function
       | [] ->
           (* echo "cannot find mod %s" (Id.show mod_id); *)
@@ -429,7 +433,7 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
     if unveiled then Unveiled else
       item.base.domain
   in
-  let mod_pool = List.filter_map can_spawn_mod (full_mod_pool (domain, item_tags)) in
+  let mod_pool = List.filter_map can_spawn_mod (full_mod_pool (domain, item_tags, None)) in
   let mod_pool =
     match mod_group_multiplier with
       | None ->
@@ -942,3 +946,91 @@ let unveil item =
   let pool = remove_mod_group mod2 pool in
   let mod3 = random_from_pool pool in
   item, List.filter_map Fun.id [ mod1; mod2; mod3 ]
+
+let apply_orb_of_dominance item =
+  let influences =
+    match item.influence with
+      | SEC x -> [ x ]
+      | SEC_pair (x, y) -> [ x; y ]
+      | Not_influenced
+      | Fractured
+      | Synthesized
+      | Exarch
+      | Eater
+      | Exarch_and_eater ->
+          fail "item does not have a Shaper / Elder / Conqueror influence"
+  in
+  let candidates =
+    let elevate_if_possible { modifier; fractured } =
+      let elevate_with_influence_if_possible (influence: Influence.sec) =
+        match Base_tag.get_influence_tag_for_tags item.base.tags influence with
+          | None ->
+              None
+          | Some influence_tag ->
+              let has_weight (tag, _) = Id.compare tag influence_tag = 0 in
+              if List.exists has_weight modifier.spawn_weights then
+                let mod_group =
+                  sort_mod_group (
+                    modifier.domain,
+                    base_tags item,
+                    modifier.group,
+                    Some influence_tag
+                  )
+                in
+                let rec elevate upgraded_version = function
+                  | [] ->
+                      upgraded_version
+                  | [ head ] :: tail ->
+                      if Id.compare head.Mod.id modifier.id = 0 then
+                        upgraded_version
+                      else
+                        elevate (Some head) tail
+                  | (_ :: _ :: _ | []) :: _ ->
+                      (* Cannot elevate when there are multiple or no mods to elevate to. *)
+                      None
+                in
+                Some (modifier, elevate None mod_group)
+              else
+                None
+      in
+      if fractured then
+        None
+      else
+        List.find_map elevate_with_influence_if_possible influences
+    in
+    List.filter_map elevate_if_possible item.mods
+  in
+  (* Choose a mod to elevate. *)
+  let elevatable_candidates =
+    List.filter_map
+      (fun (m, e) -> match e with None -> None | Some e -> Some (m, e))
+      candidates
+  in
+  let candidate_count = List.length elevatable_candidates in
+  if candidate_count <= 0 then fail "item has no mod that can be elevated";
+  let to_elevate, elevated =
+    List.nth elevatable_candidates (Random.int candidate_count)
+  in
+  (* Remove chosen mod from list of candidates. *)
+  let candidates =
+    List.filter
+      (fun (m, _) -> Id.compare m.Mod.id to_elevate.id <> 0)
+      candidates
+  in
+  (* Choose a mod to remove. *)
+  let candidate_count = List.length candidates in
+  if candidate_count <= 0 then fail "item must have at least two influenced modifiers";
+  let to_remove, _ = List.nth candidates (Random.int candidate_count) in
+  (* Replace the mods on the item. *)
+  let mods =
+    List.filter_map
+      (fun ({ modifier; _ } as x) ->
+         if Id.compare modifier.id to_remove.id = 0 then
+           None
+         else if Id.compare modifier.id to_elevate.id = 0 then
+           Some { modifier = elevated; fractured = false }
+         else
+           Some x)
+      item.mods
+  in
+  { item with mods }

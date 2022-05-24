@@ -463,6 +463,9 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         item_can_be_rare item;
         return @@ Item.reforge_rare ~fossils (Item.set_rarity Rare item)
+    | Orb_of_dominance ->
+        with_item state @@ fun item ->
+        return @@ Item.apply_orb_of_dominance item
     | Awakeners_orb ->
         with_item state @@ fun item ->
         with_aside state @@ fun aside ->
