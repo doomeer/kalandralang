@@ -20,6 +20,7 @@
 %token SUFFIX_COUNT NO_SUFFIX OPEN_SUFFIX FULL_SUFFIXES
 %token AFFIX_COUNT NO_AFFIX OPEN_AFFIX FULL_AFFIXES
 %token LPAR RPAR LBRACE RBRACE LBRACKET RBRACKET
+%token RECOMBINE
 %token <AST.comparison_operator> COMPARISON_OPERATOR
 %token <AST.currency> CURRENCY
 %token <Fossil.t> FOSSIL
@@ -184,6 +185,8 @@ simple_instruction:
   { node @@ Simple (Apply (Fossils ($1 :: $2))) }
 | CRAFT STRING
   { node @@ Simple (Apply (Craft (Id.make $2))) }
+| RECOMBINE
+  { node @@ Simple Recombine }
 | SET_ASIDE
   { node @@ Simple Set_aside }
 | SWAP

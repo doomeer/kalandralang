@@ -243,6 +243,15 @@ let orb_of_dominance: field =
 let awaken: field =
   c "Awakener's Orb" "awaken" ex
 
+let armour_recombinator: field =
+  c "Armour Recombinator" "armour_recombinator" 7.
+
+let weapon_recombinator: field =
+  c "Weapon Recombinator" "weapon_recombinator" 7.
+
+let jewellery_recombinator: field =
+  c "Jewellery Recombinator" "jewellery_recombinator" 7.
+
 let lesser_ember: field =
   c "Lesser Eldritch Ember" "lesser_ember" 0.5
 
@@ -555,6 +564,12 @@ let get_currency (currency: AST.currency) =
         get orb_of_dominance
     | Awakeners_orb ->
         get awaken
+    | Armour_recombinator ->
+        get armour_recombinator
+    | Weapon_recombinator ->
+        get weapon_recombinator
+    | Jewellery_recombinator ->
+        get jewellery_recombinator
     | Ember Lesser ->
         get lesser_ember
     | Ember Greater ->

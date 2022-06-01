@@ -64,6 +64,12 @@ let set_max_rarity item =
 let is_fractured item =
   List.exists (fun { fractured; _ } -> fractured) item.mods
 
+let is_prefix { modifier; _ } =
+  Mod.is_prefix modifier
+
+let is_suffix { modifier; _ } =
+  Mod.is_suffix modifier
+
 let is_prefix_or_suffix { modifier; _ } =
   Mod.is_prefix_or_suffix modifier
 
@@ -161,6 +167,9 @@ let tags item =
 
 let has_tag tag item =
   Id.Set.mem tag (tags item)
+
+let get_type item =
+  Base_tag.get_item_type_from_tags item.base.tags
 
 type only =
   | Prefixes_and_suffixes
@@ -1034,3 +1043,159 @@ let apply_orb_of_dominance item =
       item.mods
   in
   { item with mods }
+
+let get_influence_tags item =
+  match item.influence with
+    | Not_influenced
+    | Fractured
+    | Synthesized
+    | Exarch
+    | Eater
+    | Exarch_and_eater ->
+        Id.Set.empty
+    | SEC sec ->
+        (
+          match Base_tag.get_influence_tag (get_type item) sec with
+            | None -> Id.Set.empty
+            | Some tag -> Id.Set.singleton tag
+        )
+    | SEC_pair (sec1, sec2) ->
+        let item_type = get_type item in
+        let tags1 =
+          match Base_tag.get_influence_tag item_type sec1 with
+            | None -> Id.Set.empty
+            | Some tag -> Id.Set.singleton tag
+        in
+        let tags2 =
+          match Base_tag.get_influence_tag item_type sec2 with
+            | None -> Id.Set.empty
+            | Some tag -> Id.Set.singleton tag
+        in
+        Id.Set.union tags1 tags2
+
+(* /r/pathofexile/comments/v0nm0c/the_complete_guide_to_recombinators/ *)
+let recombine item1 item2 =
+  let selected_base, forbidden_influence_tags =
+    let selected_item, forbidden_influence_tags =
+      let item1_influence_tags = get_influence_tags item1 in
+      let item2_influence_tags = get_influence_tags item2 in
+      if Random.bool () then
+        (* The only influenced mods that can occur on the item we don't pick
+           necessarily have the influence of this item.
+           We can thus simply forbid the influences of the item we don't
+           pick, unless the item we pick has those influences. *)
+        item1, Id.Set.diff item2_influence_tags item1_influence_tags
+      else
+        item2, Id.Set.diff item1_influence_tags item2_influence_tags
+    in
+    {
+      base = selected_item.base;
+      level = (item1.level + item2.level) / 2; (* TODO: check *)
+      tags = selected_item.tags;
+      rarity = Rare; (* Will be updated at the end. *)
+      mods = List.filter (fun m -> not (is_prefix_or_suffix m)) selected_item.mods;
+      split = selected_item.split;
+      influence = selected_item.influence;
+    },
+    forbidden_influence_tags
+  in
+  let prefix_mod_pool =
+    List.filter is_prefix item1.mods @
+    List.filter is_prefix item2.mods
+  in
+  let suffix_mod_pool =
+    List.filter is_suffix item1.mods @
+    List.filter is_suffix item2.mods
+  in
+  let pick pool =
+    let count =
+      match List.length pool with
+        | 0 ->
+            0
+        | 1 ->
+            (
+              match Random.int 3 with
+                | 0 | 1 -> 1
+                | 2 | _ -> 0
+            )
+        | 2 ->
+            (
+              match Random.int 3 with
+                | 0 -> 2
+                | 1 | 2 | _ -> 1
+            )
+        | 3 ->
+            let c = Random.int 100 in
+            if c < 20 then 3 else
+            if c < 70 then 2 else
+              1
+        | 4 ->
+            let c = Random.int 100 in
+            if c < 35 then 3 else
+            if c < 90 then 2 else
+              1
+        | 5 ->
+            let c = Random.int 100 in
+            if c < 50 then 3 else 2
+        | _ ->
+            let c = Random.int 100 in
+            if c < 70 then 3 else 2
+    in
+    (* Remove mods that require influence which is not present. *)
+    (* TODO: It is unclear if the mods should be removed before or after
+       computing [count]. *)
+    let pool =
+      let not_forbidden { modifier; _ } =
+        let not_forbidden_weight (tag, _) =
+          not (Id.Set.mem tag forbidden_influence_tags)
+        in
+        List.for_all not_forbidden_weight modifier.spawn_weights
+      in
+      List.filter not_forbidden pool
+    in
+    (* Pick mods, but do not select the same group twice. *)
+    let rec pick pool acc n =
+      if n <= 0 then
+        acc
+      else
+        (* Pick a random mod. *)
+        match pool with
+          | [] ->
+              acc
+          | _ :: _ ->
+              let selected_mod = List.nth pool (Random.int (List.length pool)) in
+              (* Remove mods that can no longer be picked. *)
+              let pool =
+                let can_still_be_picked { modifier; _ } =
+                  Id.compare modifier.group selected_mod.modifier.group <> 0
+                in
+                List.filter can_still_be_picked pool
+              in
+              pick pool (selected_mod :: acc) (n - 1)
+    in
+    pick pool [] count
+  in
+  let prefixes = pick prefix_mod_pool in
+  let suffixes = pick suffix_mod_pool in
+  let result =
+    set_to_lowest_possible_rarity
+      { selected_base with mods = selected_base.mods @ prefixes @ suffixes }
+  in
+  (* Chance to upgrade or downgrade a tier. *)
+  let result =
+    if Random.int 8 = 0 then
+      result (* TODO: upgrade a mod *)
+    else if Random.int 8 = 0 then
+      result (* TODO: downgrade a mod *)
+    else
+      result
+  in
+  (* Chance to add a random mod. *)
+  (* TODO: chance to add a special mod instead *)
+  let result =
+    if Random.int 8 = 0 then
+      spawn_random_mod ~fail_if_impossible: false result
+    else
+      result
+  in
+  result

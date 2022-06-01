@@ -143,7 +143,8 @@ let check_recipe ast =
           if not (Label_set.mem label declared_labels) then
             error loc "unknown label: %s" (AST.Label.show label)
       | Simple (
-          Stop | Apply _ | Set_aside | Swap | Use_imprint | Gain _ | Echo _ | Show |
+          Stop | Apply _ | Set_aside | Recombine |
+          Swap | Use_imprint | Gain _ | Echo _ | Show |
           Show_mod_pool | Show_unveil_mod_pool
         ) ->
           ()

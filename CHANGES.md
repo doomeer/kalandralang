@@ -170,6 +170,11 @@
 
 - Added Orb of Dominance.
 
+- Added partial support for recombinators.
+  The chances to select modifiers is likely to be very accurate,
+  however special effects (adding a mod, changing a tier…) are not fully implemented
+  and their chances were evaluated from a very small sample size.
+
 ## Version 0.1.0
 
 First released version.

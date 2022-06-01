@@ -1,0 +1,21 @@
+# This example shows how to use recombinators.
+
+# We start from a pair of boots.
+buy "Metadata/Items/Armours/Boots/BootsAtlas2"
+  with "IncreasedLife1"
+  with "LightningResist8"
+  with "FireResist8"
+  with "ColdResist8"
+
+# We set this item aside.
+set_aside
+
+# We buy another pair of boots.
+buy "Metadata/Items/Armours/Boots/BootsDex9"
+  with "IncreasedLife0"
+  with fractured "ChanceToSuppressSpells5__"
+  with "Dexterity9"
+  with "Strength9"
+
+# We recombine the two pairs of boots together.
+recombine

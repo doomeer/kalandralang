@@ -117,6 +117,10 @@
     | "deft" -> FOSSIL Deft
     | "orb_of_dominance" -> CURRENCY Orb_of_dominance
     | "awaken" -> CURRENCY Awakeners_orb
+    | "armour_recombinator" -> CURRENCY Armour_recombinator
+    | "weapon_recombinator" -> CURRENCY Weapon_recombinator
+    | "jewellery_recombinator" -> CURRENCY Jewellery_recombinator
+    | "recombine" -> RECOMBINE
     | "lesser_ember" -> CURRENCY (Ember Lesser)
     | "greater_ember" -> CURRENCY (Ember Greater)
     | "grand_ember" -> CURRENCY (Ember Grand)

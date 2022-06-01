@@ -78,6 +78,9 @@ type currency =
   | Fossils of Fossil.t list
   | Orb_of_dominance
   | Awakeners_orb
+  | Armour_recombinator
+  | Weapon_recombinator
+  | Jewellery_recombinator
   | Ember of eldritch_currency_tier
   | Ichor of eldritch_currency_tier
   | Eldritch_annul
@@ -129,6 +132,9 @@ let show_currency = function
   | Fossils fossils -> String.concat " + " (List.map Fossil.show fossils)
   | Orb_of_dominance -> "orb_of_dominance"
   | Awakeners_orb -> "awaken"
+  | Armour_recombinator -> "armour_recombinator"
+  | Weapon_recombinator -> "weapon_recombinator"
+  | Jewellery_recombinator -> "jewellery_recombinator"
   | Ember Lesser -> "lesser_ember"
   | Ember Greater -> "greater_ember"
   | Ember Grand -> "grand_ember"
@@ -497,6 +503,7 @@ type simple_instruction =
   | Stop
   | Buy of buy
   | Apply of currency
+  | Recombine
   | Set_aside
   | Swap
   | Use_imprint
@@ -544,6 +551,8 @@ let pp_simple_instruction instruction =
         pp_buy buy
     | Apply currency ->
         pp_currency currency
+    | Recombine ->
+        atom "recombine"
     | Set_aside ->
         atom "set_aside"
     | Swap ->

@@ -32,6 +32,7 @@ You can also find more examples in the
 Kalandralang supports:
 - basic currencies;
 - Eldricht currencies except Orb of Conflict;
+- recombinators (partial support: special effects are not fully implemented);
 - Awakener's Orb;
 - Orb of Dominance;
 - essences;

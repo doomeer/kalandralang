@@ -354,6 +354,49 @@ let item_cannot_be_split (item: Item.t) =
   if item.split then
     fail "item is split"
 
+let recombinator_category (item_type: Base_tag.item_type) =
+  match item_type with
+    | Body_armour
+    | Boots
+    | Gloves
+    | Helmet ->
+        `armour
+    | Bow
+    | Claw
+    | Dagger
+    | One_hand_axe
+    | One_hand_mace
+    | One_hand_sword
+    | Quiver
+    | Rune_dagger
+    | Sceptre
+    | Shield
+    | Staff
+    | Thrusting_one_hand_sword
+    | Two_hand_axe
+    | Two_hand_mace
+    | Two_hand_sword
+    | Wand
+    | Warstaff ->
+        `weapon
+    | Amulet
+    | Belt
+    | Ring ->
+        `jewellery
+    | Other ->
+        fail "cannot recombine this type of items"
+
+let recombine state (expected_category: [ `armour | `weapon | `jewellery ]) =
+  with_item state @@ fun item ->
+  with_aside state @@ fun aside ->
+  let item_type = Item.get_type item in
+  let aside_type = Item.get_type item in
+  if item_type <> aside_type then
+    fail "cannot recombine: incompatible base types";
+  if recombinator_category item_type <> expected_category then
+    fail "cannot recombine this type of items with this type of recombinators";
+  Item.recombine item aside
+
 let apply_currency state (currency: AST.currency) =
   state.debug (AST.show_currency currency);
   let return item =
@@ -445,7 +488,7 @@ let apply_currency state (currency: AST.currency) =
         let essence = Essence.by_name name in
         let modifier =
           match
-            Essence.get_mod essence Base_tag.(get_item_type_from_tags item.base.tags)
+            Essence.get_mod essence (Item.get_type item)
           with
             | None ->
                 fail "cannot use an essence on this item type"
@@ -512,6 +555,12 @@ let apply_currency state (currency: AST.currency) =
           |> Item.spawn_additional_random_mods
         in
         { (return item) with aside = None }
+    | Armour_recombinator ->
+        { (return @@ recombine state `armour) with aside = None }
+    | Weapon_recombinator ->
+        { (return @@ recombine state `weapon) with aside = None }
+    | Jewellery_recombinator ->
+        { (return @@ recombine state `jewellery) with aside = None }
     | Ember tier ->
         with_item state @@ fun item ->
         return @@ Item.apply_eldritch_ember (AST.eldritch_tier_of_currency tier) item
@@ -708,6 +757,17 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
     | Apply currency ->
         let state = apply_currency state currency in
         goto_next state
+    | Recombine ->
+        with_item state @@ fun item ->
+        goto_next (
+          match recombinator_category (Item.get_type item) with
+            | `armour ->
+                apply_currency state Armour_recombinator
+            | `weapon ->
+                apply_currency state Weapon_recombinator
+            | `jewellery ->
+                apply_currency state Jewellery_recombinator
+        )
     | Set_aside ->
         state.debug "set aside";
         with_item state @@ fun item ->

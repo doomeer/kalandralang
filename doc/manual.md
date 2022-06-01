@@ -488,7 +488,8 @@ item has no suffix.
 When executing a recipe, Kalandralang stores a *set-aside item* in memory.
 At the very start, there is no set-aside item.
 Use the `set_aside` instruction to set the current item aside (see [Set Aside](#set-aside)).
-Items can be set aside for [Awakener's Orb](#awakeners-orb) in particular.
+Items can be set aside for [Awakener's Orb](#awakeners-orb)
+and [Recombinators](#recombinators) in particular.
 Note that [Splitting](#split) an item replaces the set-aside item.
 
 #### Current Imprint
@@ -648,6 +649,19 @@ This usually results in a Marble Amulet with the hunter modifier
 Projectiles Pierce an additional Target and the warlord modifier
 #% increased Area of Effect. But as both items could have more
 than one influenced modifier, this is not guaranteed.
+
+##### Recombinators
+
+| Keyword | Currency |
+| --- | --- |
+| `armour_recombinator` | Armour Recombinator |
+| `weapon_recombinator` | Weapon Recombinator |
+| `jewellery_recombinator` | Jewellery Recombinator |
+| `recombine` | Armour Recombinator, Weapon Recombinator, or Jewellery Recombinator (chosen according to the base type of the current item) |
+
+All recombinator instructions recombine the [Current Item](#current-item) and the
+[Set-Aside Item](#set-aside-item) together. Both item are deleted and the current item
+becomes the result of the recombination.
 
 #### Essences
 
