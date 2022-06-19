@@ -181,6 +181,11 @@
   to items C and D to form CD, and finally recombine AB and CD together.
   (Also contributed by haggys22.)
 
+- Added `is_base` predicate to check the current item base type.
+  Typically useful when transferring mods on better bases with recombinators.
+
+- One can now `craft` on a normal item. This turns it into a magic item.
+
 ## Version 0.1.0
 
 First released version.

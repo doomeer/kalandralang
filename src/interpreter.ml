@@ -421,6 +421,12 @@ let apply_currency state (currency: AST.currency) =
     let modifier = Mod.by_id modifier in
     if not (Mod.is_crafted modifier) then
       fail "not a crafted modifier";
+    (* We can craft on a normal item to turn it magic. *)
+    let item =
+      match item.rarity with
+        | Normal -> Item.set_rarity Magic item
+        | _ -> item
+    in
     return (Item.add_mod modifier item)
   in
   match currency with
