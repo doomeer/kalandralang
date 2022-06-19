@@ -150,7 +150,9 @@ let check_recipe ast =
           Show_mod_pool | Show_unveil_mod_pool
         ) ->
           ()
-      | Simple (Buy { influence = _; base; ilvl = _; mods; cost = _ }) ->
+      | Simple (
+          Buy { exact = _; rarity = _; influence = _; base; ilvl = _; mods; cost = _ }
+        ) ->
           check_base_item loc base;
           List.iter (fun { AST.modifier; fractured = _ } -> check_mod loc modifier) mods
       | Simple (Unveil mods) ->

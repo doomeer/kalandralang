@@ -10,7 +10,8 @@
 
 %token COLON AND OR NOT DOT_DOT TRUE FALSE EOF
 %token PLUS MINUS STAR SLASH
-%token BUY ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL SHOW_UNVEIL_MOD_POOL
+%token BUY EXACT NORMAL MAGIC RARE
+%token ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL SHOW_UNVEIL_MOD_POOL
 %token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD EXARCH EATER SYNTHESIZED
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN
 %token HAS HAS_MOD HAS_GROUP IS_BASE
@@ -44,6 +45,11 @@ amount:
 | INT CURRENCY
   { [ $1, $2 ] }
 
+rarity:
+| NORMAL { Item.Normal }
+| MAGIC { Item.Magic }
+| RARE { Item.Rare }
+
 influence:
 | SHAPER { Influence.SEC Shaper }
 | ELDER { Influence.SEC Elder }
@@ -56,6 +62,10 @@ influence:
 | SYNTHESIZED { Influence.Synthesized }
 
 buy_arguments:
+| EXACT buy_arguments
+  { BA_exact :: $2 }
+| rarity buy_arguments
+  { BA_rarity $1 :: $2 }
 | influence buy_arguments
   { BA_influence $1 :: $2 }
 | STRING buy_arguments

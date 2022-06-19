@@ -530,9 +530,13 @@ if open_prefix or open_suffix then augment
 
 ### Buying a Base
 
-`buy [<influence>] [<influence>] <identifier> [ilvl <number>]
+`buy [exact] [<rarity>] [<influence>] [<influence>] <identifier> [ilvl <number>]
 [with [fractured] <identifier>]* [for <amount>]`
 is an instruction that sets or replaces the current item to a given base.
+- `exact` disables automatic generation of random mods. Without it, additional modifiers
+  are spawned as if the item was found on the ground.
+- `<rarity>` can be `normal`, `magic` or `rare`. It specifies the rarity of the item.
+  Default is maximum rarity (which may not be `rare`, e.g. for flasks it is `magic`).
 - `<influence>` are keywords that can be used to specify that the item has this influence.
   Zero, one or two influences can be specified.
   Influence keywords are: `shaper`, `elder`, `crusader`, `hunter`, `redeemer`, `warlord`,
@@ -550,11 +554,6 @@ is an instruction that sets or replaces the current item to a given base.
 - `for <amount>` specifies the cost of the item.
   It causes the given [Amount](#amounts) to be added to your
   [Spendings](#spendings-and-gains). It defaults to zero.
-
-Note that the base item will be rare, with 4 to 6 modifiers, following the
-distribution of chaos orbs. If you specify one modifier, the item will have
-3 to 5 other modifiers at random. If you specify two modifiers, the item will
-have 2 to 4 other modifiers at random. Etc.
 
 For instance, here is how to start from a random rare Agate Amulet of item level 100:
 ```sh
@@ -583,6 +582,11 @@ buy "Metadata/Items/Amulets/Amulet9"
 ```
 Note that `"Dexterity9"` is Tier 1, not Tier 9. This is how modifiers are named
 internally in the game.
+
+Here is how to start from a magic ring with Tier 1 Maximum Life and nothing else:
+```
+buy exact magic "Metadata/Items/Rings/Ring2" with "IncreasedLife7"
+```
 
 ### Crafting Instructions
 

@@ -5,6 +5,10 @@
   let keyword = function
     (* Instructions *)
     | "buy" -> BUY
+    | "exact" -> EXACT
+    | "normal" -> NORMAL
+    | "magic" -> MAGIC
+    | "rare" -> RARE
     | "shaper" -> SHAPER
     | "elder" -> ELDER
     | "crusader" -> CRUSADER

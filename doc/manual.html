@@ -511,8 +511,10 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <p>It may be possible for instructions to fail. For instance, <code>transmute</code> fails if the current item is not of normal rarity. Failures cause the recipe to stop immediately with an error message. If this happens, you should modify your recipe to ensure that it does not try to perform invalid instructions. For instance, you could add an <code>if</code> instruction before an <code>augment</code> to only perform the <code>augment</code> if the item has an open prefix or an open suffix:</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb26-1" title="1"><span class="kw">if</span> <span class="ex">open_prefix</span> or open_suffix then augment</a></code></pre></div>
 <h3 id="buying-a-base">Buying a Base</h3>
-<p><code>buy [&lt;influence&gt;] [&lt;influence&gt;] &lt;identifier&gt; [ilvl &lt;number&gt;] [with [fractured] &lt;identifier&gt;]* [for &lt;amount&gt;]</code> is an instruction that sets or replaces the current item to a given base.</p>
+<p><code>buy [exact] [&lt;rarity&gt;] [&lt;influence&gt;] [&lt;influence&gt;] &lt;identifier&gt; [ilvl &lt;number&gt;] [with [fractured] &lt;identifier&gt;]* [for &lt;amount&gt;]</code> is an instruction that sets or replaces the current item to a given base.</p>
 <ul>
+<li><code>exact</code> disables automatic generation of random mods. Without it, additional modifiers are spawned as if the item was found on the ground.</li>
+<li><code>&lt;rarity&gt;</code> can be <code>normal</code>, <code>magic</code> or <code>rare</code>. It specifies the rarity of the item. Default is maximum rarity (which may not be <code>rare</code>, e.g. for flasks it is <code>magic</code>).</li>
 <li><code>&lt;influence&gt;</code> are keywords that can be used to specify that the item has this influence. Zero, one or two influences can be specified. Influence keywords are: <code>shaper</code>, <code>elder</code>, <code>crusader</code>, <code>hunter</code>, <code>redeemer</code>, <code>warlord</code>, <code>exarch</code>, <code>eater</code>, <code>synthesized</code>.</li>
 <li>The first identifier is the base type, such as <code>&quot;Metadata/Items/Amulets/Amulet9&quot;</code> for Agate Amulets.</li>
 <li><code>ilvl &lt;number&gt;</code> is optional and sets the item level. It defaults to 100. For instance, <code>ilvl 84</code> sets the item level to 84.</li>
@@ -520,7 +522,6 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <li><code>with fractured &lt;identifier&gt;</code> is the same as <code>with &lt;identifier&gt;</code> but the modifier is fractured.</li>
 <li><code>for &lt;amount&gt;</code> specifies the cost of the item. It causes the given <a href="#amounts">Amount</a> to be added to your <a href="#spendings-and-gains">Spendings</a>. It defaults to zero.</li>
 </ul>
-<p>Note that the base item will be rare, with 4 to 6 modifiers, following the distribution of chaos orbs. If you specify one modifier, the item will have 3 to 5 other modifiers at random. If you specify two modifiers, the item will have 2 to 4 other modifiers at random. Etc.</p>
 <p>For instance, here is how to start from a random rare Agate Amulet of item level 100:</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb27-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a></code></pre></div>
 <p>Here is how to start from a normal rarity, hunter-influenced Agate Amulet of item level 86:</p>
@@ -535,6 +536,9 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <a class="sourceLine" id="cb30-4" title="4">  <span class="ex">with</span> <span class="st">&quot;Dexterity9&quot;</span></a>
 <a class="sourceLine" id="cb30-5" title="5">  <span class="kw">for</span> <span class="ex">10</span> chaos</a></code></pre></div>
 <p>Note that <code>&quot;Dexterity9&quot;</code> is Tier 1, not Tier 9. This is how modifiers are named internally in the game.</p>
+<p>Here is how to start from a magic ring with Tier 1 Maximum Life and nothing else:</p>
+<pre><code>buy exact magic &quot;Metadata/Items/Rings/Ring2&quot; with &quot;IncreasedLife7&quot;
+</code></pre>
 <h3 id="crafting-instructions">Crafting Instructions</h3>
 <h4 id="currencies">Currencies</h4>
 <p>The following keywords are instructions to apply currency to the current item.</p>
@@ -692,12 +696,12 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </table>
 <h5 id="awakeners-orb">Awakener's Orb</h5>
 <p>The <code>awaken</code> instruction applies an Awakener's Orb on the item which is on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a> to destroy it and add its influence to the <a href="#current-item">Current Item</a>. For instance, here is how to destroy a hunter-influenced Agate Amulet to add hunter influence to a warlord Marble Amulet:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1"><span class="ex">buy</span> hunter <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
-<a class="sourceLine" id="cb31-2" title="2">  <span class="ex">with</span> <span class="st">&quot;AdditionalPierceInfluence1&quot;</span></a>
-<a class="sourceLine" id="cb31-3" title="3"><span class="ex">set_aside</span></a>
-<a class="sourceLine" id="cb31-4" title="4"><span class="ex">buy</span> warlord <span class="st">&quot;Metadata/Items/Amulet/AmuletAtlas2&quot;</span></a>
-<a class="sourceLine" id="cb31-5" title="5">  <span class="ex">with</span> <span class="st">&quot;AreaOfEffectInfluence3&quot;</span></a>
-<a class="sourceLine" id="cb31-6" title="6"><span class="ex">awaken</span></a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb32-1" title="1"><span class="ex">buy</span> hunter <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
+<a class="sourceLine" id="cb32-2" title="2">  <span class="ex">with</span> <span class="st">&quot;AdditionalPierceInfluence1&quot;</span></a>
+<a class="sourceLine" id="cb32-3" title="3"><span class="ex">set_aside</span></a>
+<a class="sourceLine" id="cb32-4" title="4"><span class="ex">buy</span> warlord <span class="st">&quot;Metadata/Items/Amulet/AmuletAtlas2&quot;</span></a>
+<a class="sourceLine" id="cb32-5" title="5">  <span class="ex">with</span> <span class="st">&quot;AreaOfEffectInfluence3&quot;</span></a>
+<a class="sourceLine" id="cb32-6" title="6"><span class="ex">awaken</span></a></code></pre></div>
 <p>This usually results in a Marble Amulet with the hunter modifier Projectiles Pierce an additional Target and the warlord modifier #% increased Area of Effect. But as both items could have more than one influenced modifier, this is not guaranteed.</p>
 <h5 id="recombinators">Recombinators</h5>
 <table>
@@ -916,13 +920,13 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </tbody>
 </table>
 <p>For instance:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb32-1" title="1"><span class="ex">pristine</span></a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb33-1" title="1"><span class="ex">pristine</span></a></code></pre></div>
 <p>applies a Primitive Resonator socketed with a Pristine Fossil.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb33-1" title="1"><span class="ex">dense</span> + fundamental</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb34-1" title="1"><span class="ex">dense</span> + fundamental</a></code></pre></div>
 <p>applies a Potent Resonator socketed with a Dense Fossil and a Fundamental Fossil.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb34-1" title="1"><span class="ex">faceted</span> + aetheric + prismatic</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb35-1" title="1"><span class="ex">faceted</span> + aetheric + prismatic</a></code></pre></div>
 <p>applies a Powerful Resonator socketed with a Faceted Fossil, an Aetheric Fossil and a Prismatic Fossil.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb35-1" title="1"><span class="ex">metallic</span> + lucent + jagged + deft</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb36-1" title="1"><span class="ex">metallic</span> + lucent + jagged + deft</a></code></pre></div>
 <p>applies a Prime Resonator socketed with a Metallic Fossil, a Lucent Fossil, a Jagged Fossil and a Deft Fossil.</p>
 <h4 id="crafting-bench">Crafting Bench</h4>
 <h5 id="built-ins">Built-Ins</h5>
@@ -972,7 +976,7 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <p>Use <code>craft_any_prefix</code> and <code>craft_any_suffix</code> when you want to craft a modifier without care for which one, for instance to add a third prefix or suffix to prevent an exalt or a reforge from adding a prefix or a suffix.</p>
 <h5 id="other-modifiers">Other Modifiers</h5>
 <p>To add another mod using the crafting bench, use the <code>craft &lt;identifier&gt;</code> instruction. The identifier specifies which mod to add. See <a href="#finding-identifiers">Finding Identifiers</a> to find out which identifier to use. For instance, to add Adds # to # Cold Damage (lowest tier), use:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb36-1" title="1"><span class="ex">craft</span> <span class="st">&quot;DexMasterAddedColdDamageCrafted1&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb37-1" title="1"><span class="ex">craft</span> <span class="st">&quot;DexMasterAddedColdDamageCrafted1&quot;</span></a></code></pre></div>
 <p>Note that this operation has a very low estimated cost. It is intended to be used to block modifiers. You can use it to add meta-mods but the cost will not be estimated correctly. For meta-mods, use <a href="#build-ins">Built-In</a> crafting bench operations instead.</p>
 <h4 id="harvest-crafting">Harvest Crafting</h4>
 <p>The following keywords are instructions to perform harvest crafts on the current item.</p>
@@ -1217,18 +1221,18 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <h5 id="split">Split</h5>
 <p><code>beastcraft_split</code> splits the current item into two items. One of them becomes the <a href="#current-item">Current Item</a>, the other is pushed on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a>.</p>
 <p>You can <a href="#swap">Swap</a> the current item and the set-aside item to access the second item created by a split. For instance, to split an item that has +1 to Level of all Chaos Skill Gems and set the current item to the item that kept this modifier:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb37-1" title="1"><span class="ex">beastcraft_split</span></a>
-<a class="sourceLine" id="cb37-2" title="2"><span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then swap</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb38-1" title="1"><span class="ex">beastcraft_split</span></a>
+<a class="sourceLine" id="cb38-2" title="2"><span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then swap</a></code></pre></div>
 <h5 id="imprint">Imprint</h5>
 <p><code>beastcraft_imprint</code> sets the <a href="#current-imprint">Current Imprint</a> to an imprint of the current item.</p>
 <p>The item can then be restored by <a href="#use-imprint">Using the Imprint</a>. For instance, to try and add a suffix to an item which only has one prefix which is +1 to Level of All Skill Gems:</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb38-1" title="1"><span class="ex">.try_again</span>:</a>
-<a class="sourceLine" id="cb38-2" title="2">  <span class="ex">beastcraft_imprint</span></a>
-<a class="sourceLine" id="cb38-3" title="3">  <span class="ex">regal</span></a>
-<a class="sourceLine" id="cb38-4" title="4">  <span class="kw">if</span> <span class="ex">prefix_count</span> 2 then {</a>
-<a class="sourceLine" id="cb38-5" title="5">    <span class="ex">use_imprint</span></a>
-<a class="sourceLine" id="cb38-6" title="6">    <span class="ex">goto</span> .try_again</a>
-<a class="sourceLine" id="cb38-7" title="7">  }</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb39-1" title="1"><span class="ex">.try_again</span>:</a>
+<a class="sourceLine" id="cb39-2" title="2">  <span class="ex">beastcraft_imprint</span></a>
+<a class="sourceLine" id="cb39-3" title="3">  <span class="ex">regal</span></a>
+<a class="sourceLine" id="cb39-4" title="4">  <span class="kw">if</span> <span class="ex">prefix_count</span> 2 then {</a>
+<a class="sourceLine" id="cb39-5" title="5">    <span class="ex">use_imprint</span></a>
+<a class="sourceLine" id="cb39-6" title="6">    <span class="ex">goto</span> .try_again</a>
+<a class="sourceLine" id="cb39-7" title="7">  }</a></code></pre></div>
 <h4 id="betrayal-crafting">Betrayal Crafting</h4>
 <p>The following keywords are instructions to perform crafting obtained through the Immortal Syndicate on the current item.</p>
 <table>
@@ -1248,27 +1252,27 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <h5 id="unveiling">Unveiling</h5>
 <p><code>unveil &lt;mods&gt; [else &lt;instruction&gt;]</code> is an instruction that unveils an item with a veiled modifier. <code>&lt;mods&gt;</code> is a list of modifier identifiers separated by <code>or</code>. The <a href="#show-unveil-mod-pool">Show Unveil Mod Pool</a> instruction can be used to easily get the identifiers for the modifiers you want to unveil. If the first modifier in <code>&lt;mods&gt;</code> has been unveiled, it is chosen. Else, if the second modifier in this list has been unveiled, it is chosen. And so on. The optional <code>else</code> branch is executed if none of the modifiers were unveiled and another modifier had to be chosen instead.</p>
 <p>For instance, here is how to try to unveil life on an amulet:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb39-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
-<a class="sourceLine" id="cb39-2" title="2"><span class="ex">veiled_chaos</span></a>
-<a class="sourceLine" id="cb39-3" title="3"><span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span></a></code></pre></div>
-<p>Here is how to try to unveil life or area damage or projectile damage, in this order of priority:</p>
 <div class="sourceCode" id="cb40"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb40-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
 <a class="sourceLine" id="cb40-2" title="2"><span class="ex">veiled_chaos</span></a>
-<a class="sourceLine" id="cb40-3" title="3"><span class="ex">unveil</span></a>
-<a class="sourceLine" id="cb40-4" title="4">  <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> <span class="ex">or</span></a>
-<a class="sourceLine" id="cb40-5" title="5">  <span class="st">&quot;JunMasterVeiledAreaDamageAndAreaOfEffect&quot;</span> <span class="ex">or</span></a>
-<a class="sourceLine" id="cb40-6" title="6">  <span class="st">&quot;JunMasterVeiledProjectileDamageAndProjectileSpeed&quot;</span></a></code></pre></div>
+<a class="sourceLine" id="cb40-3" title="3"><span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span></a></code></pre></div>
+<p>Here is how to try to unveil life or area damage or projectile damage, in this order of priority:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb41-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
+<a class="sourceLine" id="cb41-2" title="2"><span class="ex">veiled_chaos</span></a>
+<a class="sourceLine" id="cb41-3" title="3"><span class="ex">unveil</span></a>
+<a class="sourceLine" id="cb41-4" title="4">  <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> <span class="ex">or</span></a>
+<a class="sourceLine" id="cb41-5" title="5">  <span class="st">&quot;JunMasterVeiledAreaDamageAndAreaOfEffect&quot;</span> <span class="ex">or</span></a>
+<a class="sourceLine" id="cb41-6" title="6">  <span class="st">&quot;JunMasterVeiledProjectileDamageAndProjectileSpeed&quot;</span></a></code></pre></div>
 <p>Finally, here is how to unveil life or try again:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb41-1" title="1">  <span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
-<a class="sourceLine" id="cb41-2" title="2"><span class="ex">.try_again</span>:</a>
-<a class="sourceLine" id="cb41-3" title="3">  <span class="ex">veiled_chaos</span></a>
-<a class="sourceLine" id="cb41-4" title="4">  <span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> else goto .try_again</a></code></pre></div>
-<p>This is equivalent to using an <code>if</code> as follows:</p>
 <div class="sourceCode" id="cb42"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb42-1" title="1">  <span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
 <a class="sourceLine" id="cb42-2" title="2"><span class="ex">.try_again</span>:</a>
 <a class="sourceLine" id="cb42-3" title="3">  <span class="ex">veiled_chaos</span></a>
-<a class="sourceLine" id="cb42-4" title="4">  <span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span></a>
-<a class="sourceLine" id="cb42-5" title="5">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> then goto .try_again</a></code></pre></div>
+<a class="sourceLine" id="cb42-4" title="4">  <span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> else goto .try_again</a></code></pre></div>
+<p>This is equivalent to using an <code>if</code> as follows:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb43-1" title="1">  <span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
+<a class="sourceLine" id="cb43-2" title="2"><span class="ex">.try_again</span>:</a>
+<a class="sourceLine" id="cb43-3" title="3">  <span class="ex">veiled_chaos</span></a>
+<a class="sourceLine" id="cb43-4" title="4">  <span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span></a>
+<a class="sourceLine" id="cb43-5" title="5">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> then goto .try_again</a></code></pre></div>
 <h4 id="set-aside">Set Aside</h4>
 <p>The <code>set_aside</code> instruction pushes the <a href="#current-item">Current Item</a> on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a>, then sets the current item to no item. You usually want to <a href="#buying-a-base">buy</a> another item after that to get a new current item. Then you usually want to use an <a href="#awakeners-orb">Awakener's Orb</a> or a <a href="#recombinators">Recombinator</a>.</p>
 <h4 id="swap">Swap</h4>
@@ -1279,22 +1283,22 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <p>Interesting crafts are not linear: what to do after a given step often depends on the state of the item. Kalandralang allows you to express <a href="#conditions">Conditions</a> and to jump to a different <a href="#program-point">Program Point</a>, expressed with the use of a <a href="#labels">Label</a>, depending on whether the condition holds or not.</p>
 <h4 id="blocks">Blocks</h4>
 <p>Everywhere you can write an instruction, you can write a block of instructions instead. A block is a sequence of instructions inside braces <code>{ ... }</code>. For instance:</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb43-1" title="1"><span class="kw">{</span></a>
-<a class="sourceLine" id="cb43-2" title="2">  <span class="ex">prefixes_cannot_be_changed</span></a>
-<a class="sourceLine" id="cb43-3" title="3">  <span class="ex">scour</span></a>
-<a class="sourceLine" id="cb43-4" title="4"><span class="kw">}</span></a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb44-1" title="1"><span class="kw">{</span></a>
+<a class="sourceLine" id="cb44-2" title="2">  <span class="ex">prefixes_cannot_be_changed</span></a>
+<a class="sourceLine" id="cb44-3" title="3">  <span class="ex">scour</span></a>
+<a class="sourceLine" id="cb44-4" title="4"><span class="kw">}</span></a></code></pre></div>
 <p>is equivalent to:</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb44-1" title="1"><span class="ex">prefixes_cannot_be_changed</span></a>
-<a class="sourceLine" id="cb44-2" title="2"><span class="ex">scour</span></a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb45-1" title="1"><span class="ex">prefixes_cannot_be_changed</span></a>
+<a class="sourceLine" id="cb45-2" title="2"><span class="ex">scour</span></a></code></pre></div>
 <p>Typically, blocks are used in conditionals and loops. For instance:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then {</a>
-<a class="sourceLine" id="cb45-2" title="2">  <span class="ex">prefixes_cannot_be_changed</span></a>
-<a class="sourceLine" id="cb45-3" title="3">  <span class="ex">scour</span></a>
-<a class="sourceLine" id="cb45-4" title="4">}</a></code></pre></div>
-<p>is <em>not</em> equivalent to:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb46-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then</a>
+<div class="sourceCode" id="cb46"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb46-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then {</a>
 <a class="sourceLine" id="cb46-2" title="2">  <span class="ex">prefixes_cannot_be_changed</span></a>
-<a class="sourceLine" id="cb46-3" title="3">  <span class="ex">scour</span></a></code></pre></div>
+<a class="sourceLine" id="cb46-3" title="3">  <span class="ex">scour</span></a>
+<a class="sourceLine" id="cb46-4" title="4">}</a></code></pre></div>
+<p>is <em>not</em> equivalent to:</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then</a>
+<a class="sourceLine" id="cb47-2" title="2">  <span class="ex">prefixes_cannot_be_changed</span></a>
+<a class="sourceLine" id="cb47-3" title="3">  <span class="ex">scour</span></a></code></pre></div>
 <p>The latter recipe applies an Orb of Scouring whether there was an open suffix or not, which is probably not what is intended according to the indentation.</p>
 <p>Blocks can have any number of instructions, including zero or one: <code>{}</code> is a valid block which does nothing, and <code>{ alt }</code> is equivalent to <code>alt</code>.</p>
 <h4 id="nesting-complex-instructions">Nesting Complex Instructions</h4>
@@ -1306,96 +1310,96 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <li><a href="#while-loops">Repeat Loops</a>.</li>
 </ul>
 <p>Complex instructions cannot be used directly inside other complex instructions. They need to be put in a <a href="#blocks">Block</a>. For instance:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb47-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then</a>
-<a class="sourceLine" id="cb47-2" title="2">  <span class="kw">if</span> <span class="ex">open_prefix</span> then</a>
-<a class="sourceLine" id="cb47-3" title="3">    <span class="ex">multimod</span></a>
-<a class="sourceLine" id="cb47-4" title="4">  <span class="kw">else</span></a>
-<a class="sourceLine" id="cb47-5" title="5">    <span class="ex">scour</span></a></code></pre></div>
-<p>will fail to parse. You should write this instead:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then {</a>
+<div class="sourceCode" id="cb48"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb48-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then</a>
 <a class="sourceLine" id="cb48-2" title="2">  <span class="kw">if</span> <span class="ex">open_prefix</span> then</a>
 <a class="sourceLine" id="cb48-3" title="3">    <span class="ex">multimod</span></a>
 <a class="sourceLine" id="cb48-4" title="4">  <span class="kw">else</span></a>
-<a class="sourceLine" id="cb48-5" title="5">    <span class="ex">scour</span></a>
-<a class="sourceLine" id="cb48-6" title="6">}</a></code></pre></div>
+<a class="sourceLine" id="cb48-5" title="5">    <span class="ex">scour</span></a></code></pre></div>
+<p>will fail to parse. You should write this instead:</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb49-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then {</a>
+<a class="sourceLine" id="cb49-2" title="2">  <span class="kw">if</span> <span class="ex">open_prefix</span> then</a>
+<a class="sourceLine" id="cb49-3" title="3">    <span class="ex">multimod</span></a>
+<a class="sourceLine" id="cb49-4" title="4">  <span class="kw">else</span></a>
+<a class="sourceLine" id="cb49-5" title="5">    <span class="ex">scour</span></a>
+<a class="sourceLine" id="cb49-6" title="6">}</a></code></pre></div>
 <h4 id="label-definitions">Label Definitions</h4>
 <p>A <a href="#labels">Label</a> followed by a colon <code>:</code> gives a name to a program point to be able to jump to it from anywhere else in the recipe. For instance:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb49-1" title="1"><span class="ex">.start</span>:</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb50-1" title="1"><span class="ex">.start</span>:</a></code></pre></div>
 <p>defines a label named <code>.start</code>. You can put this label at the beginning of your recipe to be able to jump to it later if you brick your item.</p>
 <h4 id="goto">Goto</h4>
 <p>The <code>goto &lt;label&gt;</code> instruction sets the <a href="#program-point">Program Point</a> to the instruction that follows the given label's definition. For instance:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb50-1" title="1"><span class="ex">.chaos-spam</span>:</a>
-<a class="sourceLine" id="cb50-2" title="2">  <span class="ex">chaos</span></a>
-<a class="sourceLine" id="cb50-3" title="3">  <span class="ex">goto</span> .chaos-spam</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb51-1" title="1"><span class="ex">.chaos-spam</span>:</a>
+<a class="sourceLine" id="cb51-2" title="2">  <span class="ex">chaos</span></a>
+<a class="sourceLine" id="cb51-3" title="3">  <span class="ex">goto</span> .chaos-spam</a></code></pre></div>
 <p>creates an infinite loop of chaos spamming. This will in fact never end and you will have to interrupt Kalandralang using Ctrl+C.</p>
 <p><code>goto</code> instructions can often be avoided using <a href="#if-conditionals">If Conditionals</a> and <a href="#loops">Loops</a>. In large programs, it is recommended to avoid them at all costs. But crafting recipes are often small, and gotos can sometimes actually make the recipe more readable.</p>
 <h4 id="stop">Stop</h4>
 <p>The <code>stop</code> instruction sets the <a href="#program-point">Program Point</a> to just after the last instruction of the recipe. This effectively causes the run to stop immediately. This is equivalent to putting a <a href="#labels">Label</a> at the end and using <a href="#goto">Goto</a> to jump to it.</p>
 <h4 id="if-conditionals">If Conditionals</h4>
 <p><code>if &lt;condition&gt; then &lt;instruction&gt;</code> executes the given instruction, but only if the condition holds. For instance:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb51-1" title="1"><span class="kw">if</span> <span class="ex">no_prefix</span> then augment</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb52-1" title="1"><span class="kw">if</span> <span class="ex">no_prefix</span> then augment</a></code></pre></div>
 <p>causes an Orb of Augmentation to be applied on the current item if it has no prefix.</p>
 <p>Another form of if conditionals is <code>if &lt;condition&gt; then &lt;instruction&gt; else &lt;instruction&gt;</code>. It executes the <code>then</code> instruction if the condition holds, or the <code>else</code> instruction if it doesn't. For instance:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb52-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then exalt else annul</a></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="kw">if</span> <span class="ex">open_suffix</span> then exalt else annul</a></code></pre></div>
 <p>causes an Exalted Orb to be applied on the current item if it has an open suffix, and an Orb of Annulment it its suffixes are full.</p>
 <h4 id="loops">Loops</h4>
 <h5 id="while-loops">While Loops</h5>
 <p><code>while &lt;condition&gt; do &lt;instruction&gt;</code> executes the given instruction until the given condition no longer holds. If the condition already does not hold before the while loop, the instruction is not executed at all. For instance:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb53-1" title="1"><span class="kw">while</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb54-1" title="1"><span class="kw">while</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <p>is a recipe which spams Orbs of Alteration on the current item until the item has +1 to Level of all Chaos Skill Gems. If the item already has this modifier before the loop starts, no Orb of Alteration is used at all. It is equivalent to:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb54-1" title="1"><span class="ex">.loop</span>:</a>
-<a class="sourceLine" id="cb54-2" title="2">  <span class="kw">if</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then goto .stop</a>
-<a class="sourceLine" id="cb54-3" title="3">  <span class="ex">alt</span></a>
-<a class="sourceLine" id="cb54-4" title="4">  <span class="ex">goto</span> .loop</a>
-<a class="sourceLine" id="cb54-5" title="5"><span class="ex">.stop</span>:</a></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb55-1" title="1"><span class="ex">.loop</span>:</a>
+<a class="sourceLine" id="cb55-2" title="2">  <span class="kw">if</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then goto .stop</a>
+<a class="sourceLine" id="cb55-3" title="3">  <span class="ex">alt</span></a>
+<a class="sourceLine" id="cb55-4" title="4">  <span class="ex">goto</span> .loop</a>
+<a class="sourceLine" id="cb55-5" title="5"><span class="ex">.stop</span>:</a></code></pre></div>
 <h5 id="until-loops">Until Loops</h5>
 <p><code>until &lt;condition&gt; do &lt;instruction&gt;</code> executes the given instruction until the given condition holds. If the condition already holds before the while loop, the instruction is not executed at all. For instance:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb55-1" title="1"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <p>is equivalent to:</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb56-1" title="1"><span class="kw">while</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb57-1" title="1"><span class="kw">while</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <h5 id="repeat-loops">Repeat Loops</h5>
 <p><code>repeat &lt;instruction&gt; until &lt;condition&gt;</code> executes the given instruction until the given condition holds. The instruction is always executed at least once. For instance:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb57-1" title="1"><span class="ex">repeat</span> alt until has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb58-1" title="1"><span class="ex">repeat</span> alt until has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span></a></code></pre></div>
 <p>is equivalent to:</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb58-1" title="1"><span class="ex">alt</span></a>
-<a class="sourceLine" id="cb58-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb59-1" title="1"><span class="ex">alt</span></a>
+<a class="sourceLine" id="cb59-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> do alt</a></code></pre></div>
 <p>and to:</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb59-1" title="1"><span class="ex">.loop</span>:</a>
-<a class="sourceLine" id="cb59-2" title="2">  <span class="ex">alt</span></a>
-<a class="sourceLine" id="cb59-3" title="3">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then goto .loop</a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb60-1" title="1"><span class="ex">.loop</span>:</a>
+<a class="sourceLine" id="cb60-2" title="2">  <span class="ex">alt</span></a>
+<a class="sourceLine" id="cb60-3" title="3">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then goto .loop</a></code></pre></div>
 <h3 id="selling">Selling</h3>
 <p><code>gain &lt;amount&gt;</code> causes the given <a href="#amounts">Amount</a> to be added to your earnings. It is typically used at the end of recipes to estimate profit margins. For instance, let's say that you want to estimate whether spamming Orbs of Alteration to get +1 to Level of all Chaos Skill Gems is more efficient than buying on the trade site, assuming you can sell the result for 20 chaos:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb60-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
-<a class="sourceLine" id="cb60-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> alt</a>
-<a class="sourceLine" id="cb60-3" title="3"><span class="ex">gain</span> 20 chaos</a></code></pre></div>
-<p>Kalandralang will execute the recipe and display your spendings, your earnings (here 20 Chaos Orbs), and the difference between the two.</p>
-<p>This is not a very interesting example though because you can just add 20 chaos from the spendings in your head. However, when combined with <a href="#if-conditionals">If Conditionals</a>, you can tell Kalandralang that the selling price depends on which mods the item has. For instance:</p>
 <div class="sourceCode" id="cb61"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb61-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
 <a class="sourceLine" id="cb61-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> alt</a>
-<a class="sourceLine" id="cb61-3" title="3"><span class="ex">gain</span> 20 chaos</a>
-<a class="sourceLine" id="cb61-4" title="4"><span class="kw">if</span> <span class="ex">has</span> <span class="st">&quot;Dexterity9&quot;</span> gain 30 chaos</a></code></pre></div>
+<a class="sourceLine" id="cb61-3" title="3"><span class="ex">gain</span> 20 chaos</a></code></pre></div>
+<p>Kalandralang will execute the recipe and display your spendings, your earnings (here 20 Chaos Orbs), and the difference between the two.</p>
+<p>This is not a very interesting example though because you can just add 20 chaos from the spendings in your head. However, when combined with <a href="#if-conditionals">If Conditionals</a>, you can tell Kalandralang that the selling price depends on which mods the item has. For instance:</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="ex">buy</span> <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
+<a class="sourceLine" id="cb62-2" title="2"><span class="kw">until</span> <span class="ex">has</span> <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> alt</a>
+<a class="sourceLine" id="cb62-3" title="3"><span class="ex">gain</span> 20 chaos</a>
+<a class="sourceLine" id="cb62-4" title="4"><span class="kw">if</span> <span class="ex">has</span> <span class="st">&quot;Dexterity9&quot;</span> gain 30 chaos</a></code></pre></div>
 <p>The earnings of this recipe depend on whether the item ends up with Tier 1 Dexterity or not. If it does end up with Tier 1 Dexterity, the earnings are 50 chaos. Otherwise, they are 20 chaos. This is particularly useful for recipes that can fail but for which the resulting item is still sellable.</p>
 <h3 id="other-instructions">Other Instructions</h3>
 <h4 id="echo">Echo</h4>
 <p><code>echo &lt;string&gt;</code> causes Kalandralang to output the given string. This is useful to know what is happening when debugging recipes, or simply to comment on what is going on. For instance:</p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb62-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Will now try to obtain a veiled mod through Aisling.&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Will now try to obtain a veiled mod through Aisling.&quot;</span></a></code></pre></div>
 <h4 id="show">Show</h4>
 <p><code>show</code> causes Kalandralang to output the current item and the total amount we spent up to now. This is useful when debugging recipes, or simply to mark milestones in the recipe. It can typically be preceded by <code>echo</code>, for instance:</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb63-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Prefixes are done:&quot;</span></a>
-<a class="sourceLine" id="cb63-2" title="2"><span class="ex">show</span></a></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Prefixes are done:&quot;</span></a>
+<a class="sourceLine" id="cb64-2" title="2"><span class="ex">show</span></a></code></pre></div>
 <h4 id="show-mod-pool">Show Mod Pool</h4>
 <p><code>show_mod_pool</code> causes Kalandralang to output the mods that could be added to the current item and the chance to add them when adding a single modifier (e.g. using an Exalted Orb). This also shows the <a href="#identifiers">Identifier</a> of each mod.</p>
 <p>This does not show mods that are blocked by other existing modifiers. If the suffixes are full, it will not show any suffix, and if the prefixes are full, it will not show any prefix. In particular, if the item rarity is normal, this will never show anything.</p>
 <p>Example:</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb64-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be added:&quot;</span></a>
-<a class="sourceLine" id="cb64-2" title="2"><span class="ex">show_mod_pool</span></a></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb65-1" title="1"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be added:&quot;</span></a>
+<a class="sourceLine" id="cb65-2" title="2"><span class="ex">show_mod_pool</span></a></code></pre></div>
 <h4 id="show-unveil-mod-pool">Show Unveil Mod Pool</h4>
 <p><code>show_unveil_mod_pool</code> causes Kalandralang to output the mods that could be unveiled on the current item. This also shows the <a href="#identifiers">Identifier</a> of each mod.</p>
 <p>This does not show mods that are blocked by other existing modifiers. It requires a veiled mod to be present and it only shows prefixes or suffixes, depending on whether the veiled mod is a prefix or suffix.</p>
 <p>Example:</p>
-<div class="sourceCode" id="cb65"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb65-1" title="1"><span class="ex">veiled_chaos</span></a>
-<a class="sourceLine" id="cb65-2" title="2"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be unveiled:&quot;</span></a>
-<a class="sourceLine" id="cb65-3" title="3"><span class="ex">show_unveil_mod_pool</span></a></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb66-1" title="1"><span class="ex">veiled_chaos</span></a>
+<a class="sourceLine" id="cb66-2" title="2"><span class="bu">echo</span> <span class="st">&quot;Modifiers that can be unveiled:&quot;</span></a>
+<a class="sourceLine" id="cb66-3" title="3"><span class="ex">show_unveil_mod_pool</span></a></code></pre></div>
 <h3 id="amounts">Amounts</h3>
 <p>Amounts are sequences of numbers followed by currencies. More precisely, amounts are of the form <code>(&lt;number&gt; &lt;currency&gt;)*</code>. For instance:</p>
 <ul>
@@ -1455,11 +1459,11 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </table>
 <h4 id="parentheses-in-conditions">Parentheses in Conditions</h4>
 <p><code>not</code> has higher precedence than <code>and</code>, which has higher precedence than <code>or</code>. What this means is that the following expression:</p>
-<div class="sourceCode" id="cb66"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb66-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb67-1" title="1"><span class="ex">not</span> open_suffix or no_prefix and full_prefixes</a></code></pre></div>
 <p>Is equivalent to:</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb67-1" title="1"><span class="kw">((</span>not open_suffix) or (no_prefix and full_prefixes))</a></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb68-1" title="1"><span class="kw">((</span>not open_suffix) or (no_prefix and full_prefixes))</a></code></pre></div>
 <p>Parentheses <code>( ... )</code> can be used around any condition. If operator precedence does not result in what you want, use parentheses. For instance:</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb68-1" title="1"><span class="ex">not</span> ((open_suffix or no_prefix) <span class="ex">and</span> full_prefixes)</a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb69-1" title="1"><span class="ex">not</span> ((open_suffix or no_prefix) <span class="ex">and</span> full_prefixes)</a></code></pre></div>
 <p>gives a completely different meaning to the expression. If you don't understand precedence, just use parentheses everywhere!</p>
 <h4 id="predicates-on-current-item">Predicates on Current Item</h4>
 <p>The following expressions are conditions that hold depending on the current item.</p>

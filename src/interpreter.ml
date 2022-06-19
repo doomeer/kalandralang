@@ -747,13 +747,12 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         goto state label
     | Stop ->
         { state with point = Array.length state.program.instructions }
-    | Buy { influence; base; ilvl; mods; cost } ->
+    | Buy { exact; rarity; influence; base; ilvl; mods; cost } ->
         (* TODO: check that [mods] are compatible with influences.
            More generally, check that [mods] can actually exist on the item. *)
         state.debug ("buy " ^ Id.show base);
-
         let base_obj = Base_item.by_id base in
-        let item = Item.make base_obj ilvl influence in
+        let item = Item.make base_obj ilvl ?rarity influence in
         let item =
           let add_mod item ({ modifier; fractured }: AST.buy_with) =
             let item = if fractured then Item.add_influence Fractured item else item in
@@ -761,7 +760,12 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
           in
           List.fold_left add_mod item mods
         in
-        let item = Item.spawn_additional_random_mods item in
+        let item =
+          if exact then
+            item
+          else
+            Item.spawn_additional_random_mods item
+        in
         let state =
           {
             state with

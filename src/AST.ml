@@ -190,6 +190,8 @@ type buy_with =
 
 type buy =
   {
+    exact: bool;
+    rarity: Item.rarity option;
     influence: Influence.t;
     base: Id.t;
     ilvl: int;
@@ -211,7 +213,7 @@ let pp_sec_influence (influence: Influence.sec) =
     | Redeemer -> atom "redeemer"
     | Warlord -> atom "warlord"
 
-let pp_buy { influence; base; ilvl; mods; cost } =
+let pp_buy { exact; rarity; influence; base; ilvl; mods; cost } =
   let open Pretext in
   let pp_with buy_with =
     if buy_with.fractured then
@@ -222,6 +224,18 @@ let pp_buy { influence; base; ilvl; mods; cost } =
   box [
     box [
       atom "buy"; space;
+      if exact then seq [ atom "exact"; space ] else empty;
+      (
+        match rarity with
+          | None ->
+              empty
+          | Some Normal ->
+              seq [ atom "normal"; space ]
+          | Some Magic ->
+              seq [ atom "magic"; space ]
+          | Some Rare ->
+              seq [ atom "rare"; space ]
+      );
       (
         match influence with
           | Not_influenced ->
@@ -257,6 +271,8 @@ let pp_buy { influence; base; ilvl; mods; cost } =
 
 type buy_being_made =
   {
+    bbm_exact: bool;
+    bbm_rarity: Item.rarity option;
     bbm_influence: Influence.t;
     bbm_base: Id.t option;
     bbm_ilvl: int option;
@@ -266,6 +282,8 @@ type buy_being_made =
   }
 
 type buy_argument =
+  | BA_exact
+  | BA_rarity of Item.rarity
   | BA_influence of Influence.t
   | BA_base of Id.t
   | BA_ilvl of int
@@ -274,6 +292,15 @@ type buy_argument =
 
 let make_buy args =
   let handle_arg bbm = function
+    | BA_exact ->
+        { bbm with bbm_exact = true }
+    | BA_rarity rarity ->
+        let bbm_rarity =
+          match bbm.bbm_rarity with
+            | None -> Some rarity
+            | Some _ -> fail "buy: cannot specify more than one rarity"
+        in
+        { bbm with bbm_rarity }
     | BA_influence influence ->
         let bbm_influence = Influence.add bbm.bbm_influence influence in
         { bbm with bbm_influence }
@@ -303,6 +330,8 @@ let make_buy args =
   in
   let empty_bbm =
     {
+      bbm_exact = false;
+      bbm_rarity = None;
       bbm_influence = Not_influenced;
       bbm_base = None;
       bbm_ilvl = None;
@@ -312,6 +341,8 @@ let make_buy args =
   in
   let bbm = List.fold_left handle_arg empty_bbm args in
   {
+    exact = bbm.bbm_exact;
+    rarity = bbm.bbm_rarity;
     influence = bbm.bbm_influence;
     base = (
       match bbm.bbm_base with

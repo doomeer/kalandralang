@@ -634,22 +634,31 @@ let spawn_additional_random_mods ?fossils ?tag_more_common ?only
       ?mod_groups ?mod_group_multiplier
   in
   let final_mod_count =
-    if item.base.domain = Flask then
-      let w1 = 50 in
-      let w2 = 50 in
-      let i = Random.int (w1 + w2) in
-      if i < w1 then 1 else 2
-    else if Base_item.is_jewel item.base then
-      let w3 = 65 in
-      let w4 = 35 in
-      let i = Random.int (w3 + w4) in
-      if i < w3 then 3 else 4
-    else
-      let w4 = 8 in
-      let w5 = 3 in
-      let w6 = 1 in
-      let i = Random.int (w4 + w5 + w6) in
-      if i < w4 then 4 else if i < w4 + w5 then 5 else 6
+    match item.rarity with
+      | Normal ->
+          0
+      | Magic ->
+          let w1 = 50 in
+          let w2 = 50 in
+          let i = Random.int (w1 + w2) in
+          if i < w1 then 1 else 2
+      | Rare ->
+          if item.base.domain = Flask then
+            let w1 = 50 in
+            let w2 = 50 in
+            let i = Random.int (w1 + w2) in
+            if i < w1 then 1 else 2
+          else if Base_item.is_jewel item.base then
+            let w3 = 65 in
+            let w4 = 35 in
+            let i = Random.int (w3 + w4) in
+            if i < w3 then 3 else 4
+          else
+            let w4 = 8 in
+            let w5 = 3 in
+            let w6 = 1 in
+            let i = Random.int (w4 + w5 + w6) in
+            if i < w4 then 4 else if i < w4 + w5 then 5 else 6
   in
   let rec spawn_n_mods count item =
     if count <= 0
@@ -721,18 +730,20 @@ let add_influence influence item =
     | Not_influenced | Fractured | Synthesized | Exarch | Eater | Exarch_and_eater ->
         item
 
-let make base level influence =
-  {
-    base;
-    level;
-    rarity = Rare;
-    tags = Id.Set.empty;
-    mods = [];
-    split = false;
-    influence = Not_influenced;
-  }
-  |> set_max_rarity
-  |> add_influence influence
+let make ?rarity base level influence =
+  let item =
+    {
+      base;
+      level;
+      rarity = rarity |> default Rare;
+      tags = Id.Set.empty;
+      mods = [];
+      split = false;
+      influence = Not_influenced;
+    }
+  in
+  let item = match rarity with None -> set_max_rarity item | Some _ -> item in
+  add_influence influence item
 
 let is_influence_mod influence_tag modifier =
   let tag_with_weight (mod_tag, weight) =

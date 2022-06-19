@@ -186,6 +186,14 @@
 
 - One can now `craft` on a normal item. This turns it into a magic item.
 
+- Added `exact` keyword to the `buy` instruction which disables automatic
+  addition of random mods. You can now start with exactly the base that you have
+  in your stash.
+
+- Added `normal`, `magic` and `rare` keywords to the `buy` instruction to specify
+  the rarity of the item you are buying. If `exact` is not specified, random
+  mods may be added but rarity will stay as requested.
+
 ## Version 0.1.0
 
 First released version.
