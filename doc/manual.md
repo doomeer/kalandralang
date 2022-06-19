@@ -483,14 +483,21 @@ Some instructions contain conditions. Those conditions are evaluated on the curr
 For instance, `no_suffix` is a condition that evaluates to `true` if the current
 item has no suffix.
 
-#### Set-Aside Item
+#### Set-Aside Item Stack
 
-When executing a recipe, Kalandralang stores a *set-aside item* in memory.
+When executing a recipe, Kalandralang stores a stack of *set-aside items* in memory.
 At the very start, there is no set-aside item.
 Use the `set_aside` instruction to set the current item aside (see [Set Aside](#set-aside)).
-Items can be set aside for [Awakener's Orb](#awakeners-orb)
-and [Recombinators](#recombinators) in particular.
-Note that [Splitting](#split) an item replaces the set-aside item.
+This pushes the current item on top of the stack.
+It can then be used as input of an [Awakener's Orb](#awakeners-orb)
+or a [Recombinator](#recombinators) in particular.
+Note that [Splitting](#split) an item also pushes one of the two resulting items aside.
+
+Since set-aside items form a stack, you can set-aside multiple items.
+For instance, if you push one item A, then set-aside another item B,
+item B will be on top of the stack, followed by item A. Using a recombinator for
+instance will thus take item B and remove it from the stack. Item A is then
+on top of the stack and can be used as input of another recombinator.
 
 #### Current Imprint
 
@@ -632,8 +639,8 @@ The following keywords are instructions to apply currency to the current item.
 
 ##### Awakener's Orb
 
-The `awaken` instruction applies an Awakener's Orb on the
-[Set-Aside Item](#set-aside-item) to destroy it and add its influence
+The `awaken` instruction applies an Awakener's Orb on the item which is on top of the
+[Set-Aside Item Stack](#set-aside-item-stack) to destroy it and add its influence
 to the [Current Item](#current-item). For instance, here is how to
 destroy a hunter-influenced Agate Amulet to add hunter influence
 to a warlord Marble Amulet:
@@ -660,8 +667,8 @@ than one influenced modifier, this is not guaranteed.
 | `recombine` | Armour Recombinator, Weapon Recombinator, or Jewellery Recombinator (chosen according to the base type of the current item) |
 
 All recombinator instructions recombine the [Current Item](#current-item) and the
-[Set-Aside Item](#set-aside-item) together. Both item are deleted and the current item
-becomes the result of the recombination.
+item which is on top of the [Set-Aside Item Stack](#set-aside-item-stack) together.
+Both item are deleted and the current item becomes the result of the recombination.
 
 #### Essences
 
@@ -848,7 +855,7 @@ The following keywords are instructions to perform beastcrafts on the current it
 
 `beastcraft_split` splits the current item into two items.
 One of them becomes the [Current Item](#current-item),
-the other becomes the [Set-Aside Item](#set-aside-item).
+the other is pushed on top of the [Set-Aside Item Stack](#set-aside-item-stack).
 
 You can [Swap](#swap) the current item and the set-aside item
 to access the second item created by a split.
@@ -931,16 +938,18 @@ This is equivalent to using an `if` as follows:
 
 #### Set Aside
 
-The `set_aside` instruction sets the [Set-Aside Item](#set-aside-item) to the
-[Current Item](#current-item), then sets the current item to no item.
+The `set_aside` instruction pushes the [Current Item](#current-item) on top of
+the [Set-Aside Item Stack](#set-aside-item-stack),
+then sets the current item to no item.
 You usually want to [buy](#buying-a-base) another item after that to get a new
-current item. Then you usually want to use an [Awakener's Orb](#awakeners-orb).
+current item. Then you usually want to use an [Awakener's Orb](#awakeners-orb)
+or a [Recombinator](#recombinators).
 
 #### Swap
 
 The `swap` instructions exchanges the [Current Item](#current-item)
-and the [Set-Aside Item](#set-aside-item). It is in particular useful
-when [Splitting](#split) items.
+and the item on top of the [Set-Aside Item Stack](#set-aside-item-stack).
+It is in particular useful when [Splitting](#split) items.
 
 #### Use Imprint
 

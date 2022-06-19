@@ -175,6 +175,12 @@
   however special effects (adding a mod, changing a tier…) are not fully implemented
   and their chances were evaluated from a very small sample size.
 
+- Set-aside items are now a stack.
+  This allows you to set more than one items aside.
+  This is in particular useful to recombine two items A and B to form AB,
+  to items C and D to form CD, and finally recombine AB and CD together.
+  (Also contributed by haggys22.)
+
 ## Version 0.1.0
 
 First released version.

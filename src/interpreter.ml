@@ -66,7 +66,7 @@ type state =
     echo: string -> unit;
     debug: string -> unit;
     item: Item.t option;
-    aside: Item.t option;
+    aside: Item.t list;
     imprint: Item.t option;
     paid: Amount.t;
     gained: Amount.t;
@@ -79,7 +79,7 @@ let start ~echo ~debug program =
     echo;
     debug;
     item = None;
-    aside = None;
+    aside = [];
     imprint = None;
     paid = Amount.zero;
     gained = Amount.zero;
@@ -96,9 +96,9 @@ let with_item state f =
 
 let with_aside state f =
   match state.aside with
-    | None ->
+    | [] ->
         fail "no item set aside"
-    | Some item ->
+    | item :: _ ->
         f item
 
 module Q:
@@ -397,6 +397,13 @@ let recombine state (expected_category: [ `armour | `weapon | `jewellery ]) =
     fail "cannot recombine this type of items with this type of recombinators";
   Item.recombine item aside
 
+let delete_aside state =
+  match state.aside with
+    | [] ->
+        state
+    | _ :: tail ->
+        { state with aside = tail }
+
 let apply_currency state (currency: AST.currency) =
   state.debug (AST.show_currency currency);
   let return item =
@@ -554,13 +561,13 @@ let apply_currency state (currency: AST.currency) =
           |> Item.add_influence (SEC aside_influence)
           |> Item.spawn_additional_random_mods
         in
-        { (return item) with aside = None }
+        delete_aside (return item)
     | Armour_recombinator ->
-        { (return @@ recombine state `armour) with aside = None }
+        delete_aside (return @@ recombine state `armour)
     | Weapon_recombinator ->
-        { (return @@ recombine state `weapon) with aside = None }
+        delete_aside (return @@ recombine state `weapon)
     | Jewellery_recombinator ->
-        { (return @@ recombine state `jewellery) with aside = None }
+        delete_aside (return @@ recombine state `jewellery)
     | Ember tier ->
         with_item state @@ fun item ->
         return @@ Item.apply_eldritch_ember (AST.eldritch_tier_of_currency tier) item
@@ -655,7 +662,7 @@ let apply_currency state (currency: AST.currency) =
         );
         let item1, item2 = Item.split item in
         let state = return item1 in
-        { state with aside = Some item2 }
+        { state with aside = item2 :: state.aside }
     | Beastcraft_imprint ->
         with_item state @@ fun item ->
         item_must_be_normal_or_magic item;
@@ -771,10 +778,17 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
     | Set_aside ->
         state.debug "set aside";
         with_item state @@ fun item ->
-        goto_next { state with aside = Some item; item = None }
+        goto_next { state with aside = item :: state.aside; item = None }
     | Swap ->
         state.debug "swap";
-        goto_next { state with aside = state.item; item = state.aside }
+        with_item state @@ fun item ->
+        goto_next (
+          match state.aside with
+            | [] ->
+                fail "no item set aside"
+            | head :: tail ->
+                { state with aside = item :: tail; item = Some head }
+        )
     | Use_imprint ->
         state.debug "use_imprint";
         let imprint =

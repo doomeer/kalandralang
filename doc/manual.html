@@ -117,7 +117,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#computational-model">Computational Model</a><ul>
 <li><a href="#program-point">Program Point</a></li>
 <li><a href="#current-item">Current Item</a></li>
-<li><a href="#set-aside-item">Set-Aside Item</a></li>
+<li><a href="#set-aside-item-stack">Set-Aside Item Stack</a></li>
 <li><a href="#current-imprint">Current Imprint</a></li>
 <li><a href="#spendings-and-gains">Spendings and Gains</a></li>
 <li><a href="#errors">Errors</a></li>
@@ -500,8 +500,9 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <h4 id="current-item">Current Item</h4>
 <p>When executing a recipe, Kalandralang stores a <em>current item</em> in memory. At the very start, there is no current item, so usually the first instruction is to <code>buy</code> a base (see <a href="#buying-a-base">Buying a Base</a>). After that, each instruction can modify the current item or replace it completely. For instance, <code>transmute</code> is an instruction that applies an Orb of Transmutation on the current item.</p>
 <p>Some instructions contain conditions. Those conditions are evaluated on the current item. For instance, <code>no_suffix</code> is a condition that evaluates to <code>true</code> if the current item has no suffix.</p>
-<h4 id="set-aside-item">Set-Aside Item</h4>
-<p>When executing a recipe, Kalandralang stores a <em>set-aside item</em> in memory. At the very start, there is no set-aside item. Use the <code>set_aside</code> instruction to set the current item aside (see <a href="#set-aside">Set Aside</a>). Items can be set aside for <a href="#awakeners-orb">Awakener's Orb</a> and <a href="#recombinators">Recombinators</a> in particular. Note that <a href="#split">Splitting</a> an item replaces the set-aside item.</p>
+<h4 id="set-aside-item-stack">Set-Aside Item Stack</h4>
+<p>When executing a recipe, Kalandralang stores a stack of <em>set-aside items</em> in memory. At the very start, there is no set-aside item. Use the <code>set_aside</code> instruction to set the current item aside (see <a href="#set-aside">Set Aside</a>). This pushes the current item on top of the stack. It can then be used as input of an <a href="#awakeners-orb">Awakener's Orb</a> or a <a href="#recombinators">Recombinator</a> in particular. Note that <a href="#split">Splitting</a> an item also pushes one of the two resulting items aside.</p>
+<p>Since set-aside items form a stack, you can set-aside multiple items. For instance, if you push one item A, then set-aside another item B, item B will be on top of the stack, followed by item A. Using a recombinator for instance will thus take item B and remove it from the stack. Item A is then on top of the stack and can be used as input of another recombinator.</p>
 <h4 id="current-imprint">Current Imprint</h4>
 <p>When executing a recipe, Kalandralang stores a <em>current imprint</em> in memory. At the very start, there is no current imprint. Use the <code>beastcraft_imprint</code> instruction to make an imprint of the current item (see <a href="#imprint">Imprint</a>). Use the <code>use_imprint</code> instruction to restore the current item to the current imprint (see <a href="#use-imprint">Use Imprint</a>).</p>
 <h4 id="spendings-and-gains">Spendings and Gains</h4>
@@ -690,7 +691,7 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </tbody>
 </table>
 <h5 id="awakeners-orb">Awakener's Orb</h5>
-<p>The <code>awaken</code> instruction applies an Awakener's Orb on the <a href="#set-aside-item">Set-Aside Item</a> to destroy it and add its influence to the <a href="#current-item">Current Item</a>. For instance, here is how to destroy a hunter-influenced Agate Amulet to add hunter influence to a warlord Marble Amulet:</p>
+<p>The <code>awaken</code> instruction applies an Awakener's Orb on the item which is on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a> to destroy it and add its influence to the <a href="#current-item">Current Item</a>. For instance, here is how to destroy a hunter-influenced Agate Amulet to add hunter influence to a warlord Marble Amulet:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb31-1" title="1"><span class="ex">buy</span> hunter <span class="st">&quot;Metadata/Items/Amulets/Amulet9&quot;</span></a>
 <a class="sourceLine" id="cb31-2" title="2">  <span class="ex">with</span> <span class="st">&quot;AdditionalPierceInfluence1&quot;</span></a>
 <a class="sourceLine" id="cb31-3" title="3"><span class="ex">set_aside</span></a>
@@ -725,7 +726,7 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </tr>
 </tbody>
 </table>
-<p>All recombinator instructions recombine the <a href="#current-item">Current Item</a> and the <a href="#set-aside-item">Set-Aside Item</a> together. Both item are deleted and the current item becomes the result of the recombination.</p>
+<p>All recombinator instructions recombine the <a href="#current-item">Current Item</a> and the item which is on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a> together. Both item are deleted and the current item becomes the result of the recombination.</p>
 <h4 id="essences">Essences</h4>
 <p>The following keywords are instructions to apply an essence to the current item.</p>
 <table>
@@ -1214,7 +1215,7 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 </tbody>
 </table>
 <h5 id="split">Split</h5>
-<p><code>beastcraft_split</code> splits the current item into two items. One of them becomes the <a href="#current-item">Current Item</a>, the other becomes the <a href="#set-aside-item">Set-Aside Item</a>.</p>
+<p><code>beastcraft_split</code> splits the current item into two items. One of them becomes the <a href="#current-item">Current Item</a>, the other is pushed on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a>.</p>
 <p>You can <a href="#swap">Swap</a> the current item and the set-aside item to access the second item created by a split. For instance, to split an item that has +1 to Level of all Chaos Skill Gems and set the current item to the item that kept this modifier:</p>
 <div class="sourceCode" id="cb37"><pre class="sourceCode sh"><code class="sourceCode bash"><a class="sourceLine" id="cb37-1" title="1"><span class="ex">beastcraft_split</span></a>
 <a class="sourceLine" id="cb37-2" title="2"><span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;GlobalChaosGemLevel1&quot;</span> then swap</a></code></pre></div>
@@ -1269,9 +1270,9 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <a class="sourceLine" id="cb42-4" title="4">  <span class="ex">unveil</span> <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span></a>
 <a class="sourceLine" id="cb42-5" title="5">  <span class="kw">if</span> <span class="ex">not</span> has <span class="st">&quot;JunMasterVeiledBaseLifeAndManaRegen_&quot;</span> then goto .try_again</a></code></pre></div>
 <h4 id="set-aside">Set Aside</h4>
-<p>The <code>set_aside</code> instruction sets the <a href="#set-aside-item">Set-Aside Item</a> to the <a href="#current-item">Current Item</a>, then sets the current item to no item. You usually want to <a href="#buying-a-base">buy</a> another item after that to get a new current item. Then you usually want to use an <a href="#awakeners-orb">Awakener's Orb</a>.</p>
+<p>The <code>set_aside</code> instruction pushes the <a href="#current-item">Current Item</a> on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a>, then sets the current item to no item. You usually want to <a href="#buying-a-base">buy</a> another item after that to get a new current item. Then you usually want to use an <a href="#awakeners-orb">Awakener's Orb</a> or a <a href="#recombinators">Recombinator</a>.</p>
 <h4 id="swap">Swap</h4>
-<p>The <code>swap</code> instructions exchanges the <a href="#current-item">Current Item</a> and the <a href="#set-aside-item">Set-Aside Item</a>. It is in particular useful when <a href="#split">Splitting</a> items.</p>
+<p>The <code>swap</code> instructions exchanges the <a href="#current-item">Current Item</a> and the item on top of the <a href="#set-aside-item-stack">Set-Aside Item Stack</a>. It is in particular useful when <a href="#split">Splitting</a> items.</p>
 <h4 id="use-imprint">Use Imprint</h4>
 <p>The <code>use_imprint</code> instruction sets the <a href="#current-item">Current Item</a> to the <a href="#current-imprint">Current Imprint</a>, and sets the current imprint to no imprint.</p>
 <h3 id="control-flow-instructions">Control-Flow Instructions</h3>
