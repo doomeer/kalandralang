@@ -270,6 +270,9 @@ and eval_condition state (condition: AST.condition) =
     | Has_group id ->
         with_item state @@ fun item ->
         Item.has_mod_group_id id item
+    | Is_base id ->
+        with_item state @@ fun item ->
+        Id.compare item.base.id id = 0
     | C_prefix_count (min, max) ->
         with_item state @@ fun item ->
         let count = Item.prefix_count item in

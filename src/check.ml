@@ -106,6 +106,8 @@ and check_condition ({ node; loc }: AST.condition) =
         check_mod loc modifier
     | Has_group modifier ->
         check_mod_group loc modifier
+    | Is_base base ->
+        check_base_item loc base
 
 let check_recipe ast =
   let rec gather_labels ((declared, used) as acc) (ast: AST.t) =

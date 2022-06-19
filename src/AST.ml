@@ -361,6 +361,7 @@ and condition_node =
   | Has of Id.t
   | Has_mod of Id.t
   | Has_group of Id.t
+  | Is_base of Id.t
   | C_prefix_count of int * int
   | Open_prefix
   | Full_prefixes
@@ -467,6 +468,8 @@ and pp_condition ?(ctx = `top) condition =
         seq [ atom "has_mod"; space; Id.pp modifier ]
     | Has_group modifier ->
         seq [ atom "has_group"; space; Id.pp modifier ]
+    | Is_base base ->
+        seq [ atom "is_base"; space; Id.pp base ]
     | C_prefix_count (0, 0) ->
         atom "no_prefix"
     | C_prefix_count (a, b) when a = b ->
