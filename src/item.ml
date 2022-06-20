@@ -472,8 +472,8 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
 let add_mod_force ?(fractured = false) modifier item =
   { item with mods = { modifier; fractured } :: item.mods }
 
-let add_mod ?(fractured = false) modifier item =
-  if fractured && is_fractured item then
+let add_mod ?(fractured = false) ?(allow_multifracture = false) modifier item =
+  if fractured && is_fractured item && not allow_multifracture then
     fail "cannot add a second fractured modifier";
   if Mod.is_prefix modifier && prefix_count item >= max_prefix_count item then
     fail "cannot add another prefix";

@@ -756,7 +756,7 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         let item =
           let add_mod item ({ modifier; fractured }: AST.buy_with) =
             let item = if fractured then Item.add_influence Fractured item else item in
-            Item.add_mod ~fractured (Mod.by_id modifier) item
+            Item.add_mod ~fractured ~allow_multifracture: true (Mod.by_id modifier) item
           in
           List.fold_left add_mod item mods
         in
