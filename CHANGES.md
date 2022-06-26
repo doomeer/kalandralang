@@ -194,6 +194,8 @@
   the rarity of the item you are buying. If `exact` is not specified, random
   mods may be added but rarity will stay as requested.
 
+- You can now `buy` items with multiple fractured mods.
+
 ## Version 0.1.0
 
 First released version.

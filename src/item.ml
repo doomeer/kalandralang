@@ -473,8 +473,6 @@ let add_mod_force ?(fractured = false) modifier item =
   { item with mods = { modifier; fractured } :: item.mods }
 
 let add_mod ?(fractured = false) modifier item =
-  if fractured && is_fractured item then
-    fail "cannot add a second fractured modifier";
   if Mod.is_prefix modifier && prefix_count item >= max_prefix_count item then
     fail "cannot add another prefix";
   if Mod.is_suffix modifier && suffix_count item >= max_suffix_count item then
