@@ -1,0 +1,13 @@
+(library
+ (name kalandralang_lib)
+ (public_name kalandralang.lib)
+ (libraries
+  uri
+  tls
+  cohttp-lwt-unix
+  lwt
+  ezjsonm))
+
+(ocamllex lexer)
+
+(ocamlyacc parser)
