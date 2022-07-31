@@ -1,0 +1,10 @@
+(executable
+ (name main)
+ (public_name kalandralang-server)
+ (libraries
+  clap
+  lwt
+  tls
+  cohttp-lwt-unix
+  ezjsonm
+  kalandralang.lib))
