@@ -615,6 +615,22 @@ let remove_all_suffixes item =
   in
   { item with mods }
 
+let harvest_augment_and_remove ~tag item =
+  (* Choose mod to add before removing a random mod, because this random mod is
+     actually removed *after* adding. *)
+  match
+    random_from_pool (mod_pool ~tag item)
+  with
+    | None ->
+        fail "item cannot spawn any mod with tag %s" (Id.show (Mod.tag_id tag))
+    | Some modifier ->
+        let item =
+          remove_random_mod item
+            ~respect_cannot_be_changed: true
+            ~respect_cannot_roll: false
+        in
+        add_mod_force modifier item
+
 let set_to_lowest_possible_rarity item =
   let p = prefix_count item in
   let s = suffix_count item in

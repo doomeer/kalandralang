@@ -39,7 +39,7 @@ Kalandralang supports:
 - most fossils;
 - the crafting bench;
 - most relevant Harvest crafts (however, costs currently use pre-Kalandra numbers instead
-  of Lifeforce; and augments do not remove mods);
+  of Lifeforce);
 - beastcrafting: imprinting and splitting items;
 - Betrayal crafting: Aisling;
 - unveiling;

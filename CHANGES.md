@@ -8,6 +8,8 @@
 
 - Costs are now displayed in Divine Orbs instead of Exalted Orbs.
 
+- Harvest augments now also remove a random modifier.
+
 ## Changes Made During Archnemesis and Sentinel League
 
 ### Eldritch Crafting

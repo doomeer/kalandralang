@@ -157,6 +157,7 @@ show_mod_pool
 ### Code
 
 Here is an example recipe to make a fire amulet.
+It uses the old Harvest augments though, it would no longer work after Kalandra league.
 You can also find the code in `examples/fire-amulet.kld`.
 ```sh
 # This recipe produces Citrine Amulets with:
@@ -794,17 +795,17 @@ The following keywords are instructions to perform harvest crafts on the current
 
 | Keyword | Craft |
 | --- | --- |
-| `harvest_augment_attack` | **Augment** an item with a new **Attack** modifier |
-| `harvest_augment_caster` | **Augment** an item with a new **Caster** modifier |
-| `harvest_augment_chaos` | **Augment** an item with a new **Chaos** modifier |
-| `harvest_augment_cold` | **Augment** an item with a new **Cold** modifier |
-| `harvest_augment_critical` | **Augment** an item with a new **Critical** modifier |
-| `harvest_augment_defences` | **Augment** an item with a new **Defences** modifier |
-| `harvest_augment_fire` | **Augment** an item with a new **Fire** modifier |
-| `harvest_augment_life` | **Augment** an item with a new **Life** modifier |
-| `harvest_augment_lightning` | **Augment** an item with a new **Lightning** modifier |
-| `harvest_augment_physical` | **Augment** an item with a new **Physical** modifier |
-| `harvest_augment_speed` | **Augment** an item with a new **Speed** modifier |
+| `harvest_augment_attack` | **Augment** an item with a new **Attack** modifier, then remove a random modifier |
+| `harvest_augment_caster` | **Augment** an item with a new **Caster** modifier, then remove a random modifier |
+| `harvest_augment_chaos` | **Augment** an item with a new **Chaos** modifier, then remove a random modifier |
+| `harvest_augment_cold` | **Augment** an item with a new **Cold** modifier, then remove a random modifier |
+| `harvest_augment_critical` | **Augment** an item with a new **Critical** modifier, then remove a random modifier |
+| `harvest_augment_defences` | **Augment** an item with a new **Defences** modifier, then remove a random modifier |
+| `harvest_augment_fire` | **Augment** an item with a new **Fire** modifier, then remove a random modifier |
+| `harvest_augment_life` | **Augment** an item with a new **Life** modifier, then remove a random modifier |
+| `harvest_augment_lightning` | **Augment** an item with a new **Lightning** modifier, then remove a random modifier |
+| `harvest_augment_physical` | **Augment** an item with a new **Physical** modifier, then remove a random modifier |
+| `harvest_augment_speed` | **Augment** an item with a new **Speed** modifier, then remove a random modifier |
 | `harvest_non_attack_to_attack` | **Remove** a random **non-Attack** modifier from an item and add a new **Attack** modifier |
 | `harvest_non_caster_to_caster` | **Remove** a random **non-Caster** modifier from an item and add a new **Attack** modifier |
 | `harvest_non_chaos_to_chaos` | **Remove** a random **non-Chaos** modifier from an item and add a new **Attack** modifier |

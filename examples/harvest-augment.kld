@@ -1,0 +1,10 @@
+# This example shows that one can add a suffix with harvest augments
+# without risking removing prefixes.
+
+buy exact rare "Metadata/Items/Weapons/TwoHandWeapons/Bows/Bow20"
+  with "LocalAddedLightningDamage6"
+  with "LocalAddedFireDamage6"
+  with "LocalAddedColdDamage6"
+
+prefixes_cannot_be_changed
+harvest_augment_critical

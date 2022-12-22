@@ -606,7 +606,7 @@ let apply_currency state (currency: AST.currency) =
             | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
                 fail "cannot harvest augment an influenced item"
         );
-        return @@ Item.spawn_random_mod ~tag item
+        return @@ Item.harvest_augment_and_remove ~tag item
     | Harvest_non_to tag ->
         with_item state @@ fun item ->
         (
