@@ -742,6 +742,6 @@ let load filename =
   List.iter update !field_list
 
 let show_chaos_amount amount =
-  sf "%.2fex (%dc)"
-    (amount /. get exalt)
+  sf "%.2fdiv (%dc)"
+    (amount /. get divine)
     (int_of_float amount)

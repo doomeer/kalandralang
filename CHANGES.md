@@ -6,6 +6,8 @@
 
 - Metacrafting mods now cost Divine Orbs.
 
+- Costs are now displayed in Divine Orbs instead of Exalted Orbs.
+
 ## Changes Made During Archnemesis and Sentinel League
 
 ### Eldritch Crafting

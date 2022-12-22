@@ -55,8 +55,8 @@ struct
     Map.iter (fun c n -> total := !total +. float n *. Cost.get_currency c) a;
     !total
 
-  let to_exalt a =
-    to_chaos a /. Cost.(get exalt)
+  let to_divine a =
+    to_chaos a /. Cost.(get divine)
 
   let iter a f = Map.iter f a
 end

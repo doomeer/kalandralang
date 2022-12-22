@@ -107,7 +107,7 @@ let run_recipe recipe ~batch_options ~display_options =
           (show_average (A.sub !gained !paid));
       if not display_options.no_histogram && !run_index >= 2 then (
         echo "";
-        Histogram.output histogram ~w: 80 ~h: 12 ~unit: "ex"
+        Histogram.output histogram ~w: 80 ~h: 12 ~unit: "div"
       );
   in
   let () = (
@@ -162,7 +162,7 @@ let run_recipe recipe ~batch_options ~display_options =
               (show_amount (A.sub state.gained state.paid));
         );
         if not display_options.no_histogram then
-          Histogram.add histogram (A.to_exalt state.paid);
+          Histogram.add histogram (A.to_divine state.paid);
 
         run_index := !run_index + 1;
       done;
