@@ -710,15 +710,15 @@ let get_currency (currency: AST.currency) =
     | Craft _ ->
         get transmute
     | Multimod ->
-        2. *. get exalt
+        2. *. get divine
     | Prefixes_cannot_be_changed ->
-        2. *. get exalt
+        2. *. get divine
     | Suffixes_cannot_be_changed ->
-        2. *. get exalt
+        2. *. get divine
     | Cannot_roll_attack_mods ->
-        get exalt
+        get divine
     | Cannot_roll_caster_mods ->
-        5. *. get bless
+        get divine
     | Remove_crafted_mods ->
         get scour
     | Craft_any_prefix ->

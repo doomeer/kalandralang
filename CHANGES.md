@@ -4,6 +4,8 @@
 
 - The default league is now Sanctum.
 
+- Metacrafting mods now cost Divine Orbs.
+
 ## Changes Made During Archnemesis and Sentinel League
 
 ### Eldritch Crafting
