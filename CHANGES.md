@@ -1,6 +1,10 @@
 # Kalandralang Changelog
 
-## Next Release
+## Changes Made During Sanctum League
+
+- The default league is now Sanctum.
+
+## Changes Made During Archnemesis and Sentinel League
 
 ### Eldritch Crafting
 

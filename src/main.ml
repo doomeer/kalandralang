@@ -614,7 +614,7 @@ let main () =
             ~long: "ninja-league"
             ~placeholder: "LEAGUE"
             ~description: "League name to give to poe.ninja's API."
-            "Sentinel"
+            "Sanctum"
         in
         let tft_league =
           Clap.default_string
