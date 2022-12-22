@@ -74,6 +74,7 @@
     | "chaos" -> CURRENCY Chaos_orb
     | "annul" -> CURRENCY Orb_of_annulment
     | "exalt" -> CURRENCY Exalted_orb
+    | "divine" -> CURRENCY Divine_orb
     | "crusader_exalt" -> CURRENCY Crusader_exalted_orb
     | "hunter_exalt" -> CURRENCY Hunter_exalted_orb
     | "redeemer_exalt" -> CURRENCY Redeemer_exalted_orb

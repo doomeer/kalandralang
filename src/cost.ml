@@ -87,6 +87,9 @@ let annul: field =
 let exalt: field =
   c "Exalted Orb" "exalt" ex
 
+let divine: field =
+  c "Divine Orb" "divine" (10. *. ex)
+
 let crusader_exalt: field =
   c "Crusader's Exalted Orb" "crusader_exalt" (0.5 *. ex)
 
@@ -472,6 +475,8 @@ let get_currency (currency: AST.currency) =
         get annul
     | Exalted_orb ->
         get exalt
+    | Divine_orb ->
+        get divine
     | Crusader_exalted_orb ->
         get crusader_exalt
     | Hunter_exalted_orb ->

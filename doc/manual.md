@@ -608,6 +608,7 @@ The following keywords are instructions to apply currency to the current item.
 | `chaos` | Chaos Orb |
 | `annul` | Orb of Annulment |
 | `exalt` | Exalted Orb |
+| `divine` | Divine Orb |
 | `orb_of_dominance` | Orb of Dominance |
 
 ##### Conqueror Exalted Orbs

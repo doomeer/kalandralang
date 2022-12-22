@@ -69,6 +69,7 @@ type currency =
   | Chaos_orb
   | Orb_of_annulment
   | Exalted_orb
+  | Divine_orb
   | Crusader_exalted_orb
   | Hunter_exalted_orb
   | Redeemer_exalted_orb
@@ -123,6 +124,7 @@ let show_currency = function
   | Chaos_orb -> "chaos"
   | Orb_of_annulment -> "annul"
   | Exalted_orb -> "exalt"
+  | Divine_orb -> "divine"
   | Crusader_exalted_orb -> "crusader_exalt"
   | Hunter_exalted_orb -> "hunter_exalt"
   | Redeemer_exalted_orb -> "redeemer_exalt"

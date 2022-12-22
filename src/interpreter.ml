@@ -475,6 +475,8 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         item_must_be_rare item;
         return @@ Item.spawn_random_mod item
+    | Divine_orb ->
+        fail "not implemented: divine"
     | Crusader_exalted_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
