@@ -597,6 +597,11 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         item_must_be_rare item;
         return @@ Item.apply_eldritch_chaos item
+    | Wild_crystallised_lifeforce
+    | Vivid_crystallised_lifeforce
+    | Primal_crystallised_lifeforce
+    | Sacred_crystallised_lifeforce ->
+        fail "lifeforce cannot be applied directly, use harvest_* instructions"
     | Harvest_augment tag ->
         with_item state @@ fun item ->
         (

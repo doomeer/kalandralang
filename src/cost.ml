@@ -288,149 +288,17 @@ let eldritch_exalt: field =
 let eldritch_chaos: field =
   c "Eldritch Chaos Orb" "eldritch_chaos" 30.
 
-let harvest_augment_attack: field =
-  h "Augment Attack" "harvest_augment_attack" (10. *. div)
+let wild_crystallised_lifeforce: field =
+  c "Wild Crystallised Lifeforce" "wild_lifeforce" 0.02
 
-let harvest_augment_caster: field =
-  h "Augment Caster" "harvest_augment_caster" (10. *. div)
+let vivid_crystallised_lifeforce: field =
+  c "Vivid Crystallised Lifeforce" "vivid_lifeforce" 0.02
 
-let harvest_augment_chaos: field =
-  h "Augment Chaos" "harvest_augment_chaos" (10. *. div)
+let primal_crystallised_lifeforce: field =
+  c "Primal Crystallised Lifeforce" "primal_lifeforce" 0.02
 
-let harvest_augment_cold: field =
-  h "Augment Cold" "harvest_augment_cold" (10. *. div)
-
-let harvest_augment_critical: field =
-  h "Augment Critical" "harvest_augment_critical" (10. *. div)
-
-let harvest_augment_defences: field =
-  h "Augment Defence" "harvest_augment_defences" (10. *. div)
-
-let harvest_augment_fire: field =
-  h "Augment Fire" "harvest_augment_fire" (10. *. div)
-
-let harvest_augment_life: field =
-  h "Augment Life" "harvest_augment_life" (10. *. div)
-
-let harvest_augment_lightning: field =
-  h "Augment Lightning" "harvest_augment_lightning" (10. *. div)
-
-let harvest_augment_physical: field =
-  h "Augment Physical" "harvest_augment_physical" (10. *. div)
-
-let harvest_augment_speed: field =
-  h "Augment Speed" "harvest_augment_speed" (10. *. div)
-
-let harvest_non_attack_to_attack: field =
-  h "Remove Non-Attack Add Attack" "harvest_non_attack_to_attack" (1.5 *. div)
-
-let harvest_non_caster_to_caster: field =
-  h "Remove Non-Caster Add Caster" "harvest_non_caster_to_caster" (1.5 *. div)
-
-let harvest_non_chaos_to_chaos: field =
-  h "Remove Non-Chaos Add Chaos" "harvest_non_chaos_to_chaos" (1.5 *. div)
-
-let harvest_non_cold_to_cold: field =
-  h "Remove Non-Cold Add Cold" "harvest_non_cold_to_cold" (1.5 *. div)
-
-let harvest_non_critical_to_critical: field =
-  h "Remove Non-Critical Add Critical" "harvest_non_critical_to_critical" (1.5 *. div)
-
-let harvest_non_defences_to_defences: field =
-  h "Remove Non-Defence Add Defence" "harvest_non_defences_to_defences" (1.5 *. div)
-
-let harvest_non_fire_to_fire: field =
-  h "Remove Non-Fire Add Fire" "harvest_non_fire_to_fire" (1.5 *. div)
-
-let harvest_non_life_to_life: field =
-  h "Remove Non-Life Add Life" "harvest_non_life_to_life" (1.5 *. div)
-
-let harvest_non_lightning_to_lightning: field =
-  h "Remove Non-Lightning Add Lightning" "harvest_non_lightning_to_lightning" (1.5 *. div)
-
-let harvest_non_physical_to_physical: field =
-  h "Remove Non-Physical Add Physical" "harvest_non_physical_to_physical" (1.5 *. div)
-
-let harvest_non_speed_to_speed: field =
-  h "Remove Non-Speed Add Speed" "harvest_non_speed_to_speed" (1.5 *. div)
-
-let harvest_reforge_attack: field =
-  h "Reforge Attack" "harvest_reforge_attack" 10.
-
-let harvest_reforge_caster: field =
-  h "Reforge Caster" "harvest_reforge_caster" 10.
-
-let harvest_reforge_chaos: field =
-  h "Reforge Chaos" "harvest_reforge_chaos" 10.
-
-let harvest_reforge_cold: field =
-  h "Reforge Cold" "harvest_reforge_cold" 10.
-
-let harvest_reforge_critical: field =
-  h "Reforge Critical" "harvest_reforge_critical" 10.
-
-let harvest_reforge_defences: field =
-  h "Reforge Defence" "harvest_reforge_defences" 10.
-
-let harvest_reforge_fire: field =
-  h "Reforge Fire" "harvest_reforge_fire" 10.
-
-let harvest_reforge_life: field =
-  h "Reforge Life" "harvest_reforge_life" 10.
-
-let harvest_reforge_lightning: field =
-  h "Reforge Lightning" "harvest_reforge_lightning" 10.
-
-let harvest_reforge_physical: field =
-  h "Reforge Physical" "harvest_reforge_physical" 10.
-
-let harvest_reforge_speed: field =
-  h "Reforge Speed" "harvest_reforge_speed" 10.
-
-let harvest_reforge_attack_more_common: field =
-  h "Reforge Attack More Common" "harvest_reforge_attack_more_common" 15.
-
-let harvest_reforge_caster_more_common: field =
-  h "Reforge Caster More Common" "harvest_reforge_caster_more_common" 15.
-
-let harvest_reforge_chaos_more_common: field =
-  h "Reforge Chaos More Common" "harvest_reforge_chaos_more_common" 15.
-
-let harvest_reforge_cold_more_common: field =
-  h "Reforge Cold More Common" "harvest_reforge_cold_more_common" 15.
-
-let harvest_reforge_critical_more_common: field =
-  h "Reforge Critical More Common" "harvest_reforge_critical_more_common" 15.
-
-let harvest_reforge_defences_more_common: field =
-  h "Reforge Defence More Common" "harvest_reforge_defences_more_common" 15.
-
-let harvest_reforge_fire_more_common: field =
-  h "Reforge Fire More Common" "harvest_reforge_fire_more_common" 15.
-
-let harvest_reforge_life_more_common: field =
-  h "Reforge Life More Common" "harvest_reforge_life_more_common" 15.
-
-let harvest_reforge_lightning_more_common: field =
-  h "Reforge Lightning More Common" "harvest_reforge_lightning_more_common" 15.
-
-let harvest_reforge_physical_more_common: field =
-  h "Reforge Physical More Common" "harvest_reforge_physical_more_common" 15.
-
-let harvest_reforge_speed_more_common: field =
-  h "Reforge Speed More Common" "harvest_reforge_speed_more_common" 15.
-
-let harvest_reforge_keep_prefixes: field =
-  h "Reforge keep Prefix" "harvest_reforge_keep_prefixes" (1.5 *. div)
-
-let harvest_reforge_keep_suffixes: field =
-  h "Reforge keep Suffix" "harvest_reforge_keep_suffixes" (1.5 *. div)
-
-let harvest_reforge_more_likely: field =
-  h "Reforge Rare More Likely" "harvest_reforge_more_likely" 30.
-
-let harvest_reforge_less_likely: field =
-  h "Reforge Rare Less Likely" "harvest_reforge_less_likely" 15.
+let sacred_crystallised_lifeforce: field =
+  c "Sacred Crystallised Lifeforce" "sacred_lifeforce" 0.02
 
 let beastcraft_aspect_of_the_avian: field =
   b "Saqawal, First of the Sky" "beastcraft_aspect_of_the_avian" 6.
@@ -597,102 +465,112 @@ let get_currency (currency: AST.currency) =
         get eldritch_exalt
     | Eldritch_chaos ->
         get eldritch_chaos
-    | Harvest_augment `attack ->
-        get harvest_augment_attack
-    | Harvest_augment `caster ->
-        get harvest_augment_caster
-    | Harvest_augment `chaos ->
-        get harvest_augment_chaos
-    | Harvest_augment `cold ->
-        get harvest_augment_cold
-    | Harvest_augment `critical ->
-        get harvest_augment_critical
-    | Harvest_augment `defences ->
-        get harvest_augment_defences
+    | Wild_crystallised_lifeforce ->
+        get wild_crystallised_lifeforce
+    | Vivid_crystallised_lifeforce ->
+        get vivid_crystallised_lifeforce
+    | Primal_crystallised_lifeforce ->
+        get primal_crystallised_lifeforce
+    | Sacred_crystallised_lifeforce ->
+        get sacred_crystallised_lifeforce
     | Harvest_augment `fire ->
-        get harvest_augment_fire
-    | Harvest_augment `life ->
-        get harvest_augment_life
+        15000. *. get wild_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `cold ->
+        15000. *. get vivid_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
     | Harvest_augment `lightning ->
-        get harvest_augment_lightning
+        15000. *. get primal_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
     | Harvest_augment `physical ->
-        get harvest_augment_physical
+        15000. *. get vivid_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `life ->
+        17500. *. get wild_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `defences ->
+        17500. *. get primal_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `chaos ->
+        17500. *. get vivid_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `attack ->
+        17500. *. get wild_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `caster ->
+        17500. *. get primal_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
     | Harvest_augment `speed ->
-        get harvest_augment_speed
+        20000. *. get vivid_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
+    | Harvest_augment `critical ->
+        20000. *. get primal_crystallised_lifeforce +.
+        get sacred_crystallised_lifeforce
     | Harvest_non_to `attack ->
-        get harvest_non_attack_to_attack
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `caster ->
-        get harvest_non_caster_to_caster
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `chaos ->
-        get harvest_non_chaos_to_chaos
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `cold ->
-        get harvest_non_cold_to_cold
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `critical ->
-        get harvest_non_critical_to_critical
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `defences ->
-        get harvest_non_defences_to_defences
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `fire ->
-        get harvest_non_fire_to_fire
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `life ->
-        get harvest_non_life_to_life
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `lightning ->
-        get harvest_non_lightning_to_lightning
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `physical ->
-        get harvest_non_physical_to_physical
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_non_to `speed ->
-        get harvest_non_speed_to_speed
-    | Harvest_reforge `attack ->
-        get harvest_reforge_attack
-    | Harvest_reforge `caster ->
-        get harvest_reforge_caster
-    | Harvest_reforge `chaos ->
-        get harvest_reforge_chaos
-    | Harvest_reforge `cold ->
-        get harvest_reforge_cold
-    | Harvest_reforge `critical ->
-        get harvest_reforge_critical
-    | Harvest_reforge `defences ->
-        get harvest_reforge_defences
-    | Harvest_reforge `fire ->
-        get harvest_reforge_fire
-    | Harvest_reforge `life ->
-        get harvest_reforge_life
-    | Harvest_reforge `lightning ->
-        get harvest_reforge_lightning
-    | Harvest_reforge `physical ->
-        get harvest_reforge_physical
-    | Harvest_reforge `speed ->
-        get harvest_reforge_speed
-    | Harvest_reforge_more_common `attack ->
-        get harvest_reforge_attack_more_common
-    | Harvest_reforge_more_common `caster ->
-        get harvest_reforge_caster_more_common
-    | Harvest_reforge_more_common `chaos ->
-        get harvest_reforge_chaos_more_common
-    | Harvest_reforge_more_common `cold ->
-        get harvest_reforge_cold_more_common
-    | Harvest_reforge_more_common `critical ->
-        get harvest_reforge_critical_more_common
-    | Harvest_reforge_more_common `defences ->
-        get harvest_reforge_defences_more_common
-    | Harvest_reforge_more_common `fire ->
-        get harvest_reforge_fire_more_common
-    | Harvest_reforge_more_common `life ->
-        get harvest_reforge_life_more_common
-    | Harvest_reforge_more_common `lightning ->
-        get harvest_reforge_lightning_more_common
-    | Harvest_reforge_more_common `physical ->
-        get harvest_reforge_physical_more_common
-    | Harvest_reforge_more_common `speed ->
-        get harvest_reforge_speed_more_common
+        (* Deprecated. *)
+        1.5 *. get divine
+    | Harvest_reforge `fire | Harvest_reforge_more_common `fire ->
+        50. *. get wild_crystallised_lifeforce
+    | Harvest_reforge `cold | Harvest_reforge_more_common `cold ->
+        50. *. get vivid_crystallised_lifeforce
+    | Harvest_reforge `lightning | Harvest_reforge_more_common `lightning ->
+        50. *. get primal_crystallised_lifeforce
+    | Harvest_reforge `physical | Harvest_reforge_more_common `physical ->
+        50. *. get vivid_crystallised_lifeforce
+    | Harvest_reforge `life | Harvest_reforge_more_common `life ->
+        75. *. get wild_crystallised_lifeforce
+    | Harvest_reforge `defences | Harvest_reforge_more_common `defences ->
+        75. *. get primal_crystallised_lifeforce
+    | Harvest_reforge `chaos | Harvest_reforge_more_common `chaos ->
+        100. *. get vivid_crystallised_lifeforce
+    | Harvest_reforge `attack | Harvest_reforge_more_common `attack ->
+        75. *. get wild_crystallised_lifeforce
+    | Harvest_reforge `caster | Harvest_reforge_more_common `caster ->
+        75. *. get primal_crystallised_lifeforce
+    | Harvest_reforge `speed | Harvest_reforge_more_common `speed ->
+        150. *. get vivid_crystallised_lifeforce
+    | Harvest_reforge `critical | Harvest_reforge_more_common `critical ->
+        150. *. get primal_crystallised_lifeforce
     | Harvest_reforge_keep_prefixes ->
-        get harvest_reforge_keep_prefixes
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_reforge_keep_suffixes ->
-        get harvest_reforge_keep_suffixes
+        (* Deprecated. *)
+        1.5 *. get divine
     | Harvest_reforge_more_likely ->
-        get harvest_reforge_more_likely
+        200. *. get wild_crystallised_lifeforce
     | Harvest_reforge_less_likely ->
-        get harvest_reforge_less_likely
+        200. *. get wild_crystallised_lifeforce
     | Beastcraft_aspect_of_the_avian ->
         get beastcraft_aspect_of_the_avian
     | Beastcraft_aspect_of_the_cat ->

@@ -38,8 +38,8 @@ Kalandralang supports:
 - essences;
 - most fossils;
 - the crafting bench;
-- most relevant Harvest crafts (however, costs currently use pre-Kalandra numbers instead
-  of Lifeforce);
+- most relevant Harvest crafts (warning: reforge more likely / less likely still use
+  the old weights);
 - beastcrafting: imprinting and splitting items;
 - Betrayal crafting: Aisling;
 - unveiling;
@@ -53,6 +53,7 @@ Kalandralang does not support in particular:
 - actual modifier values and currencies and crafts that affect those values
   (Blessed Orb, Divine Orb, Harvest rerolls, lucky Harvest reforges) — currently
   Kalandralang just displays a random value in the range of possible values;
-- Orb of Conflict.
+- Orb of Conflict;
+- Fracturing Orbs.
 
 See also the [Changelog](CHANGES.md).

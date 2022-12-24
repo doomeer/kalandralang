@@ -10,6 +10,8 @@
 
 - Harvest augments now also remove a random modifier.
 
+- Harvest crafts now use Crystallised Lifeforce.
+
 ## Changes Made During Archnemesis and Sentinel League
 
 ### Eldritch Crafting
