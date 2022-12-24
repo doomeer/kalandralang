@@ -51,7 +51,7 @@ let get field =
 let set field value =
   values := Int_map.add field.id value !values
 
-let ex = 150.
+let div = 200.
 let c = register Ninja_currency
 let e = register Ninja_essence
 let f = register Ninja_fossil
@@ -85,22 +85,22 @@ let annul: field =
   c "Orb of Annulment" "annul" 2.5
 
 let exalt: field =
-  c "Exalted Orb" "exalt" ex
+  c "Exalted Orb" "exalt" 20.
 
 let divine: field =
-  c "Divine Orb" "divine" (10. *. ex)
+  c "Divine Orb" "divine" div
 
 let crusader_exalt: field =
-  c "Crusader's Exalted Orb" "crusader_exalt" (0.5 *. ex)
+  c "Crusader's Exalted Orb" "crusader_exalt" (0.5 *. div)
 
 let hunter_exalt: field =
-  c "Hunter's Exalted Orb" "hunter_exalt" ex
+  c "Hunter's Exalted Orb" "hunter_exalt" div
 
 let redeemer_exalt: field =
-  c "Redeemer's Exalted Orb" "redeemer_exalt" (0.5 *. ex)
+  c "Redeemer's Exalted Orb" "redeemer_exalt" (0.5 *. div)
 
 let warlord_exalt: field =
-  c "Warlord's Exalted Orb" "warlord_exalt" (0.5 *. ex)
+  c "Warlord's Exalted Orb" "warlord_exalt" (0.5 *. div)
 
 let veiled_chaos: field =
   c "Veiled Chaos Orb" "veiled_chaos" 5.
@@ -241,10 +241,10 @@ let prime_resonator: field =
   r "Prime Chaotic Resonator" "prime_resonator" 40.
 
 let orb_of_dominance: field =
-  c "Orb of Dominance" "orb_of_dominance" ex
+  c "Orb of Dominance" "orb_of_dominance" div
 
 let awaken: field =
-  c "Awakener's Orb" "awaken" ex
+  c "Awakener's Orb" "awaken" div
 
 let armour_recombinator: field =
   c "Armour Recombinator" "armour_recombinator" 7.
@@ -289,70 +289,70 @@ let eldritch_chaos: field =
   c "Eldritch Chaos Orb" "eldritch_chaos" 30.
 
 let harvest_augment_attack: field =
-  h "Augment Attack" "harvest_augment_attack" (10. *. ex)
+  h "Augment Attack" "harvest_augment_attack" (10. *. div)
 
 let harvest_augment_caster: field =
-  h "Augment Caster" "harvest_augment_caster" (10. *. ex)
+  h "Augment Caster" "harvest_augment_caster" (10. *. div)
 
 let harvest_augment_chaos: field =
-  h "Augment Chaos" "harvest_augment_chaos" (10. *. ex)
+  h "Augment Chaos" "harvest_augment_chaos" (10. *. div)
 
 let harvest_augment_cold: field =
-  h "Augment Cold" "harvest_augment_cold" (10. *. ex)
+  h "Augment Cold" "harvest_augment_cold" (10. *. div)
 
 let harvest_augment_critical: field =
-  h "Augment Critical" "harvest_augment_critical" (10. *. ex)
+  h "Augment Critical" "harvest_augment_critical" (10. *. div)
 
 let harvest_augment_defences: field =
-  h "Augment Defence" "harvest_augment_defences" (10. *. ex)
+  h "Augment Defence" "harvest_augment_defences" (10. *. div)
 
 let harvest_augment_fire: field =
-  h "Augment Fire" "harvest_augment_fire" (10. *. ex)
+  h "Augment Fire" "harvest_augment_fire" (10. *. div)
 
 let harvest_augment_life: field =
-  h "Augment Life" "harvest_augment_life" (10. *. ex)
+  h "Augment Life" "harvest_augment_life" (10. *. div)
 
 let harvest_augment_lightning: field =
-  h "Augment Lightning" "harvest_augment_lightning" (10. *. ex)
+  h "Augment Lightning" "harvest_augment_lightning" (10. *. div)
 
 let harvest_augment_physical: field =
-  h "Augment Physical" "harvest_augment_physical" (10. *. ex)
+  h "Augment Physical" "harvest_augment_physical" (10. *. div)
 
 let harvest_augment_speed: field =
-  h "Augment Speed" "harvest_augment_speed" (10. *. ex)
+  h "Augment Speed" "harvest_augment_speed" (10. *. div)
 
 let harvest_non_attack_to_attack: field =
-  h "Remove Non-Attack Add Attack" "harvest_non_attack_to_attack" (1.5 *. ex)
+  h "Remove Non-Attack Add Attack" "harvest_non_attack_to_attack" (1.5 *. div)
 
 let harvest_non_caster_to_caster: field =
-  h "Remove Non-Caster Add Caster" "harvest_non_caster_to_caster" (1.5 *. ex)
+  h "Remove Non-Caster Add Caster" "harvest_non_caster_to_caster" (1.5 *. div)
 
 let harvest_non_chaos_to_chaos: field =
-  h "Remove Non-Chaos Add Chaos" "harvest_non_chaos_to_chaos" (1.5 *. ex)
+  h "Remove Non-Chaos Add Chaos" "harvest_non_chaos_to_chaos" (1.5 *. div)
 
 let harvest_non_cold_to_cold: field =
-  h "Remove Non-Cold Add Cold" "harvest_non_cold_to_cold" (1.5 *. ex)
+  h "Remove Non-Cold Add Cold" "harvest_non_cold_to_cold" (1.5 *. div)
 
 let harvest_non_critical_to_critical: field =
-  h "Remove Non-Critical Add Critical" "harvest_non_critical_to_critical" (1.5 *. ex)
+  h "Remove Non-Critical Add Critical" "harvest_non_critical_to_critical" (1.5 *. div)
 
 let harvest_non_defences_to_defences: field =
-  h "Remove Non-Defence Add Defence" "harvest_non_defences_to_defences" (1.5 *. ex)
+  h "Remove Non-Defence Add Defence" "harvest_non_defences_to_defences" (1.5 *. div)
 
 let harvest_non_fire_to_fire: field =
-  h "Remove Non-Fire Add Fire" "harvest_non_fire_to_fire" (1.5 *. ex)
+  h "Remove Non-Fire Add Fire" "harvest_non_fire_to_fire" (1.5 *. div)
 
 let harvest_non_life_to_life: field =
-  h "Remove Non-Life Add Life" "harvest_non_life_to_life" (1.5 *. ex)
+  h "Remove Non-Life Add Life" "harvest_non_life_to_life" (1.5 *. div)
 
 let harvest_non_lightning_to_lightning: field =
-  h "Remove Non-Lightning Add Lightning" "harvest_non_lightning_to_lightning" (1.5 *. ex)
+  h "Remove Non-Lightning Add Lightning" "harvest_non_lightning_to_lightning" (1.5 *. div)
 
 let harvest_non_physical_to_physical: field =
-  h "Remove Non-Physical Add Physical" "harvest_non_physical_to_physical" (1.5 *. ex)
+  h "Remove Non-Physical Add Physical" "harvest_non_physical_to_physical" (1.5 *. div)
 
 let harvest_non_speed_to_speed: field =
-  h "Remove Non-Speed Add Speed" "harvest_non_speed_to_speed" (1.5 *. ex)
+  h "Remove Non-Speed Add Speed" "harvest_non_speed_to_speed" (1.5 *. div)
 
 let harvest_reforge_attack: field =
   h "Reforge Attack" "harvest_reforge_attack" 10.
@@ -421,10 +421,10 @@ let harvest_reforge_speed_more_common: field =
   h "Reforge Speed More Common" "harvest_reforge_speed_more_common" 15.
 
 let harvest_reforge_keep_prefixes: field =
-  h "Reforge keep Prefix" "harvest_reforge_keep_prefixes" (1.5 *. ex)
+  h "Reforge keep Prefix" "harvest_reforge_keep_prefixes" (1.5 *. div)
 
 let harvest_reforge_keep_suffixes: field =
-  h "Reforge keep Suffix" "harvest_reforge_keep_suffixes" (1.5 *. ex)
+  h "Reforge keep Suffix" "harvest_reforge_keep_suffixes" (1.5 *. div)
 
 let harvest_reforge_more_likely: field =
   h "Reforge Rare More Likely" "harvest_reforge_more_likely" 30.
@@ -451,7 +451,7 @@ let beastcraft_imprint: field =
   b "Craicic Chimeral" "beastcraft_imprint" 120.
 
 let aisling: field =
-  s "T4 Aisling" "aisling" (3. *. ex)
+  s "T4 Aisling" "aisling" div
 
 let get_currency (currency: AST.currency) =
   match currency with
