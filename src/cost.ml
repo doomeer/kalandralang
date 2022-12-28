@@ -300,6 +300,9 @@ let primal_crystallised_lifeforce: field =
 let sacred_crystallised_lifeforce: field =
   c "Sacred Crystallised Lifeforce" "sacred_lifeforce" 0.02
 
+let fracturing_orb: field =
+  c "Fracturing Orb" "fracture" (4. *. div)
+
 let beastcraft_aspect_of_the_avian: field =
   b "Saqawal, First of the Sky" "beastcraft_aspect_of_the_avian" 6.
 
@@ -473,6 +476,8 @@ let get_currency (currency: AST.currency) =
         get primal_crystallised_lifeforce
     | Sacred_crystallised_lifeforce ->
         get sacred_crystallised_lifeforce
+    | Fracturing_orb ->
+        get fracturing_orb
     | Harvest_augment `fire ->
         15000. *. get wild_crystallised_lifeforce +.
         get sacred_crystallised_lifeforce

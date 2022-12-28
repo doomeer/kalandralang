@@ -1224,3 +1224,31 @@ let recombine item1 item2 =
       result
   in
   result
+
+let apply_fracturing_orb item =
+  let map_fracturable_mods f =
+    item.mods |> List.map @@ fun ({ modifier; fractured } as m) ->
+    if not fractured && Mod.is_prefix_or_suffix modifier then
+      f m
+    else
+      m
+  in
+  let fracturable_mod_count =
+    let count = ref 0 in
+    let _: modifier list = map_fracturable_mods (fun m -> incr count; m) in
+    !count
+  in
+  if fracturable_mod_count <= 0 then
+    item
+  else
+    let index_to_fracture = Random.int fracturable_mod_count in
+    let current_index = ref 0 in
+    let mods =
+      map_fracturable_mods @@ fun m ->
+      let m =
+        if !current_index = index_to_fracture then { m with fractured = true } else m
+      in
+      incr current_index;
+      m
+    in
+    { item with mods; influence = Influence.add item.influence Fractured }

@@ -138,6 +138,7 @@
     | "eldritch_annul" -> CURRENCY Eldritch_annul
     | "eldritch_exalt" -> CURRENCY Eldritch_exalt
     | "eldritch_chaos" -> CURRENCY Eldritch_chaos
+    | "fracture" -> CURRENCY Fracturing_orb
     | "harvest_augment_attack" -> CURRENCY (Harvest_augment `attack)
     | "harvest_augment_caster" -> CURRENCY (Harvest_augment `caster)
     | "harvest_augment_chaos" -> CURRENCY (Harvest_augment `chaos)

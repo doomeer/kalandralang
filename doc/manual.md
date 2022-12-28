@@ -611,6 +611,7 @@ The following keywords are instructions to apply currency to the current item.
 | `exalt` | Exalted Orb |
 | `divine` | Divine Orb |
 | `orb_of_dominance` | Orb of Dominance |
+| `fracture` | Fracturing Orb |
 
 ##### Conqueror Exalted Orbs
 

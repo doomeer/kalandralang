@@ -44,7 +44,8 @@ Kalandralang supports:
 - Betrayal crafting: Aisling;
 - unveiling;
 - influenced items;
-- synthesized items.
+- synthesized items;
+- fractured items and Fracturing Orb.
 
 Kalandralang does not support in particular:
 - Hollow and Sanctified Fossils;
@@ -53,7 +54,6 @@ Kalandralang does not support in particular:
 - actual modifier values and currencies and crafts that affect those values
   (Blessed Orb, Divine Orb, Harvest rerolls, lucky Harvest reforges) — currently
   Kalandralang just displays a random value in the range of possible values;
-- Orb of Conflict;
-- Fracturing Orbs.
+- Orb of Conflict.
 
 See also the [Changelog](CHANGES.md).

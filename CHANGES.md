@@ -12,6 +12,8 @@
 
 - Harvest crafts now use Crystallised Lifeforce.
 
+- Added Fracturing Orb (instruction keyword: `fracture`).
+
 ## Changes Made During Archnemesis and Sentinel League
 
 ### Eldritch Crafting

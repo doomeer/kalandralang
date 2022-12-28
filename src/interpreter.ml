@@ -602,6 +602,20 @@ let apply_currency state (currency: AST.currency) =
     | Primal_crystallised_lifeforce
     | Sacred_crystallised_lifeforce ->
         fail "lifeforce cannot be applied directly, use harvest_* instructions"
+    | Fracturing_orb ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        (
+          match item.influence with
+            | Not_influenced ->
+                ()
+            | Synthesized | Fractured | SEC _ | SEC_pair _
+            | Exarch | Eater | Exarch_and_eater ->
+                fail "cannot fracture influenced, synthesized, and already-fractured items"
+        );
+        if List.length (List.filter Item.is_prefix_or_suffix item.mods) < 4 then
+          fail "cannot fracture items with less than 4 mods";
+        return @@ Item.apply_fracturing_orb item
     | Harvest_augment tag ->
         with_item state @@ fun item ->
         (
