@@ -695,8 +695,7 @@ let reforge_magic item =
       ~respect_cannot_be_changed: true
       ~respect_cannot_roll: false
   in
-  let item = spawn_random_mod item in
-  if Random.bool () then spawn_random_mod ~fail_if_impossible: false item else item
+  spawn_additional_random_mods item
 
 (* If [modifier] is specified, [tag] cannot be specified; [modifier] is added first. *)
 (* The first added mod always has [tag]. *)
