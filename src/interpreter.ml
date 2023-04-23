@@ -207,7 +207,7 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
           let has_mod_group { Item.modifier; fractured = _ } =
             match modifier.generation_type with
               | Prefix | Suffix ->
-                  Id.compare modifier.group mod_group = 0
+                  Id.Set.mem mod_group modifier.groups
               | Exarch_implicit _ | Eater_implicit _ ->
                   (* Those could have the same mod group as a prefix or suffix,
                      and we wouldn't know what to do. So currently "tier" only

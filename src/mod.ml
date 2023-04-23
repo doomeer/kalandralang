@@ -57,7 +57,7 @@ type t =
     domain: Base_item.domain;
     generation_type: generation_type;
     (* Only one mod per [group] can spawn on an item. *)
-    group: Id.t;
+    groups: Id.Set.t;
     required_level: int;
     (* [spawn_weights] define on which items the modifier can spawn,
        and with which weight (first matching tag in the list wins).
@@ -145,7 +145,7 @@ let pp_stat { id; min; max } =
   ]
 
 let pp {
-    id; domain; generation_type; group; required_level;
+    id; domain; generation_type; groups; required_level;
     spawn_weights; generation_weights;
     tags; adds_tags; stats; is_essence_only;
   } =
@@ -153,7 +153,7 @@ let pp {
     "id", Id.pp id;
     "domain", Base_item.pp_domain domain;
     "generation_type", pp_generation_type generation_type;
-    "group", Id.pp group;
+    "groups", Id.Set.pp groups;
     "required_level", Pretext.OCaml.int required_level;
     "spawn_weights", Pretext.OCaml.list pp_spawn_weight spawn_weights;
     "generation_weights", Pretext.OCaml.list pp_spawn_weight generation_weights;
@@ -175,7 +175,7 @@ let import (x: data) =
   pool := x;
   let add modifier =
     id_map := Id.Map.add modifier.id modifier !id_map;
-    mod_groups := Id.Set.add modifier.group !mod_groups
+    mod_groups := Id.Set.union modifier.groups !mod_groups
   in
   List.iter add x
 
@@ -219,7 +219,7 @@ let load filename =
       let id = Id.make id in
       let domain = ref None in
       let generation_type = ref None in
-      let group = ref Id.empty in
+      let groups = ref Id.Set.empty in
       let required_level = ref 0 in
       let spawn_weights = ref [] in
       let generation_weights = ref [] in
@@ -247,7 +247,12 @@ let load filename =
                       ()
               )
           | "group" ->
-              group := JSON.as_id value
+              groups := Id.Set.add (JSON.as_id value) !groups
+          | "groups" ->
+              groups :=
+                Id.Set.union
+                  (JSON.as_array value |> List.map JSON.as_id |> Id.Set.of_list)
+                  !groups
           | "name" ->
               name := JSON.as_id value
           | "required_level" ->
@@ -337,7 +342,7 @@ let load filename =
                         id;
                         domain;
                         generation_type;
-                        group = !group;
+                        groups = !groups;
                         required_level = !required_level;
                         spawn_weights;
                         generation_weights = !generation_weights;
@@ -353,7 +358,7 @@ let load filename =
                       | None ->
                           pool := modifier :: !pool;
                           id_map := Id.Map.add id modifier !id_map;
-                          mod_groups := Id.Set.add modifier.group !mod_groups
+                          mod_groups := Id.Set.union modifier.groups !mod_groups
   in
   List.iter add_entry JSON.(parse_file filename |> as_object)
 
@@ -444,7 +449,12 @@ let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
   generation_type ^ fractured ^ domain ^ tier ^
   translated_mod ^
   (if !show_identifiers then " (" ^ Id.show modifier.id ^ ")" else "") ^
-  (if !show_group_identifiers then " (" ^ Id.show modifier.group ^ ")" else "")
+  (
+    if !show_group_identifiers then
+      " (" ^ String.concat ", " (Id.Set.elements modifier.groups |> List.map Id.show) ^ ")"
+    else
+      ""
+  )
 
 let multimod_id = Id.make "StrIntMasterItemGenerationCanHaveMultipleCraftedMods"
 let prefixes_cannot_be_changed_id = Id.make "StrMasterItemGenerationCannotChangePrefixes"
@@ -461,6 +471,8 @@ let veiled_prefix_id = Id.make "VeiledPrefix"
 let veiled_suffix_id = Id.make "VeiledSuffix"
 let veiled_prefix_group = Id.make "VeiledPrefix"
 let veiled_suffix_group = Id.make "VeiledSuffix"
+let veiled_prefix_groups = Id.Set.singleton veiled_prefix_group
+let veiled_suffix_groups = Id.Set.singleton veiled_suffix_group
 
 type harvest_tag = [
   | `attack

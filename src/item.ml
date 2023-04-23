@@ -120,7 +120,7 @@ let has_mod_group_id must_be_fractured group_id item =
   List.exists
     (fun { modifier; fractured } ->
        (fractured || not must_be_fractured) &&
-       Id.compare modifier.Mod.group group_id = 0)
+       Id.Set.mem group_id modifier.Mod.groups)
     item.mods
 
 let has_mod modifier item =
@@ -132,23 +132,23 @@ let has_mod modifier item =
 (* Since we can only have one of each eldritch implicits,
    and [mod_pool] is used to *replace* mods when used with eldritch implicits,
    we allow all eldritch implicits to be in the mod pool. *)
-let has_mod_group_prefix_or_suffix group item =
+let has_mod_group_prefix_or_suffix groups item =
   let is_group { modifier; _ } =
     match modifier.generation_type with
       | Prefix | Suffix ->
-          Id.compare modifier.Mod.group group = 0
+          not (Id.Set.disjoint groups modifier.Mod.groups)
       | Exarch_implicit _ | Eater_implicit _ ->
           false
   in
   List.exists is_group item.mods
 
 let has_veiled_mod item =
-  has_mod_group_prefix_or_suffix Mod.veiled_prefix_group item ||
-  has_mod_group_prefix_or_suffix Mod.veiled_suffix_group item
+  has_mod_group_prefix_or_suffix Mod.veiled_prefix_groups item ||
+  has_mod_group_prefix_or_suffix Mod.veiled_suffix_groups item
 
 let is_veiled { modifier; _ } =
-  Id.compare modifier.Mod.group Mod.veiled_prefix_group = 0 ||
-  Id.compare modifier.Mod.group Mod.veiled_suffix_group = 0
+  Id.Set.mem Mod.veiled_prefix_group modifier.Mod.groups ||
+  Id.Set.mem Mod.veiled_suffix_group modifier.Mod.groups
 
 let has_unveiled_mod item =
   List.exists
@@ -230,12 +230,12 @@ let full_mod_pool = memoize @@ fun (domain, item_tags, keep_weight_0_tag) ->
   in
   List.filter_map can_spawn_mod !Mod.pool
 
-let sort_mod_group = memoize @@ fun (domain, item_tags, mod_group, keep_weight_0_tag) ->
+let sort_mod_group = memoize @@ fun (domain, item_tags, mod_groups, keep_weight_0_tag) ->
   let pool =
     let has_mod_group (_, modifier) =
       match modifier.Mod.generation_type with
         | Prefix | Suffix ->
-            if Id.compare modifier.Mod.group mod_group = 0 then
+            if not (Id.Set.disjoint mod_groups modifier.Mod.groups) then
               Some modifier
             else
               None
@@ -262,8 +262,8 @@ let sort_mod_group = memoize @@ fun (domain, item_tags, mod_group, keep_weight_0
   List.sort by_ilvl_or_stat pool |> list_group by_ilvl_or_stat
 
 let mod_tier =
-  let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_group, mod_id) ->
-    let sorted_group = sort_mod_group (domain, item_tags, mod_group, None) in
+  let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_groups, mod_id) ->
+    let sorted_group = sort_mod_group (domain, item_tags, mod_groups, None) in
     let rec find_mod tier = function
       | [] ->
           (* echo "cannot find mod %s" (Id.show mod_id); *)
@@ -299,7 +299,7 @@ let mod_tier =
     if modifier.is_essence_only then
       essence_mod_tier modifier.id
     else
-      mod_tier_memoized (modifier.domain, base_tags item, modifier.group, modifier.id)
+      mod_tier_memoized (modifier.domain, base_tags item, modifier.groups, modifier.id)
 
 let show_modifier item { modifier; fractured } =
   let tier = mod_tier item modifier in
@@ -393,7 +393,7 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
         | _ ->
             false
     in
-    let already_has_mod_group = has_mod_group_prefix_or_suffix modifier.Mod.group item in
+    let already_has_mod_group = has_mod_group_prefix_or_suffix modifier.Mod.groups item in
     if
       match tag with
         | None -> false
@@ -457,7 +457,7 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
           mod_pool
       | Some multiplier ->
           let adjust_weight (weight, modifier) =
-            if Id.Set.mem modifier.Mod.group mod_groups then
+            if not (Id.Set.disjoint modifier.Mod.groups mod_groups) then
               int_of_float (float weight *. multiplier), modifier
             else
               weight, modifier
@@ -490,7 +490,7 @@ let add_mod ?(fractured = false) modifier item =
       fail "item cannot have another crafted mod";
   )
   else (
-    if has_mod_group_prefix_or_suffix modifier.group item then
+    if has_mod_group_prefix_or_suffix modifier.groups item then
       fail "item already has a mod for this group";
   );
   add_mod_force ~fractured modifier item
@@ -939,13 +939,13 @@ let apply_eldritch_chaos item =
 
 let reforge_with_mod_group_multiplier mod_group_multiplier item =
   let mod_groups =
-    let get_group { modifier; _ } =
+    let get_group acc { modifier; _ } =
       if Mod.is_prefix_or_suffix modifier then
-        Some modifier.group
+        Id.Set.union acc modifier.groups
       else
-        None
+        acc
     in
-    List.filter_map get_group item.mods |> Id.Set.of_list
+    List.fold_left get_group Id.Set.empty item.mods
   in
   reforge_rare ~mod_groups ~mod_group_multiplier item
 
@@ -976,8 +976,8 @@ let remove_mod_group (modifier: Mod.t option) pool =
   match modifier with
     | None ->
         pool
-    | Some { group; _ } ->
-        List.filter (fun (_, modifier) -> Id.compare modifier.Mod.group group <> 0) pool
+    | Some { groups; _ } ->
+        List.filter (fun (_, modifier) -> Id.Set.disjoint modifier.Mod.groups groups) pool
 
 let unveil item =
   let item, pool = prepare_unveil item in
@@ -1014,7 +1014,7 @@ let apply_orb_of_dominance item =
                   sort_mod_group (
                     modifier.domain,
                     base_tags item,
-                    modifier.group,
+                    modifier.groups,
                     Some influence_tag
                   )
                 in
@@ -1199,7 +1199,7 @@ let recombine item1 item2 =
               (* Remove mods that can no longer be picked. *)
               let pool =
                 let can_still_be_picked { modifier; _ } =
-                  Id.compare modifier.group selected_mod.modifier.group <> 0
+                  Id.Set.disjoint modifier.groups selected_mod.modifier.groups
                 in
                 List.filter can_still_be_picked pool
               in

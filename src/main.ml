@@ -270,7 +270,7 @@ let find
       (
         match group with
           | None -> true
-          | Some x -> Id.show modifier.group =~ x
+          | Some x -> Id.Set.exists (fun group -> Id.show group =~ x) modifier.groups
       ) &&
       (
         match translation with

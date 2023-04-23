@@ -1,4 +1,4 @@
-let version = "KKASH005"
+let version = "KKASH006"
 
 exception Wrong_version
 
@@ -205,13 +205,13 @@ let i_mod_stat i: Mod.stat =
   { id; min; max }
 
 let o_mod o (
-    { id; domain; generation_type; group; required_level; spawn_weights;
+    { id; domain; generation_type; groups; required_level; spawn_weights;
       generation_weights; tags; adds_tags; stats; is_essence_only }: Mod.t
   ) =
   o_id o id;
   o_base_item_domain o domain;
   o_mod_generation_type o generation_type;
-  o_id o group;
+  o_id_set o groups;
   o_int o required_level;
   o_list (o_pair o_id o_int) o spawn_weights;
   o_list (o_pair o_id o_int) o generation_weights;
@@ -224,7 +224,7 @@ let i_mod i: Mod.t =
   let id = i_id i in
   let domain = i_base_item_domain i in
   let generation_type = i_mod_generation_type i in
-  let group = i_id i in
+  let groups = i_id_set i in
   let required_level = i_int i in
   let spawn_weights = i_list (i_pair i_id i_int) i in
   let generation_weights = i_list (i_pair i_id i_int) i in
@@ -232,7 +232,7 @@ let i_mod i: Mod.t =
   let adds_tags = i_id_set i in
   let stats = i_list i_mod_stat i in
   let is_essence_only = i_bool i in
-  { id; domain; generation_type; group; required_level; spawn_weights;
+  { id; domain; generation_type; groups; required_level; spawn_weights;
     generation_weights; tags; adds_tags; stats; is_essence_only }
 
 let o_stat_translation_condition o ({ min; max }: Stat_translation.condition) =
