@@ -130,9 +130,12 @@ let rec compile ({ node; loc }: AST.t): program =
         let else_ = compile else_ in
         let has_one_of_the_mods =
           List.fold_left
-            (fun acc modifier ->
-               { AST.loc; node = AST.Or (acc, { loc; node = Has modifier }) })
-            { AST.loc; node = Has head }
+            (fun acc id ->
+               {
+                 AST.loc;
+                 node = AST.Or (acc, { loc; node = Has { fractured = false; id } })
+               })
+            { AST.loc; node = Has { fractured = false; id = head } }
             tail
         in
         seql [

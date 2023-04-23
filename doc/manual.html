@@ -599,6 +599,10 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td><code>orb_of_dominance</code></td>
 <td>Orb of Dominance</td>
 </tr>
+<tr class="odd">
+<td><code>fracture</code></td>
+<td>Fracturing Orb</td>
+</tr>
 </tbody>
 </table>
 <h5 id="conqueror-exalted-orbs">Conqueror Exalted Orbs</h5>
@@ -1486,9 +1490,19 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Holds if the item has the modifier denoted by the given identifier.</td>
 </tr>
 <tr class="even">
+<td><code>has_mod fractured</code></td>
+<td><code>has_mod fractured &lt;identifier&gt;</code></td>
+<td>Holds if the item has the modifier denoted by the given identifier and this modifier is fractured.</td>
+</tr>
+<tr class="odd">
 <td><code>has_group</code></td>
 <td><code>has_group &lt;identifier&gt;</code></td>
 <td>Holds if the item has a modifier from the modifier group denoted by the given identifier.</td>
+</tr>
+<tr class="even">
+<td><code>has_group fractured</code></td>
+<td><code>has_group fractured &lt;identifier&gt;</code></td>
+<td>Holds if the item has a modifier from the modifier group denoted by the given identifier and this modifier is fractured.</td>
 </tr>
 <tr class="odd">
 <td><code>has</code></td>
@@ -1496,36 +1510,41 @@ Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 <td>Equivalent to <code>has_mod &lt;identifier&gt; or has_group &lt;identifier&gt;</code>.</td>
 </tr>
 <tr class="even">
+<td><code>has fractured</code></td>
+<td><code>has fractured &lt;identifier&gt;</code></td>
+<td>Equivalent to <code>has_mod fractured &lt;identifier&gt; or has_group fractured &lt;identifier&gt;</code>.</td>
+</tr>
+<tr class="odd">
 <td><code>is_base</code></td>
 <td><code>is_base &lt;identifier&gt;</code></td>
 <td>Holds if the base type of the item is <code>&lt;identifier&gt;</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>open_prefix</code></td>
 <td><code>open_prefix</code></td>
 <td>Holds if the item has at least one open prefix. This is <em>not</em> equivalent to <code>prefix_count 0..2</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>full_prefixes</code></td>
 <td><code>full_prefixes</code></td>
 <td>Holds if the item cannot have more prefixes. This is <em>not</em> equivalent to <code>prefix_count 3</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>open_suffix</code></td>
 <td><code>open_suffix</code></td>
 <td>Holds if the item has at least one open suffix. This is <em>not</em> equivalent to <code>suffix_count 0..2</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>full_suffixes</code></td>
 <td><code>full_suffixes</code></td>
 <td>Holds if the item cannot have more suffixes. This is <em>not</em> equivalent to <code>suffix_count 3</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>open_affix</code></td>
 <td><code>open_affix</code></td>
 <td>Holds if the item has at least one open prefix or suffix. This is <em>not</em> equivalent to <code>affix_count 0..5</code> as it depends on the item's rarity.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>full_affixes</code></td>
 <td><code>full_affixes</code></td>
 <td>Holds if the item can have neither more prefixes nor more suffixes. This is <em>not</em> equivalent to <code>affix_count 6</code> as it depends on the item's rarity.</td>

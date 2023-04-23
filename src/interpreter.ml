@@ -261,15 +261,15 @@ and eval_condition state (condition: AST.condition) =
           eval_comparison_operator b op2 c
         else
           false
-    | Has id ->
+    | Has { fractured; id } ->
         with_item state @@ fun item ->
-        Item.has_mod_group_id id item || Item.has_mod_id id item
-    | Has_mod id ->
+        Item.has_mod_group_id fractured id item || Item.has_mod_id fractured id item
+    | Has_mod { fractured; id } ->
         with_item state @@ fun item ->
-        Item.has_mod_id id item
-    | Has_group id ->
+        Item.has_mod_id fractured id item
+    | Has_group { fractured; id } ->
         with_item state @@ fun item ->
-        Item.has_mod_group_id id item
+        Item.has_mod_group_id fractured id item
     | Is_base id ->
         with_item state @@ fun item ->
         Id.compare item.base.id id = 0

@@ -100,12 +100,12 @@ and check_condition ({ node; loc }: AST.condition) =
         check_arithmetic_expression a;
         check_arithmetic_expression b;
         check_arithmetic_expression c
-    | Has modifier ->
-        check_mod_or_group loc modifier
-    | Has_mod modifier ->
-        check_mod loc modifier
-    | Has_group modifier ->
-        check_mod_group loc modifier
+    | Has { fractured = _; id } ->
+        check_mod_or_group loc id
+    | Has_mod { fractured = _; id } ->
+        check_mod loc id
+    | Has_group { fractured = _; id } ->
+        check_mod_group loc id
     | Is_base base ->
         check_base_item loc base
 

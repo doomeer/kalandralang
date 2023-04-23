@@ -401,9 +401,9 @@ and condition_node =
       arithmetic_expression * comparison_operator *
       arithmetic_expression
   (* Item Conditions *)
-  | Has of Id.t
-  | Has_mod of Id.t
-  | Has_group of Id.t
+  | Has of { fractured: bool; id: Id.t }
+  | Has_mod of { fractured: bool; id: Id.t }
+  | Has_group of { fractured: bool; id: Id.t }
   | Is_base of Id.t
   | C_prefix_count of int * int
   | Open_prefix
@@ -505,12 +505,24 @@ and pp_condition ?(ctx = `top) condition =
           pp_comparison_operator op2; break;
           pp_arithmetic_expression c;
         ]
-    | Has modifier ->
-        seq [ atom "has"; space; Id.pp modifier ]
-    | Has_mod modifier ->
-        seq [ atom "has_mod"; space; Id.pp modifier ]
-    | Has_group modifier ->
-        seq [ atom "has_group"; space; Id.pp modifier ]
+    | Has { fractured; id } ->
+        seq [
+          atom "has"; space;
+          if fractured then seq [ atom "fractured"; space ] else empty;
+          Id.pp id;
+        ]
+    | Has_mod { fractured; id } ->
+        seq [
+          atom "has_mod"; space;
+          if fractured then seq [ atom "fractured"; space ] else empty;
+          Id.pp id;
+        ]
+    | Has_group { fractured; id } ->
+        seq [
+          atom "has_group"; space;
+          if fractured then seq [ atom "fractured"; space ] else empty;
+          Id.pp id;
+        ]
     | Is_base base ->
         seq [ atom "is_base"; space; Id.pp base ]
     | C_prefix_count (0, 0) ->

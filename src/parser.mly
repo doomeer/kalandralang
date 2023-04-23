@@ -124,11 +124,17 @@ condition:
   COMPARISON_OPERATOR arithmetic_expression
   { node @@ Double_comparison ($1, $2, $3, $4, $5) }
 | HAS STRING
-  { node @@ Has (Id.make $2) }
+  { node @@ Has { fractured = false; id = Id.make $2 } }
 | HAS_MOD STRING
-  { node @@ Has_mod (Id.make $2) }
+  { node @@ Has_mod { fractured = false; id = Id.make $2 } }
 | HAS_GROUP STRING
-  { node @@ Has_group (Id.make $2) }
+  { node @@ Has_group { fractured = false; id = Id.make $2 } }
+| HAS FRACTURED STRING
+  { node @@ Has { fractured = true; id = Id.make $3 } }
+| HAS_MOD FRACTURED STRING
+  { node @@ Has_mod { fractured = true; id = Id.make $3 } }
+| HAS_GROUP FRACTURED STRING
+  { node @@ Has_group { fractured = true; id = Id.make $3 } }
 | IS_BASE STRING
   { node @@ Is_base (Id.make $2) }
 | PREFIX_COUNT INT
