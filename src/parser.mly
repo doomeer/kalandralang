@@ -167,6 +167,12 @@ condition:
   { node @@ Open_affix }
 | FULL_AFFIXES
   { node @@ Full_affixes }
+| NORMAL
+  { node @@ Normal }
+| MAGIC
+  { node @@ Magic }
+| RARE
+  { node @@ Rare }
 | LPAR condition RPAR
   { $2 }
 

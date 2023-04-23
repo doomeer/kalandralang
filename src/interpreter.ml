@@ -303,6 +303,15 @@ and eval_condition state (condition: AST.condition) =
     | Full_affixes ->
         with_item state @@ fun item ->
         Item.affix_count item >= Item.max_affix_count item
+    | Normal ->
+        with_item state @@ fun item ->
+        (match item.rarity with Normal -> true | _ -> false)
+    | Magic ->
+        with_item state @@ fun item ->
+        (match item.rarity with Magic -> true | _ -> false)
+    | Rare ->
+        with_item state @@ fun item ->
+        (match item.rarity with Rare -> true | _ -> false)
 
 let is_done state =
   state.point < 0 || state.point >= Array.length state.program.instructions

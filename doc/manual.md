@@ -1305,6 +1305,9 @@ The following expressions are conditions that hold depending on the current item
 | `full_suffixes` | `full_suffixes` | Holds if the item cannot have more suffixes. This is *not* equivalent to `suffix_count 3` as it depends on the item's rarity. |
 | `open_affix` | `open_affix` | Holds if the item has at least one open prefix or suffix. This is *not* equivalent to `affix_count 0..5` as it depends on the item's rarity. |
 | `full_affixes` | `full_affixes` | Holds if the item can have neither more prefixes nor more suffixes. This is *not* equivalent to `affix_count 6` as it depends on the item's rarity. |
+| `normal` | `normal` | Holds if the item has normal rarity. |
+| `magic` | `magic` | Holds if the item is magic. |
+| `rare` | `rare` | Holds if the item is rare. |
 
 The following expressions are deprecated and may be removed in future versions,
 use [Comparisons](#comparisons) on [Item Properties](#item-properties) instead:

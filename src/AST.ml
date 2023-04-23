@@ -414,6 +414,9 @@ and condition_node =
   | C_affix_count of int * int
   | Open_affix
   | Full_affixes
+  | Normal
+  | Magic
+  | Rare
 
 and condition = condition_node node
 
@@ -555,6 +558,12 @@ and pp_condition ?(ctx = `top) condition =
         atom "open_affix"
     | Full_affixes ->
         atom "full_affixes"
+    | Normal ->
+        atom "normal"
+    | Magic ->
+        atom "magic"
+    | Rare ->
+        atom "rare"
 
 type simple_instruction =
   | Goto of Label.t

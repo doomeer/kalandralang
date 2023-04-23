@@ -64,7 +64,10 @@ and check_condition ({ node; loc }: AST.condition) =
     | Open_suffix
     | Full_suffixes
     | Open_affix
-    | Full_affixes ->
+    | Full_affixes
+    | Normal
+    | Magic
+    | Rare ->
         ()
     | C_prefix_count (0, 0) ->
         warn loc "no_prefix and prefix_count 0 are deprecated, use prefix_count = 0 instead"
