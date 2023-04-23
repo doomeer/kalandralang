@@ -1,5 +1,21 @@
 # Kalandralang Changelog
 
+## Changes Made During Crucible League
+
+- The default league is now Crucible.
+
+- Fixed `update-data` which was broken due to a change made on the data repository
+  to support multiple groups per mod.
+
+- `fractured` can be used as an influence when buying items.
+
+- Added conditions `has fractured`, `has_mod fractured` and `has_group fractured`.
+
+- Added influence conditions `shaper`, `elder`, `crusader`, `hunter`, `redeemer`,
+  `warlord`, `exarch`, `eater`, `synthesized`, `fractured`.
+
+- Added rarity conditions `normal`, `magic` and `rare`.
+
 ## Changes Made During Sanctum League
 
 - The default league is now Sanctum.
