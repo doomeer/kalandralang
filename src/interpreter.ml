@@ -270,6 +270,9 @@ and eval_condition state (condition: AST.condition) =
     | Has_group { fractured; id } ->
         with_item state @@ fun item ->
         Item.has_mod_group_id fractured id item
+    | Has_influence influence ->
+        with_item state @@ fun item ->
+        Influence.includes item.influence influence
     | Is_base id ->
         with_item state @@ fun item ->
         Id.compare item.base.id id = 0

@@ -404,6 +404,7 @@ and condition_node =
   | Has of { fractured: bool; id: Id.t }
   | Has_mod of { fractured: bool; id: Id.t }
   | Has_group of { fractured: bool; id: Id.t }
+  | Has_influence of Influence.t
   | Is_base of Id.t
   | C_prefix_count of int * int
   | Open_prefix
@@ -526,6 +527,8 @@ and pp_condition ?(ctx = `top) condition =
           if fractured then seq [ atom "fractured"; space ] else empty;
           Id.pp id;
         ]
+    | Has_influence influence ->
+        Influence.pp influence
     | Is_base base ->
         seq [ atom "is_base"; space; Id.pp base ]
     | C_prefix_count (0, 0) ->

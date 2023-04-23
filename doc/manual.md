@@ -1308,6 +1308,16 @@ The following expressions are conditions that hold depending on the current item
 | `normal` | `normal` | Holds if the item has normal rarity. |
 | `magic` | `magic` | Holds if the item is magic. |
 | `rare` | `rare` | Holds if the item is rare. |
+| `shaper` | `shaper` | Holds if the item has Shaper influence. |
+| `elder` | `elder` | Holds if the item has Elder influence. |
+| `crusader` | `crusader` | Holds if the item has Crusader influence. |
+| `hunter` | `hunter` | Holds if the item has Hunter influence. |
+| `redeemer` | `redeemer` | Holds if the item has Redeemer influence. |
+| `warlord` | `warlord` | Holds if the item has Warlord influence. |
+| `exarch` | `exarch` | Holds if the item has Searing Exarch influence. |
+| `eater` | `eater` | Holds if the item has Eater of Worlds influence. |
+| `synthesized` | `synthesized` | Holds if the item is synthesized. |
+| `fractured` | `fractured` | Holds if the item is fractured. |
 
 The following expressions are deprecated and may be removed in future versions,
 use [Comparisons](#comparisons) on [Item Properties](#item-properties) instead:

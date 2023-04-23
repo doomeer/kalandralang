@@ -22,6 +22,7 @@ let pp_sec sec =
 
 let compare_sec = (Stdlib.compare: sec -> sec -> int)
 
+(* TODO: fractured + exarch / eater (don't forget to update [includes]) *)
 type t =
   | Not_influenced
   | Fractured
@@ -74,3 +75,24 @@ let add a b =
     | (Exarch | Eater | Exarch_and_eater), (SEC _ | SEC_pair _)
     | (SEC _ | SEC_pair _), (Exarch | Eater | Exarch_and_eater) ->
         fail "cannot have both Eldritch and Shaper / Elder / Conqueror influences"
+
+(* [a] includes [b] *)
+let includes a b =
+  match a, b with
+    | Not_influenced, Not_influenced -> true
+    | Not_influenced, _ -> false
+    | Fractured, Fractured -> true
+    | Fractured, _ -> false
+    | Synthesized, Synthesized -> true
+    | Synthesized, _ -> false
+    | SEC a, SEC b -> a = b
+    | SEC _, _ -> false
+    | SEC_pair (a, b), SEC c -> a = c || b = c
+    | SEC_pair (a, b), SEC_pair (c, d) -> (a = c && b = d) || (a = d && b = c)
+    | SEC_pair _, _ -> false
+    | Exarch, Exarch -> true
+    | Exarch, _ -> false
+    | Eater, Eater -> true
+    | Eater, _ -> false
+    | Exarch_and_eater, (Exarch | Eater | Exarch_and_eater) -> true
+    | Exarch_and_eater, _ -> false

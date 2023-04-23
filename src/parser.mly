@@ -136,6 +136,8 @@ condition:
   { node @@ Has_mod { fractured = true; id = Id.make $3 } }
 | HAS_GROUP FRACTURED STRING
   { node @@ Has_group { fractured = true; id = Id.make $3 } }
+| influence
+  { node @@ Has_influence $1 }
 | IS_BASE STRING
   { node @@ Is_base (Id.make $2) }
 | PREFIX_COUNT INT
