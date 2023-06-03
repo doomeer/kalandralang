@@ -31,6 +31,9 @@ let from_lexbuf lexbuf =
     let char2 = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_start_p.pos_bol in
     raise (Parse_error { file; line; char1; char2; message })
 
+let from_string string =
+  from_lexbuf (Lexing.from_string string)
+
 let from_stdin () =
   from_lexbuf (Lexing.from_channel stdin)
 
