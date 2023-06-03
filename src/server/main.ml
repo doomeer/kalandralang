@@ -106,7 +106,7 @@ let () =
       ()
   in
   Clap.close ();
-  Data.load data_dir;
+  Data.load print_endline data_dir;
   Lwt_main.run @@
   Cohttp_lwt_unix.Server.create ~mode: (`TCP (`Port port))
     (Cohttp_lwt_unix.Server.make ~callback: serve ())

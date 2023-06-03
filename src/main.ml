@@ -5,8 +5,6 @@
 open Kalandralang_lib
 open Misc
 
-let run_recipe = Run.recipe print_endline
-
 type find_filters =
   {
     rex: bool;
@@ -129,8 +127,8 @@ let main () =
       ~long: "data-dir"
       ~placeholder: "PATH"
       ~description: "Path to data directory. \
-      On Linux, this defaults to: `~/.kalandralang/data/`. \
-      On other Platforms, this currently defaults to `./data/`."
+                     On Linux, this defaults to: `~/.kalandralang/data/`. \
+                     On other Platforms, this currently defaults to `./data/`."
       ()
   in
   let command =
@@ -159,8 +157,8 @@ let main () =
             ~set_long: "loop"
             ~description:
               "Run recipe in an infinite loop, until either manually aborted \
-              with CTRL+C or until --timeout is reached. \
-              Causes --count to be ignored."
+               with CTRL+C or until --timeout is reached. \
+               Causes --count to be ignored."
             false
         in
         let verbose =
@@ -263,6 +261,14 @@ let main () =
                only output the total cost and profit after each craft."
             false
         in
+        let json =
+          Clap.flag
+            ~set_long: "json"
+            ~description:
+              "Output results in JSON format. Also Causes other \
+               outputs to be printed to stderr instead of stdout."
+            false
+        in
         let filename =
           Clap.optional_string
             ~placeholder: "FILE"
@@ -291,7 +297,7 @@ let main () =
             loop;
           }
         in
-        `run (filename, batch_options, seed, display_options)
+        `run (filename, batch_options, seed, display_options, json)
       );
       (
         Clap.case "format"
@@ -466,12 +472,14 @@ let main () =
     | `format filename ->
         let recipe = Parse.from_file_or_stdin filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, batch_options, seed, display_options) ->
+    | `run (filename, batch_options, seed, display_options, json) ->
+        let print_text_line = if json then prerr_endline else print_endline in
+        let echo x = Printf.ksprintf print_text_line x in
         if batch_options.count <= 0 then
           fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
         let recipe = Parse.from_file_or_stdin filename in
-        Data.load data_dir;
+        Data.load print_text_line data_dir;
         Check.check_recipe recipe;
         let compiled_recipe = Linear.compile recipe in
         Option.iter Random.init seed;
@@ -490,11 +498,12 @@ let main () =
           echo "Seed: %d" seed
         );
         let exec_time_start = Unix.gettimeofday () in
+        let results =
+          Run.recipe print_text_line compiled_recipe ~batch_options ~display_options
+            ~return_items: 0
+        in
         let count =
-          match
-            run_recipe compiled_recipe ~batch_options ~display_options
-              ~return_items: 0
-          with
+          match results with
             | Ok results -> results.count
             | Error _ -> 0
         in
@@ -507,6 +516,13 @@ let main () =
             echo "Average crafting time: %12.3fs"
               ((time_end -. exec_time_start) /. float count);
           echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
+        );
+        if json then (
+          match results with
+            | Ok results ->
+                print_endline (JSON.encode (JSON.make "" (Run.json_of_results `Null results)))
+            | Error message ->
+                print_endline (JSON.encode (JSON.make "" (`O [ "error", `String message ])))
         )
     | `compile filename ->
         let recipe = Parse.from_file_or_stdin filename in
@@ -517,14 +533,14 @@ let main () =
         in
         Option.iter output decompiled_recipe
     | `find pattern ->
-        Data.load data_dir;
+        Data.load print_endline data_dir;
         find pattern
     | `write_default_costs ->
         Data.write_default_costs data_dir
     | `update_costs (ninja_league, tft_league) ->
         Data.update_costs data_dir ~ninja_league: ninja_league ~tft_league: tft_league
     | `update_data ->
-        Data.update_data data_dir
+        Data.update_data print_endline data_dir
 
 let backtrace = false
 

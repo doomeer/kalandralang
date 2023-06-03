@@ -46,7 +46,8 @@ let get_paths data_dir =
     costs;
   }
 
-let load_data data_dir =
+let load_data print_endline data_dir =
+  let echo x = Printf.ksprintf print_endline x in
   let path = get_paths data_dir in
   let module_load mdl filepath =
     let filename = Filename.basename filepath in
@@ -96,8 +97,9 @@ let load_data data_dir =
     save_to_data ();
   )
 
-let load data_dir =
-  load_data data_dir;
+let load print_endline data_dir =
+  let echo x = Printf.ksprintf print_endline x in
+  load_data print_endline data_dir;
   let path = get_paths data_dir in
   if Sys.file_exists path.costs then (
     echo "Loading %s..." (Filename.basename path.costs);
@@ -174,9 +176,9 @@ let update_poe_data data_dir =
   in
   List.iter update_poe_data_files poe_data
 
-let update_data data_dir =
+let update_data print_endline data_dir =
   let path = get_paths data_dir in
   update_poe_data data_dir;
   if Sys.file_exists path.cache then
     Sys.remove path.cache;
-  load_data data_dir
+  load_data print_endline data_dir

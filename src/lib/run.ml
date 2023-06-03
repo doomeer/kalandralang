@@ -9,7 +9,7 @@ type display_options =
     no_total: bool;
     no_echo: bool;
     no_histogram: bool;
-    show_time:bool;
+    show_time: bool;
     summary: bool;
   }
 
