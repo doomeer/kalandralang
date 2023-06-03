@@ -490,15 +490,22 @@ let main () =
           echo "Seed: %d" seed
         );
         let exec_time_start = Unix.gettimeofday () in
-        let run_index = run_recipe compiled_recipe ~batch_options ~display_options in
+        let count =
+          match
+            run_recipe compiled_recipe ~batch_options ~display_options
+              ~return_items: 0
+          with
+            | Ok results -> results.count
+            | Error _ -> 0
+        in
         let time_end = Unix.gettimeofday () in
         if display_options.show_time then (
           echo "";
           if display_options.verbose then
             echo "Initialization time:   %12.3fs" (exec_time_start -. run_time_start);
-          if run_index > 1 then
+          if count > 1 then
             echo "Average crafting time: %12.3fs"
-              ((time_end -. exec_time_start) /. float run_index);
+              ((time_end -. exec_time_start) /. float count);
           echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
         )
     | `compile filename ->

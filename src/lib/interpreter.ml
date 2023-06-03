@@ -59,6 +59,12 @@ struct
     to_chaos a /. Cost.(get divine)
 
   let iter a f = Map.iter f a
+
+  type average = float Map.t
+
+  let average a c =
+    let c = float c in
+    Map.map (fun i -> float i /. c) a
 end
 
 type state =

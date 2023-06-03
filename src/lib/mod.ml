@@ -125,6 +125,13 @@ let is_crafted modifier =
     | _ ->
         false
 
+let is_veiled modifier =
+  match modifier.domain with
+    | Veiled ->
+        true
+    | _ ->
+        false
+
 let caster_tag = Id.make "caster"
 let attack_tag = Id.make "attack"
 
@@ -383,37 +390,44 @@ type show_mode =
 let show_identifiers = ref false
 let show_group_identifiers = ref false
 
-let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
+let show ?(only_text = false) ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
   let generation_type =
-    match modifier.generation_type with
-      | Prefix -> "(prefix) "
-      | Suffix -> "(suffix) "
-      | Exarch_implicit tier -> "(" ^ show_eldritch_tier tier ^ " Exarch) "
-      | Eater_implicit tier -> "(" ^ show_eldritch_tier tier ^ " Eater) "
+    if only_text then "" else
+      match modifier.generation_type with
+        | Prefix -> "(prefix) "
+        | Suffix -> "(suffix) "
+        | Exarch_implicit tier -> "(" ^ show_eldritch_tier tier ^ " Exarch) "
+        | Eater_implicit tier -> "(" ^ show_eldritch_tier tier ^ " Eater) "
   in
-  let fractured = if fractured then "{fractured} " else "" in
+  let fractured =
+    if only_text then "" else
+    if fractured then "{fractured} " else ""
+  in
   let domain =
-    match modifier.domain with
-      | Item | Misc | Abyss_jewel | Unveiled | Flask -> ""
-      | Crafted -> "{crafted} "
-      | Veiled -> "{veiled} "
+    if only_text then "" else
+      match modifier.domain with
+        | Item | Misc | Abyss_jewel | Unveiled | Flask -> ""
+        | Crafted -> "{crafted} "
+        | Veiled -> "{veiled} "
   in
   let tier =
-    match tier with
-      | None ->
-          ""
-      | Some tier ->
-          "[T" ^ string_of_int tier ^ "] "
+    if only_text then "" else
+      match tier with
+        | None ->
+            ""
+        | Some tier ->
+            "[T" ^ string_of_int tier ^ "] "
   in
   let margin =
-    String.make
-      (
-        indentation +
-        String.length generation_type +
-        String.length domain +
-        String.length tier
-      )
-      ' '
+    if only_text then "" else
+      String.make
+        (
+          indentation +
+          String.length generation_type +
+          String.length domain +
+          String.length tier
+        )
+        ' '
   in
   let translated_mod =
     match modifier.domain with
@@ -448,9 +462,10 @@ let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
   in
   generation_type ^ fractured ^ domain ^ tier ^
   translated_mod ^
-  (if !show_identifiers then " (" ^ Id.show modifier.id ^ ")" else "") ^
+  (if !show_identifiers && not only_text then
+     " (" ^ Id.show modifier.id ^ ")" else "") ^
   (
-    if !show_group_identifiers then
+    if !show_group_identifiers && not only_text then
       " (" ^ String.concat ", " (Id.Set.elements modifier.groups |> List.map Id.show) ^ ")"
     else
       ""

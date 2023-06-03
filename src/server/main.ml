@@ -62,10 +62,18 @@ let serve _connection (request: Cohttp.Request.t) (body: Cohttp_lwt.Body.t) =
               Buffer.add_string output_buffer string;
               Buffer.add_char output_buffer '\n'
             in
-            let _run_index =
+            match
               Run.recipe echo compiled_recipe ~batch_options ~display_options
-            in
-            respond ~content_type: "text/plain" (Buffer.contents output_buffer)
+                ~return_items: 10
+            with
+              | Ok results ->
+                  respond ~content_type: "application/json"
+                    (Ezjsonm.value_to_string
+                       (Run.json_of_results
+                          (`String (Buffer.contents output_buffer)) results))
+              | Error message ->
+                  respond ~status: `Bad_request ~content_type: "text/plain"
+                    message
           else
             not_found ()
       | _ ->
