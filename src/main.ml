@@ -3,53 +3,6 @@
 
 open Misc
 
-exception Parse_error of {
-    file: string;
-    line: int;
-    char1: int;
-    char2: int;
-    message: string
-  }
-
-let () =
-  Printexc.register_printer @@ function
-  | Failure message ->
-      Some message
-  | Parse_error { file; line; char1; char2; message } ->
-      Some (sf "File %S, line %d, characters %d-%d: %s" file line char1 char2 message)
-  | _ ->
-      None
-
-let parse_recipe lexbuf =
-  try
-    try
-      Parser.program Lexer.token lexbuf
-    with
-      | Parsing.Parse_error ->
-          failwith "parse error"
-  with Failure message ->
-    let file = lexbuf.lex_start_p.pos_fname in
-    let line = lexbuf.lex_start_p.pos_lnum in
-    let char1 = lexbuf.lex_start_p.pos_cnum - lexbuf.lex_start_p.pos_bol in
-    let char2 = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_start_p.pos_bol in
-    raise (Parse_error { file; line; char1; char2; message })
-
-let parse_recipe_stdin () =
-  parse_recipe (Lexing.from_channel stdin)
-
-let parse_recipe_file filename =
-  let ch = open_in filename in
-  Fun.protect ~finally: (fun () -> close_in ch) @@ fun () ->
-  let lexbuf = Lexing.from_channel ch in
-  lexbuf.lex_start_p <- { lexbuf.lex_start_p with pos_fname = filename };
-  lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = filename };
-  parse_recipe lexbuf
-
-let parse_recipe filename =
-  match filename with
-    | None -> parse_recipe_stdin ()
-    | Some filename -> parse_recipe_file filename
-
 type display_options =
   {
     verbose: bool;
@@ -637,13 +590,13 @@ let main () =
   Clap.close ();
   match command with
     | `format filename ->
-        let recipe = parse_recipe filename in
+        let recipe = Parse.from_file_or_stdin filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
     | `run (filename, batch_options, seed, display_options) ->
         if batch_options.count <= 0 then
           fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
-        let recipe = parse_recipe filename in
+        let recipe = Parse.from_file_or_stdin filename in
         Data.load data_dir;
         Check.check_recipe recipe;
         let compiled_recipe = Linear.compile recipe in
@@ -675,7 +628,7 @@ let main () =
           echo "Total crafting time:   %12.3fs" (time_end -. exec_time_start);
         )
     | `compile filename ->
-        let recipe = parse_recipe filename in
+        let recipe = Parse.from_file_or_stdin filename in
         let compiled_recipe = Linear.compile recipe in
         let decompiled_recipe = Linear.decompile compiled_recipe in
         let output decompiled_recipe =
