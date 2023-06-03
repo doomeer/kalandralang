@@ -1,6 +1,8 @@
 (* USES clap *)
 (* USES re *)
+(* USES kalandralang.lib *)
 
+open Kalandralang_lib
 open Misc
 
 let run_recipe = Run.recipe print_endline
