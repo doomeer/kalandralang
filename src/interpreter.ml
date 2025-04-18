@@ -513,6 +513,10 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         item_must_be_rare item;
         return @@ Item.reforge_rare_with_veiled_mod item
+    | Veiled_orb ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        return @@ Item.remove_random_mod_add_veiled_mod item
     | Essence name ->
         with_item state @@ fun item ->
         let essence = Essence.by_name name in

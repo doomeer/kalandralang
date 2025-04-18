@@ -80,6 +80,7 @@
     | "redeemer_exalt" -> CURRENCY Redeemer_exalted_orb
     | "warlord_exalt" -> CURRENCY Warlord_exalted_orb
     | "veiled_chaos" -> CURRENCY Veiled_chaos_orb
+    | "veil" -> CURRENCY Veiled_orb
     | "essence_of_anger" -> CURRENCY (Essence Anger)
     | "essence_of_anguish" -> CURRENCY (Essence Anguish)
     | "essence_of_contempt" -> CURRENCY (Essence Contempt)
