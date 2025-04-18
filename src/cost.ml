@@ -321,6 +321,9 @@ let beastcraft_split: field =
 let beastcraft_imprint: field =
   b "Craicic Chimeral" "beastcraft_imprint" 120.
 
+let veil: field =
+  c "Veiled Orb" "veil" (10. *. div)
+
 let aisling: field =
   s "T4 Aisling" "aisling" div
 
@@ -357,7 +360,10 @@ let get_currency (currency: AST.currency) =
     | Warlord_exalted_orb ->
         get warlord_exalt
     | Veiled_chaos_orb ->
+        (* legacy *)
         get veiled_chaos
+    | Veiled_orb ->
+        get veil
     | Essence Anger ->
         get essence_of_anger
     | Essence Anguish ->
@@ -589,6 +595,7 @@ let get_currency (currency: AST.currency) =
     | Beastcraft_imprint ->
         get beastcraft_imprint
     | Aisling ->
+        (* Aisling is now itemized as Veiled orb *)
         get aisling
     | Craft _ ->
         get transmute
