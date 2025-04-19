@@ -142,7 +142,7 @@ let update_poe_data data_dir =
       echo "Updating: %s..." filename;
       let url =
         Uri.of_string
-          ("https://raw.githubusercontent.com/brather1ng/RePoE/master/RePoE/data/" ^ filename)
+          ("https://raw.githubusercontent.com/repoe-fork/repoe-fork.github.io/master/RePoE/data/" ^ filename)
       in
       let response, bytes = Http_request.download ~headers filepath url in
       Http_request.get_header "etag" response, bytes

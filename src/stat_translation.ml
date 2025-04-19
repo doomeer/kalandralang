@@ -373,8 +373,8 @@ let load filename =
                 let min = ref None in
                 let handle_value (name, value) =
                   match name with
-                    | "max" -> max := Some (JSON.as_int value)
-                    | "min" -> min := Some (JSON.as_int value)
+                    | "max" -> max := (JSON.as_int_opt value)
+                    | "min" -> min := (JSON.as_int_opt value)
                     | _ -> ()
                 in
                 List.iter handle_value (JSON.as_object json);

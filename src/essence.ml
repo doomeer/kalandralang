@@ -160,26 +160,26 @@ let load filename =
               level;
               on_amulet = JSON.(mods |-> "Amulet" |> as_id);
               on_belt = JSON.(mods |-> "Belt" |> as_id);
-              on_body_armour = JSON.(mods |-> "Body Armour" |> as_id);
+              on_body_armour = JSON.(mods |-> "Body_Armour" |> as_id);
               on_boots = JSON.(mods |-> "Boots" |> as_id);
               on_bow = JSON.(mods |-> "Bow" |> as_id);
               on_claw = JSON.(mods |-> "Claw" |> as_id);
               on_dagger = JSON.(mods |-> "Dagger" |> as_id);
               on_gloves = JSON.(mods |-> "Gloves" |> as_id);
               on_helmet = JSON.(mods |-> "Helmet" |> as_id);
-              on_one_hand_axe = JSON.(mods |-> "One Hand Axe" |> as_id);
-              on_one_hand_mace = JSON.(mods |-> "One Hand Mace" |> as_id);
-              on_one_hand_sword = JSON.(mods |-> "One Hand Sword" |> as_id);
+              on_one_hand_axe = JSON.(mods |-> "One_Hand_Axe" |> as_id);
+              on_one_hand_mace = JSON.(mods |-> "One_Hand_Mace" |> as_id);
+              on_one_hand_sword = JSON.(mods |-> "One_Hand_Sword" |> as_id);
               on_quiver = JSON.(mods |-> "Quiver" |> as_id);
               on_ring = JSON.(mods |-> "Ring" |> as_id);
               on_sceptre = JSON.(mods |-> "Sceptre" |> as_id);
               on_shield = JSON.(mods |-> "Shield" |> as_id);
               on_staff = JSON.(mods |-> "Staff" |> as_id);
               on_thrusting_one_hand_sword =
-                JSON.(mods |-> "Thrusting One Hand Sword" |> as_id);
-              on_two_hand_axe = JSON.(mods |-> "Two Hand Axe" |> as_id);
-              on_two_hand_mace = JSON.(mods |-> "Two Hand Mace" |> as_id);
-              on_two_hand_sword = JSON.(mods |-> "Two Hand Sword" |> as_id);
+                JSON.(mods |-> "Thrusting_One_Hand_Sword" |> as_id);
+              on_two_hand_axe = JSON.(mods |-> "Two_Hand_Axe" |> as_id);
+              on_two_hand_mace = JSON.(mods |-> "Two_Hand_Mace" |> as_id);
+              on_two_hand_sword = JSON.(mods |-> "Two_Hand_Sword" |> as_id);
               on_wand = JSON.(mods |-> "Wand" |> as_id);
             }
           in
