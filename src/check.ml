@@ -1,5 +1,11 @@
 open Misc
 
+type recipe_version_options =
+  {
+    (* Enable legacy crafting currencies and methods *)
+    legacy: bool;
+  }
+
 let found_an_error = ref false
 
 let warn loc x =
@@ -113,7 +119,7 @@ and check_condition ({ node; loc }: AST.condition) =
     | Is_base base ->
         check_base_item loc base
 
-let check_recipe ast =
+let check_recipe ast (options: recipe_version_options) =
   let rec gather_labels ((declared, used) as acc) (ast: AST.t) =
     match ast.node with
       | Simple (Goto label) ->
@@ -148,8 +154,20 @@ let check_recipe ast =
       | Simple (Goto label) ->
           if not (Label_set.mem label declared_labels) then
             error loc "unknown label: %s" (AST.Label.show label)
+      | Simple (Apply currency) ->
+         (match currency with
+           | Harvest_reforge_keep_prefixes
+           | Harvest_reforge_keep_suffixes
+           | Veiled_chaos_orb
+           | Aisling ->
+             if not options.legacy then
+               error loc
+                 "Legacy crafting method: %s.  Use `run --legacy' to enable it."
+                 (AST.show_currency currency)
+           | _ ->
+              ())
       | Simple (
-          Stop | Apply _ | Set_aside | Recombine |
+          Stop | Set_aside | Recombine |
           Swap | Use_imprint | Gain _ | Echo _ | Show |
           Show_mod_pool | Show_unveil_mod_pool
         ) ->

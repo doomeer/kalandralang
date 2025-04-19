@@ -436,6 +436,14 @@ let main () =
                only output the total cost and profit after each craft."
             false
         in
+        let legacy =
+          Clap.flag
+            ~set_long: "legacy"
+            ~description:
+            "Enable crafting methods no longer available in current \
+             version of Path of Exile."
+            false
+        in
         let filename =
           Clap.optional_string
             ~placeholder: "FILE"
@@ -464,7 +472,12 @@ let main () =
             loop;
           }
         in
-        `run (filename, batch_options, seed, display_options)
+        let recipe_version_options : Check.recipe_version_options =
+          {
+            legacy;
+          }
+        in
+        `run (filename, batch_options, seed, display_options, recipe_version_options)
       );
       (
         Clap.case "format"
@@ -639,13 +652,13 @@ let main () =
     | `format filename ->
         let recipe = parse_recipe filename in
         Pretext.to_channel ~starting_level: 2 stdout (AST.pp recipe)
-    | `run (filename, batch_options, seed, display_options) ->
+    | `run (filename, batch_options, seed, display_options, recipe_version_options) ->
         if batch_options.count <= 0 then
           fail "--count cannot be smaller than 1";
         let run_time_start = Unix.gettimeofday () in
         let recipe = parse_recipe filename in
         Data.load data_dir;
-        Check.check_recipe recipe;
+        Check.check_recipe recipe recipe_version_options;
         let compiled_recipe = Linear.compile recipe in
         Option.iter Random.init seed;
         if display_options.show_seed then (
