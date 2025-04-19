@@ -54,6 +54,7 @@ type stat =
 type t =
   {
     id: Id.t;
+    mod_type: Id.t; (* "type" in data file *)
     domain: Base_item.domain;
     generation_type: generation_type;
     (* Only one mod per [group] can spawn on an item. *)
@@ -145,12 +146,13 @@ let pp_stat { id; min; max } =
   ]
 
 let pp {
-    id; domain; generation_type; groups; required_level;
+    id; mod_type; domain; generation_type; groups; required_level;
     spawn_weights; generation_weights;
     tags; adds_tags; stats; is_essence_only;
   } =
   Pretext.OCaml.record [
     "id", Id.pp id;
+    "type", Id.pp mod_type;
     "domain", Base_item.pp_domain domain;
     "generation_type", pp_generation_type generation_type;
     "groups", Id.Set.pp groups;
@@ -217,6 +219,7 @@ let load filename =
   let add_entry (id, json) =
     if id =~! royale_rex then
       let id = Id.make id in
+      let mod_type = ref Id.empty in
       let domain = ref None in
       let generation_type = ref None in
       let groups = ref Id.Set.empty in
@@ -255,6 +258,8 @@ let load filename =
                   !groups
           | "name" ->
               name := JSON.as_id value
+          | "type" ->
+              mod_type := JSON.as_id value
           | "required_level" ->
               required_level := JSON.as_int value
           | "spawn_weights" ->
@@ -340,6 +345,7 @@ let load filename =
                     let modifier =
                       {
                         id;
+                        mod_type = !mod_type;
                         domain;
                         generation_type;
                         groups = !groups;
