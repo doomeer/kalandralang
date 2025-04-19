@@ -18,6 +18,8 @@ val as_bool: t -> bool
 
 val as_int: t -> int
 
+val as_int_opt: t -> int option
+
 val as_float: t -> float
 
 val as_float_opt: t -> float option

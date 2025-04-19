@@ -64,6 +64,13 @@ let as_int json =
     | _ ->
         fail json "not a number"
 
+let as_int_opt json =
+  match json.json with
+    | `Float x ->
+       Some (int_of_float x)
+    | _ ->
+        None
+
 let as_float json =
   match json.json with
     | `Float x ->
