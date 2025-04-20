@@ -400,6 +400,21 @@ let rec o_stat_translation_format o (x: Stat_translation.format) =
     | IH_divide_by_one_thousand y ->
         o_byte o 51;
         o_stat_translation_format o y
+    | IH_plus_two_hundred y ->
+        o_byte o 52;
+        o_stat_translation_format o y
+    | IH_divide_by_twenty y ->
+        o_byte o 53;
+        o_stat_translation_format o y
+    | IH_weapon_tree_unique_base_type_name y ->
+        o_byte o 54;
+        o_stat_translation_format o y
+    | IH_locations_to_metres y ->
+        o_byte o 55;
+        o_stat_translation_format o y
+    | IH_display_indexable_skill y ->
+        o_byte o 56;
+        o_stat_translation_format o y
 
 let rec i_stat_translation_format i: Stat_translation.format =
   match i_byte i with
@@ -557,6 +572,21 @@ let rec i_stat_translation_format i: Stat_translation.format =
     | 51 ->
         let y = i_stat_translation_format i in
         IH_divide_by_one_thousand y
+    | 52 ->
+        let y = i_stat_translation_format i in
+        IH_plus_two_hundred y
+    | 53 ->
+        let y = i_stat_translation_format i in
+        IH_divide_by_twenty y
+    | 54 ->
+        let y = i_stat_translation_format i in
+        IH_weapon_tree_unique_base_type_name y
+    | 55 ->
+        let y = i_stat_translation_format i in
+        IH_locations_to_metres y
+    | 56 ->
+        let y = i_stat_translation_format i in
+        IH_display_indexable_skill y
     | _ ->
         failwith "invalid stat translation format"
 

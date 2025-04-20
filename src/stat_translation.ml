@@ -6,6 +6,7 @@ type format =
   | IH_30pct_of_value of format (* 30%_of_value *)
   | IH_60pct_of_value of format (* 60%_of_value *)
   | IH_deciseconds_to_seconds of format
+  | IH_plus_two_hundred of format
   | IH_divide_by_three of format
   | IH_divide_by_five of format
   | IH_divide_by_one_hundred of format
@@ -19,6 +20,7 @@ type format =
   | IH_divide_by_ten_1dp_if_required of format
   | IH_divide_by_twelve of format
   | IH_divide_by_fifteen_0dp of format
+  | IH_divide_by_twenty of format
   | IH_divide_by_twenty_then_double_0dp of format
   | IH_divide_by_fifty of format
   | IH_divide_by_one_hundred_2dp_if_required of format
@@ -53,6 +55,9 @@ type format =
   | IH_double of format
   | IH_negate_and_double of format
   | IH_metamorphosis_reward_description of format
+  | IH_weapon_tree_unique_base_type_name of format
+  | IH_locations_to_metres of format
+  | IH_display_indexable_skill of format
 
 type condition =
   {
@@ -105,6 +110,8 @@ let rec apply_format ?(omit_plus = false) f value =
         apply_format f (value *. 60. /. 100.)
     | IH_deciseconds_to_seconds f ->
         apply_format f (value /. 10.)
+    | IH_plus_two_hundred f ->
+        apply_format f (value +. 200.)
     | IH_divide_by_three f ->
         apply_format f (value /. 3.)
     | IH_divide_by_five f ->
@@ -131,6 +138,8 @@ let rec apply_format ?(omit_plus = false) f value =
         apply_format f (value /. 12.)
     | IH_divide_by_fifteen_0dp f ->
         apply_format f (round_0dp (value /. 15.))
+    | IH_divide_by_twenty f ->
+        apply_format f (value /. 20.)
     | IH_divide_by_twenty_then_double_0dp f ->
         apply_format f (round_0dp (value /. 20.) *. 2.)
     | IH_divide_by_fifty f ->
@@ -198,6 +207,12 @@ let rec apply_format ?(omit_plus = false) f value =
     | IH_negate_and_double f ->
         apply_format f (-. value *. 2.)
     | IH_metamorphosis_reward_description f ->
+        apply_format f value
+    | IH_weapon_tree_unique_base_type_name f ->
+        apply_format f value
+    | IH_locations_to_metres f ->
+        apply_format f value
+    | IH_display_indexable_skill f ->
         apply_format f value
 
 type translate_mode =
@@ -417,6 +432,8 @@ let load filename =
                   IH_60pct_of_value format
               | "deciseconds_to_seconds" ->
                   IH_deciseconds_to_seconds format
+              | "plus_two_hundred" ->
+                  IH_plus_two_hundred format
               | "divide_by_three" ->
                   IH_divide_by_three format
               | "divide_by_five" ->
@@ -443,6 +460,8 @@ let load filename =
                   IH_divide_by_twelve format
               | "divide_by_fifteen_0dp" ->
                   IH_divide_by_fifteen_0dp format
+              | "divide_by_twenty" ->
+                  IH_divide_by_twenty format
               | "divide_by_twenty_then_double_0dp" ->
                   IH_divide_by_twenty_then_double_0dp format
               | "divide_by_fifty" ->
@@ -511,6 +530,12 @@ let load filename =
                   IH_negate_and_double format
               | "metamorphosis_reward_description" ->
                   IH_metamorphosis_reward_description format
+              | "weapon_tree_unique_base_type_name" ->
+                  IH_weapon_tree_unique_base_type_name format
+              | "locations_to_metres" ->
+                  IH_locations_to_metres format
+              | "display_indexable_skill" ->
+                  IH_display_indexable_skill format
               | s ->
                   Printf.printf "Warning: %s: unknown format: %s\n%!"
                     (JSON.show_origin json) s;
