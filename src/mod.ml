@@ -168,6 +168,7 @@ let pp {
 let pool = ref []
 let id_map = ref Id.Map.empty
 let mod_groups = ref Id.Set.empty
+let mod_types = ref Id.Set.empty
 
 type data = t list
 
@@ -177,7 +178,8 @@ let import (x: data) =
   pool := x;
   let add modifier =
     id_map := Id.Map.add modifier.id modifier !id_map;
-    mod_groups := Id.Set.union modifier.groups !mod_groups
+    mod_groups := Id.Set.union modifier.groups !mod_groups;
+    mod_types := Id.Set.add modifier.mod_type !mod_types
   in
   List.iter add x
 
@@ -364,7 +366,8 @@ let load filename =
                       | None ->
                           pool := modifier :: !pool;
                           id_map := Id.Map.add id modifier !id_map;
-                          mod_groups := Id.Set.union modifier.groups !mod_groups
+                          mod_groups := Id.Set.union modifier.groups !mod_groups;
+                          mod_types := Id.Set.add modifier.mod_type !mod_types
   in
   List.iter add_entry JSON.(parse_file filename |> as_object)
 
@@ -380,6 +383,9 @@ let by_id id =
 
 let group_exists id =
   Id.Set.mem id !mod_groups
+
+let mod_type_exists id =
+  Id.Set.mem id !mod_types
 
 type show_mode =
   | With_placeholders

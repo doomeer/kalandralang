@@ -230,12 +230,12 @@ let full_mod_pool = memoize @@ fun (domain, item_tags, keep_weight_0_tag) ->
   in
   List.filter_map can_spawn_mod !Mod.pool
 
-let sort_mod_group = memoize @@ fun (domain, item_tags, mod_groups, keep_weight_0_tag) ->
+let sort_tier_group = memoize @@ fun (domain, item_tags, mod_type, keep_weight_0_tag) ->
   let pool =
-    let has_mod_group (_, modifier) =
+    let has_mod_type (_, modifier) =
       match modifier.Mod.generation_type with
         | Prefix | Suffix ->
-            if not (Id.Set.disjoint mod_groups modifier.Mod.groups) then
+            if Id.compare mod_type modifier.Mod.mod_type = 0 then
               Some modifier
             else
               None
@@ -244,7 +244,7 @@ let sort_mod_group = memoize @@ fun (domain, item_tags, mod_groups, keep_weight_
             None
     in
     full_mod_pool (domain, item_tags, keep_weight_0_tag)
-    |> List.filter_map has_mod_group
+    |> List.filter_map has_mod_type
   in
   (* [mod2] and [mod1] are reversed because we want to sort in reverse order. *)
   let by_ilvl_or_stat (mod2: Mod.t) (mod1: Mod.t) =
@@ -262,8 +262,8 @@ let sort_mod_group = memoize @@ fun (domain, item_tags, mod_groups, keep_weight_
   List.sort by_ilvl_or_stat pool |> list_group by_ilvl_or_stat
 
 let mod_tier =
-  let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_groups, mod_id) ->
-    let sorted_group = sort_mod_group (domain, item_tags, mod_groups, None) in
+  let mod_tier_memoized = memoize @@ fun (domain, item_tags, mod_type, mod_id) ->
+    let sorted_group = sort_tier_group (domain, item_tags, mod_type, None) in
     let rec find_mod tier = function
       | [] ->
           (* echo "cannot find mod %s" (Id.show mod_id); *)
@@ -299,7 +299,7 @@ let mod_tier =
     if modifier.is_essence_only then
       essence_mod_tier modifier.id
     else
-      mod_tier_memoized (modifier.domain, base_tags item, modifier.groups, modifier.id)
+      mod_tier_memoized (modifier.domain, base_tags item, modifier.mod_type, modifier.id)
 
 let show_modifier item { modifier; fractured } =
   let tier = mod_tier item modifier in
@@ -1011,10 +1011,10 @@ let apply_orb_of_dominance item =
               let has_weight (tag, _) = Id.compare tag influence_tag = 0 in
               if List.exists has_weight modifier.spawn_weights then
                 let mod_group =
-                  sort_mod_group (
+                  sort_tier_group (
                     modifier.domain,
                     base_tags item,
-                    modifier.groups,
+                    modifier.mod_type,
                     Some influence_tag
                   )
                 in
