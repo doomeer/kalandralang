@@ -194,6 +194,153 @@ struct
   let warstaff_basilisk = Id.make "warstaff_basilisk"
   let warstaff_eyrie = Id.make "warstaff_eyrie"
   let warstaff_adjudicator = Id.make "warstaff_adjudicator"
+
+  let influence_map =
+    let bindings = [
+        _2h_axe_shaper, Shaper;
+        _2h_axe_elder, Elder;
+        _2h_axe_crusader, Crusader;
+        _2h_axe_basilisk, Hunter;
+        _2h_axe_eyrie, Redeemer;
+        _2h_axe_adjudicator, Warlord;
+        _2h_mace_shaper, Shaper;
+        _2h_mace_elder, Elder;
+        _2h_mace_crusader, Crusader;
+        _2h_mace_basilisk, Hunter;
+        _2h_mace_eyrie, Redeemer;
+        _2h_mace_adjudicator, Warlord;
+        _2h_sword_shaper, Shaper;
+        _2h_sword_elder, Elder;
+        _2h_sword_crusader, Crusader;
+        _2h_sword_basilisk, Hunter;
+        _2h_sword_eyrie, Redeemer;
+        _2h_sword_adjudicator, Warlord;
+        amulet_shaper, Shaper;
+        amulet_elder, Elder;
+        amulet_crusader, Crusader;
+        amulet_basilisk, Hunter;
+        amulet_eyrie, Redeemer;
+        amulet_adjudicator, Warlord;
+        axe_shaper, Shaper;
+        axe_elder, Elder;
+        axe_crusader, Crusader;
+        axe_basilisk, Hunter;
+        axe_eyrie, Redeemer;
+        axe_adjudicator, Warlord;
+        mace_shaper, Shaper;
+        mace_elder, Elder;
+        mace_crusader, Crusader;
+        mace_basilisk, Hunter;
+        mace_eyrie, Redeemer;
+        mace_adjudicator, Warlord;
+        sword_shaper, Shaper;
+        sword_elder, Elder;
+        sword_crusader, Crusader;
+        sword_basilisk, Hunter;
+        sword_eyrie, Redeemer;
+        sword_adjudicator, Warlord;
+        belt_shaper, Shaper;
+        belt_elder, Elder;
+        belt_crusader, Crusader;
+        belt_basilisk, Hunter;
+        belt_eyrie, Redeemer;
+        belt_adjudicator, Warlord;
+        body_armour_shaper, Shaper;
+        body_armour_elder, Elder;
+        body_armour_crusader, Crusader;
+        body_armour_basilisk, Hunter;
+        body_armour_eyrie, Redeemer;
+        body_armour_adjudicator, Warlord;
+        boots_shaper, Shaper;
+        boots_elder, Elder;
+        boots_crusader, Crusader;
+        boots_basilisk, Hunter;
+        boots_eyrie, Redeemer;
+        boots_adjudicator, Warlord;
+        bow_shaper, Shaper;
+        bow_elder, Elder;
+        bow_crusader, Crusader;
+        bow_basilisk, Hunter;
+        bow_eyrie, Redeemer;
+        bow_adjudicator, Warlord;
+        claw_shaper, Shaper;
+        claw_elder, Elder;
+        claw_crusader, Crusader;
+        claw_basilisk, Hunter;
+        claw_eyrie, Redeemer;
+        claw_adjudicator, Warlord;
+        dagger_shaper, Shaper;
+        dagger_elder, Elder;
+        dagger_crusader, Crusader;
+        dagger_basilisk, Hunter;
+        dagger_eyrie, Redeemer;
+        dagger_adjudicator, Warlord;
+        gloves_shaper, Shaper;
+        gloves_elder, Elder;
+        gloves_crusader, Crusader;
+        gloves_basilisk, Hunter;
+        gloves_eyrie, Redeemer;
+        gloves_adjudicator, Warlord;
+        helmet_shaper, Shaper;
+        helmet_elder, Elder;
+        helmet_crusader, Crusader;
+        helmet_basilisk, Hunter;
+        helmet_eyrie, Redeemer;
+        helmet_adjudicator, Warlord;
+        quiver_shaper, Shaper;
+        quiver_elder, Elder;
+        quiver_crusader, Crusader;
+        quiver_basilisk, Hunter;
+        quiver_eyrie, Redeemer;
+        quiver_adjudicator, Warlord;
+        ring_shaper, Shaper;
+        ring_elder, Elder;
+        ring_crusader, Crusader;
+        ring_basilisk, Hunter;
+        ring_eyrie, Redeemer;
+        ring_adjudicator, Warlord;
+        rune_dagger_shaper, Shaper;
+        rune_dagger_elder, Elder;
+        rune_dagger_crusader, Crusader;
+        rune_dagger_basilisk, Hunter;
+        rune_dagger_eyrie, Redeemer;
+        rune_dagger_adjudicator, Warlord;
+        sceptre_shaper, Shaper;
+        sceptre_elder, Elder;
+        sceptre_crusader, Crusader;
+        sceptre_basilisk, Hunter;
+        sceptre_eyrie, Redeemer;
+        sceptre_adjudicator, Warlord;
+        shield_shaper, Shaper;
+        shield_elder, Elder;
+        shield_crusader, Crusader;
+        shield_basilisk, Hunter;
+        shield_eyrie, Redeemer;
+        shield_adjudicator, Warlord;
+        staff_shaper, Shaper;
+        staff_elder, Elder;
+        staff_crusader, Crusader;
+        staff_basilisk, Hunter;
+        staff_eyrie, Redeemer;
+        staff_adjudicator, Warlord;
+        wand_shaper, Shaper;
+        wand_elder, Elder;
+        wand_crusader, Crusader;
+        wand_basilisk, Hunter;
+        wand_eyrie, Redeemer;
+        wand_adjudicator, Warlord;
+        warstaff_shaper, Shaper;
+        warstaff_elder, Elder;
+        warstaff_crusader, Crusader;
+        warstaff_basilisk, Hunter;
+        warstaff_eyrie, Redeemer;
+        warstaff_adjudicator, Warlord;
+      ]
+    in
+    List.fold_left
+      (fun acc (id, infl) -> Id.Map.add id infl acc)
+      Id.Map.empty
+      bindings
 end
 
 let get_item_type_from_tags item_tags =
@@ -442,3 +589,8 @@ let get_influence_tag item_type influence =
 
 let get_influence_tag_for_tags item_tags influence =
   get_influence_tag (get_item_type_from_tags item_tags) influence
+
+let get_influence_from_spawn_weights spawn_weights =
+  List.find_map
+    (fun (tag, _) -> Id.Map.find_opt tag Tag.influence_map)
+    spawn_weights

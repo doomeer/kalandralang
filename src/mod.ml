@@ -405,13 +405,19 @@ let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
       | Some tier ->
           "[T" ^ string_of_int tier ^ "] "
   in
+  let influence =
+    match Base_tag.get_influence_from_spawn_weights modifier.spawn_weights with
+      | Some influence -> "*" ^ String.sub (Influence.show_sec influence) 0 1 ^ "* "
+      | None -> ""
+  in
   let margin =
     String.make
       (
         indentation +
         String.length generation_type +
         String.length domain +
-        String.length tier
+        String.length tier +
+        String.length influence
       )
       ' '
   in
@@ -446,7 +452,7 @@ let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
           let strings = deduplicate String.compare strings in
           String.concat ("\n" ^ margin) strings
   in
-  generation_type ^ fractured ^ domain ^ tier ^
+  generation_type ^ fractured ^ domain ^ tier ^ influence ^
   translated_mod ^
   (if !show_identifiers then " (" ^ Id.show modifier.id ^ ")" else "") ^
   (
