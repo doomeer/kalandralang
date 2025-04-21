@@ -56,8 +56,16 @@ let rec check_arithmetic_expression ({ node; loc }: AST.arithmetic_expression) =
     | Binary_arithmetic_operator (a, _, b) ->
         check_arithmetic_expression a;
         check_arithmetic_expression b
-    | Tier mod_group ->
-        check_mod_group loc mod_group
+    | Tier mod_type ->
+        (* Mod groups are replaced with mod types.  If the mod type does not
+           exist, check if the identifier is not a mod group, in which case warn
+           the user that mod groups are no longer supported and that they need
+           to switch *)
+       if not (Mod.mod_type_exists mod_type) then
+         if (Mod.group_exists mod_type) then
+           error loc "you are using modifier group: %S.  Modifier groups were replaced by modifier type." (Id.show mod_type)
+         else
+           error loc "unknown modifier type: %S" (Id.show mod_type)
     | Int_of_bool condition ->
         check_condition condition
 

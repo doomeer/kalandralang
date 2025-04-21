@@ -201,20 +201,20 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
     | Affix_count ->
         with_item state @@ fun item ->
         Q.of_int (Item.affix_count item)
-    | Tier mod_group ->
+    | Tier mod_type ->
         with_item state @@ fun item ->
         (
-          let has_mod_group { Item.modifier; fractured = _ } =
+          let has_mod_type { Item.modifier; fractured = _ } =
             match modifier.generation_type with
               | Prefix | Suffix ->
-                  Id.Set.mem mod_group modifier.groups
+                  Id.compare mod_type modifier.mod_type = 0
               | Exarch_implicit _ | Eater_implicit _ ->
                   (* Those could have the same mod group as a prefix or suffix,
                      and we wouldn't know what to do. So currently "tier" only
                      supports prefixes and suffixes. *)
                   false
           in
-          match List.filter has_mod_group item.mods with
+          match List.filter has_mod_type item.mods with
             | [] ->
                 (* Item has no modifier of this group. *)
                 Q.of_int 999
@@ -222,14 +222,14 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
                 (
                   match Item.mod_tier item modifier with
                     | None ->
-                        fail "don't know how to compute tier for %S in group %S"
-                          (Id.show modifier.id) (Id.show mod_group)
+                        fail "don't know how to compute tier for %S in type %S"
+                          (Id.show modifier.id) (Id.show mod_type)
                     | Some tier ->
                         Q.of_int tier
                 )
             | _ :: _ :: _ ->
                 (* Items are not supposed to have several modifiers of the same group?? *)
-                fail "item has multiple affixes for mod group: %S" (Id.show mod_group)
+                fail "item has multiple affixes for mod type: %S" (Id.show mod_type)
         )
     | Int_of_bool condition ->
         if eval_condition state condition then
