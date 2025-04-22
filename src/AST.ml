@@ -108,6 +108,8 @@ type currency =
   | Beastcraft_aspect_of_the_spider
   | Beastcraft_split
   | Beastcraft_imprint
+  | Beastcraft_add_prefix_remove_suffix
+  | Beastcraft_add_suffix_remove_prefix
   | Aisling
   | Craft of Id.t
   | Multimod
@@ -175,6 +177,8 @@ let show_currency = function
   | Beastcraft_aspect_of_the_spider -> "beastcraft_aspect_of_the_spider"
   | Beastcraft_split -> "beastcraft_split"
   | Beastcraft_imprint -> "beastcraft_imprint"
+  | Beastcraft_add_prefix_remove_suffix -> "beastcraft_add_prefix_remove_suffix"
+  | Beastcraft_add_suffix_remove_prefix -> "beastcraft_add_suffix_remove_prefix"
   | Aisling -> "aisling"
   | Craft id -> Printf.sprintf "craft %S" (Id.show id)
   | Multimod -> "multimod"

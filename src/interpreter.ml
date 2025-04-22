@@ -723,6 +723,32 @@ let apply_currency state (currency: AST.currency) =
         );
         let state = return item in
         { state with imprint = Some item }
+    | Beastcraft_add_prefix_remove_suffix ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        let item = Item.spawn_random_mod ~only: Prefixes item
+        in
+        return @@ if (Item.has_mod_id Mod.suffixes_cannot_be_changed_id item) then
+          item
+        else
+          Item.remove_random_mod
+            ~force_prefixes_cannot_be_changed: true
+            ~respect_cannot_be_changed: true
+            ~respect_cannot_roll: false
+            item
+    | Beastcraft_add_suffix_remove_prefix ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        let item = Item.spawn_random_mod ~only: Suffixes item
+        in
+        return @@ if (Item.has_mod_id Mod.prefixes_cannot_be_changed_id item) then
+           item
+        else
+           Item.remove_random_mod
+             ~force_suffixes_cannot_be_changed: true
+             ~respect_cannot_be_changed: true
+             ~respect_cannot_roll: false
+             item
     | Aisling ->
         with_item state @@ fun item ->
         item_must_be_rare item;
