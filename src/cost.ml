@@ -321,6 +321,12 @@ let beastcraft_split: field =
 let beastcraft_imprint: field =
   b "Craicic Chimeral" "beastcraft_imprint" 120.
 
+let beastcraft_add_prefix_remove_suffix: field =
+  b "Farric Wolf Alpha" "beastcraft_add_prefix_remove_suffix" 5.
+
+let beastcraft_add_suffix_remove_prefix: field =
+  b "Farric Lynx Alpha" "beastcraft_add_suffix_remove_prefix" 5.
+
 let veil: field =
   c "Veiled Orb" "veil" (10. *. div)
 
@@ -594,6 +600,10 @@ let get_currency (currency: AST.currency) =
         get beastcraft_split
     | Beastcraft_imprint ->
         get beastcraft_imprint
+    | Beastcraft_add_prefix_remove_suffix ->
+        get beastcraft_add_prefix_remove_suffix
+    | Beastcraft_add_suffix_remove_prefix ->
+        get beastcraft_add_suffix_remove_prefix
     | Aisling ->
         (* Aisling is now itemized as Veiled orb *)
         get aisling

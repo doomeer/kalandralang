@@ -205,6 +205,8 @@
     | "beastcraft_aspect_of_the_spider" -> CURRENCY Beastcraft_aspect_of_the_spider
     | "beastcraft_split" -> CURRENCY Beastcraft_split
     | "beastcraft_imprint" -> CURRENCY Beastcraft_imprint
+    | "beastcraft_add_prefix_remove_suffix" -> CURRENCY Beastcraft_add_prefix_remove_suffix
+    | "beastcraft_add_suffix_remove_prefix" -> CURRENCY Beastcraft_add_suffix_remove_prefix
     | "aisling" -> CURRENCY Aisling
     | "craft" -> CRAFT
     | "multimod" -> CURRENCY Multimod
