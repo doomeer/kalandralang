@@ -109,14 +109,14 @@ let has_a_prefix item =
 let has_a_suffix item =
   List.exists (fun { modifier; _ } -> Mod.is_suffix modifier) item.mods
 
-let has_mod_id must_be_fractured modifier_id item =
+let has_mod_id ?(must_be_fractured = false) modifier_id item =
   List.exists
     (fun { modifier; fractured } ->
        (fractured || not must_be_fractured) &&
        Id.compare modifier.Mod.id modifier_id = 0)
     item.mods
 
-let has_mod_group_id must_be_fractured group_id item =
+let has_mod_group_id ?(must_be_fractured = false) group_id item =
   List.exists
     (fun { modifier; fractured } ->
        (fractured || not must_be_fractured) &&
@@ -124,7 +124,7 @@ let has_mod_group_id must_be_fractured group_id item =
     item.mods
 
 let has_mod modifier item =
-  has_mod_id false modifier.Mod.id item
+  has_mod_id modifier.Mod.id item
 
 (* My experiment on one mod (unveiling move speed + onslaught on boots)
    seems to show that implicits and prefixes/suffixes are independent,

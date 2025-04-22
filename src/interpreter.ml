@@ -263,13 +263,14 @@ and eval_condition state (condition: AST.condition) =
           false
     | Has { fractured; id } ->
         with_item state @@ fun item ->
-        Item.has_mod_group_id fractured id item || Item.has_mod_id fractured id item
+        Item.has_mod_group_id ~must_be_fractured: fractured id item ||
+        Item.has_mod_id ~must_be_fractured: fractured id item
     | Has_mod { fractured; id } ->
         with_item state @@ fun item ->
-        Item.has_mod_id fractured id item
+        Item.has_mod_id ~must_be_fractured: fractured id item
     | Has_group { fractured; id } ->
         with_item state @@ fun item ->
-        Item.has_mod_group_id fractured id item
+        Item.has_mod_group_id ~must_be_fractured: fractured id item
     | Has_influence influence ->
         with_item state @@ fun item ->
         Influence.includes item.influence influence
