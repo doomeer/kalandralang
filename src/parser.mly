@@ -10,7 +10,7 @@
 
 %token COLON AND OR NOT DOT_DOT TRUE FALSE EOF
 %token PLUS MINUS STAR SLASH
-%token BUY EXACT NORMAL MAGIC RARE
+%token ASSERT BUY EXACT NORMAL MAGIC RARE
 %token ILVL WITH FRACTURED FOR CRAFT ECHO SHOW SHOW_MOD_POOL SHOW_UNVEIL_MOD_POOL
 %token SHAPER ELDER CRUSADER HUNTER REDEEMER WARLORD EXARCH EATER SYNTHESIZED
 %token IF THEN ELSE UNTIL REPEAT WHILE DO GOTO STOP SET_ASIDE SWAP USE_IMPRINT GAIN
@@ -204,6 +204,8 @@ simple_instruction:
   { node @@ Simple (Goto (AST.Label.make $2)) }
 | STOP
   { node @@ Simple Stop }
+| ASSERT condition
+  { node @@ Simple (Assert $2) }
 | BUY buy_arguments
   { node @@ Simple (Buy (AST.make_buy $2)) }
 | CURRENCY

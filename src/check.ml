@@ -174,6 +174,8 @@ let check_recipe ast (options: recipe_version_options) =
                  (AST.show_currency currency)
            | _ ->
               ())
+      | Simple (Assert cond) ->
+          check_condition cond
       | Simple (
           Stop | Set_aside | Recombine |
           Swap | Use_imprint | Gain _ | Echo _ | Show |

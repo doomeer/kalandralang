@@ -811,6 +811,11 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
         goto state label
     | Stop ->
         { state with point = Array.length state.program.instructions }
+    | Assert condition ->
+        if eval_condition state condition then
+          goto_next state
+        else
+          fail "assertion failure"
     | Buy { exact; rarity; influence; base; ilvl; mods; cost } ->
         (* TODO: check that [mods] are compatible with influences.
            More generally, check that [mods] can actually exist on the item. *)

@@ -4,6 +4,7 @@
 
   let keyword = function
     (* Instructions *)
+    | "assert" -> ASSERT
     | "buy" -> BUY
     | "exact" -> EXACT
     | "normal" -> NORMAL
