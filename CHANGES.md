@@ -1,5 +1,28 @@
 # Kalandralang Changelog
 
+## Changes Made Late During Settlers League
+
+- Added Veiled Orb (instruction keyword: `veil`).
+
+- `harvest_reforge_keep_prefixes`, `harvest_reforge_keep_suffixes`,
+  `veiled_chaos` and `aisling` have been removed.
+  They can be re-enabled with the new `--legacy` command-line option.
+
+- Kalandralang now downloads data from https://repoe-fork.github.io/.
+  The old location (RePoE) was no longer updated.
+
+- Influenced modifiers are now displayed with the influence they come from.
+  For instance, elder modifiers are prefixed with `*E*`.
+
+- Fixed how modifier tiers are computed.
+
+- Group identifiers must now be tier groups instead of exclusivity groups.
+
+- Added instructions `beastcraft_add_suffix_remove_prefix`
+  and `beastcraft_add_prefix_remove_suffix`.
+
+- Added instruction `assert`.
+
 ## Changes Made During Crucible League
 
 - The default league is now Crucible.
