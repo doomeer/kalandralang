@@ -4,6 +4,7 @@
 buy "Metadata/Items/Amulets/Amulet9"
 scour
 transmute
+assert (prefix_count + suffix_count) <= 2
 
 # Then we spam.
 until has "GlobalSkillGemLevel1" do {
