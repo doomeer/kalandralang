@@ -805,17 +805,24 @@ let show_mod_pool pool =
   List.iter show_mod prefixes;
   List.iter show_mod suffixes
 
-let run_simple_instruction state (instruction: AST.simple_instruction) =
+let run_simple_instruction state loc (instruction: AST.simple_instruction) =
   match instruction with
     | Goto label ->
         goto state label
     | Stop ->
         { state with point = Array.length state.program.instructions }
-    | Assert condition ->
+    | Assert (condition, message) ->
         if eval_condition state condition then
           goto_next state
         else
-          fail "assertion failure"
+          let message =
+            match message with
+              | None ->
+                  Pretext.show (AST.pp_condition condition)
+              | Some message ->
+                  message
+          in
+          fail "%s: assertion failure: %s" (show_loc loc) message
     | Buy { exact; rarity; influence; base; ilvl; mods; cost } ->
         (* TODO: check that [mods] are compatible with influences.
            More generally, check that [mods] can actually exist on the item. *)
@@ -944,8 +951,8 @@ let run_simple_instruction state (instruction: AST.simple_instruction) =
 
 let run_instruction state (instruction: Linear.instruction AST.node) =
   match instruction.node with
-    | Simple instruction ->
-        run_simple_instruction state instruction
+    | Simple simple_instruction ->
+        run_simple_instruction state instruction.loc simple_instruction
     | If (condition, label) ->
         if eval_condition state condition then
           goto state label

@@ -577,7 +577,7 @@ and pp_condition ?(ctx = `top) condition =
 type simple_instruction =
   | Goto of Label.t
   | Stop
-  | Assert of condition
+  | Assert of condition * string option
   | Buy of buy
   | Apply of currency
   | Recombine
@@ -624,8 +624,13 @@ let pp_simple_instruction instruction =
         seq [ atom "goto"; space; atom (Label.show label) ]
     | Stop ->
         atom "stop"
-    | Assert condition ->
+    | Assert (condition, None) ->
         seq [ atom "assert"; space; pp_condition condition ]
+    | Assert (condition, Some message) ->
+        seq [
+          atom "assert"; space; pp_condition condition; atom ":";
+          indent; pp_string message; dedent
+        ]
     | Buy buy ->
         pp_buy buy
     | Apply currency ->

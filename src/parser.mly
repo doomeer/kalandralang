@@ -205,7 +205,9 @@ simple_instruction:
 | STOP
   { node @@ Simple Stop }
 | ASSERT condition
-  { node @@ Simple (Assert $2) }
+  { node (Simple (Assert ($2, None))) }
+| ASSERT condition COLON STRING
+  { node @@ Simple (Assert ($2, Some $4)) }
 | BUY buy_arguments
   { node @@ Simple (Buy (AST.make_buy $2)) }
 | CURRENCY

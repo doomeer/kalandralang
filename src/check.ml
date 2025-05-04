@@ -174,7 +174,7 @@ let check_recipe ast (options: recipe_version_options) =
                  (AST.show_currency currency)
            | _ ->
               ())
-      | Simple (Assert cond) ->
+      | Simple (Assert (cond, (_: string option))) ->
           check_condition cond
       | Simple (
           Stop | Set_aside | Recombine |
