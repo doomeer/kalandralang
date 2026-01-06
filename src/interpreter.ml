@@ -204,7 +204,7 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
     | Tier mod_type ->
         with_item state @@ fun item ->
         (
-          let has_mod_type { Item.modifier; fractured = _ } =
+          let has_mod_type { Item.modifier; fractured = _; rolls = _ } =
             match modifier.generation_type with
               | Prefix | Suffix ->
                   Id.compare mod_type modifier.mod_type = 0
@@ -218,7 +218,7 @@ let rec eval_arithmetic_expression state (expression: AST.arithmetic_expression)
             | [] ->
                 (* Item has no modifier of this group. *)
                 Q.of_int 999
-            | [ { Item.modifier; fractured = _ } ] ->
+            | [ { Item.modifier; fractured = _; rolls = _ } ] ->
                 (
                   match Item.mod_tier item modifier with
                     | None ->
@@ -489,7 +489,12 @@ let apply_currency state (currency: AST.currency) =
         item_must_be_rare item;
         return @@ Item.spawn_random_mod item
     | Divine_orb ->
-        fail "not implemented: divine"
+        with_item state @@ fun item ->
+        let divine_mod (m: Item.modifier) = {
+          m with rolls = Mod.roll_stats m.modifier;
+        }
+        in
+        return @@ { item with mods = List.map divine_mod item.mods }
     | Crusader_exalted_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;
@@ -830,7 +835,7 @@ let run_simple_instruction state loc (instruction: AST.simple_instruction) =
         let base_obj = Base_item.by_id base in
         let item = Item.make base_obj ilvl ?rarity influence in
         let item =
-          let add_mod item ({ modifier; fractured }: AST.buy_with) =
+          let add_mod item ({ modifier; fractured; _ }: AST.buy_with) =
             let item = if fractured then Item.add_influence Fractured item else item in
             Item.add_mod ~fractured (Mod.by_id modifier) item
           in
@@ -944,7 +949,9 @@ let run_simple_instruction state loc (instruction: AST.simple_instruction) =
           in
           choose mods
         in
-        let chosen_mod = { Item.modifier = chosen_mod; fractured = false } in
+        let chosen_mod = { Item.modifier = chosen_mod;
+                           fractured = false;
+                           rolls = Mod.roll_stats chosen_mod } in
         let item = { item with mods = chosen_mod :: item.mods } in
         let state = { state with item = Some item } in
         goto_next state

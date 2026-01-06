@@ -16,10 +16,11 @@ let pp_rarity rarity =
 type modifier =
   {
     modifier: Mod.t;
+    rolls: int Id.Map.t;
     fractured: bool;
   }
 
-let pp_modifier { modifier; fractured } =
+let pp_modifier { modifier; fractured; _ } =
   Pretext.OCaml.record [
     "modifier", Mod.pp modifier;
     "fractured", Pretext.OCaml.bool fractured;
@@ -111,14 +112,14 @@ let has_a_suffix item =
 
 let has_mod_id ?(must_be_fractured = false) modifier_id item =
   List.exists
-    (fun { modifier; fractured } ->
+    (fun { modifier; fractured; _ } ->
        (fractured || not must_be_fractured) &&
        Id.compare modifier.Mod.id modifier_id = 0)
     item.mods
 
 let has_mod_group_id ?(must_be_fractured = false) group_id item =
   List.exists
-    (fun { modifier; fractured } ->
+    (fun { modifier; fractured; _ } ->
        (fractured || not must_be_fractured) &&
        Id.Set.mem group_id modifier.Mod.groups)
     item.mods
@@ -301,14 +302,14 @@ let mod_tier =
     else
       mod_tier_memoized (modifier.domain, base_tags item, modifier.mod_type, modifier.id)
 
-let show_modifier item { modifier; fractured } =
+let show_modifier item { modifier; fractured; rolls } =
   let tier = mod_tier item modifier in
-  Mod.show ?tier ~fractured With_random_values modifier
+  Mod.show ?tier ~fractured ~rolls With_rolled_values modifier
 
 let show item =
   let compare_mods
-      { modifier = a; fractured = _ }
-      { modifier = b; fractured = _ } =
+      { modifier = a; fractured = _; rolls = _ }
+      { modifier = b; fractured = _; rolls = _ } =
     match a.Mod.domain, b.Mod.domain with
       | Item, Crafted -> -1
       | Crafted, Item -> 1
@@ -478,7 +479,12 @@ let mod_pool ?(fossils = []) ?tag ?tag_more_common
         List.map adjust_weight mod_pool
 
 let add_mod_force ?(fractured = false) modifier item =
-  { item with mods = { modifier; fractured } :: item.mods }
+  { item with mods = {
+        modifier;
+        fractured;
+        rolls = Mod.roll_stats modifier
+      } :: item.mods
+  }
 
 let add_mod ?(fractured = false) modifier item =
   if Mod.is_prefix modifier && prefix_count item >= max_prefix_count item then
@@ -554,7 +560,7 @@ let meta
     cannot_roll_caster_mods;
   }
 
-let can_be_removed meta { modifier; fractured } =
+let can_be_removed meta { modifier; fractured; _ } =
   Mod.is_prefix_or_suffix modifier &&
   not fractured &&
   not (meta.prefixes_cannot_be_changed && Mod.is_prefix modifier) &&
@@ -610,7 +616,7 @@ let remove_all_mods ~respect_cannot_be_changed ~respect_cannot_roll item =
 let remove_all_prefixes item =
   let mods =
     List.filter
-      (fun { modifier; fractured } -> fractured || not (Mod.is_prefix modifier))
+      (fun { modifier; fractured; _ } -> fractured || not (Mod.is_prefix modifier))
       item.mods
   in
   { item with mods }
@@ -618,7 +624,7 @@ let remove_all_prefixes item =
 let remove_all_suffixes item =
   let mods =
     List.filter
-      (fun { modifier; fractured } -> fractured || not (Mod.is_suffix modifier))
+      (fun { modifier; fractured; _ } -> fractured || not (Mod.is_suffix modifier))
       item.mods
   in
   { item with mods }
@@ -1002,7 +1008,7 @@ let apply_orb_of_dominance item =
           fail "item does not have a Shaper / Elder / Conqueror influence"
   in
   let candidates =
-    let elevate_if_possible { modifier; fractured } =
+    let elevate_if_possible { modifier; fractured; _ } =
       let elevate_with_influence_if_possible (influence: Influence.sec) =
         match Base_tag.get_influence_tag_for_tags item.base.tags influence with
           | None ->
@@ -1069,7 +1075,7 @@ let apply_orb_of_dominance item =
          if Id.compare modifier.id to_remove.id = 0 then
            None
          else if Id.compare modifier.id to_elevate.id = 0 then
-           Some { modifier = elevated; fractured = false }
+           Some { modifier = elevated; fractured = false; rolls = Mod.roll_stats elevated }
          else
            Some x)
       item.mods
@@ -1234,7 +1240,7 @@ let recombine item1 item2 =
 
 let apply_fracturing_orb item =
   let map_fracturable_mods f =
-    item.mods |> List.map @@ fun ({ modifier; fractured } as m) ->
+    item.mods |> List.map @@ fun ({ modifier; fractured; _ } as m) ->
     if not fractured && Mod.is_prefix_or_suffix modifier then
       f m
     else

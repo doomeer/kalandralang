@@ -51,6 +51,16 @@ type stat =
     max: int;
   }
 
+let choose_randomly (min, max) =
+  if max >= min then
+    min + Random.int (max - min + 1)
+  else
+    max + Random.int (min - max + 1)
+
+let stats_ranges stats =
+  let add_range acc (stat: stat) = Id.Map.add stat.id (stat.min, stat.max) acc in
+  List.fold_left add_range Id.Map.empty stats
+
 type t =
   {
     id: Id.t;
@@ -76,6 +86,8 @@ type t =
     stats: stat list;
     is_essence_only: bool;
   }
+
+let roll_stats m = Id.Map.map choose_randomly @@ stats_ranges m.stats
 
 let is_prefix modifier =
   match modifier.generation_type with
@@ -391,11 +403,12 @@ type show_mode =
   | With_placeholders
   | With_ranges
   | With_random_values
+  | With_rolled_values
 
 let show_identifiers = ref false
 let show_group_identifiers = ref false
 
-let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
+let show ?tier ?(indentation = 0) ?(fractured = false) ?rolls mode modifier =
   let generation_type =
     match modifier.generation_type with
       | Prefix -> "(prefix) "
@@ -439,23 +452,17 @@ let show ?tier ?(indentation = 0) ?(fractured = false) mode modifier =
           "????????"
       | _ ->
           let translate_mode: Stat_translation.translate_mode =
-            let ranges =
-              let add_range acc (stat: stat) = Id.Map.add stat.id (stat.min, stat.max) acc in
-              List.fold_left add_range Id.Map.empty modifier.stats
+            let ranges = stats_ranges modifier.stats in
+            let roll_values =
+              match rolls with
+                | None -> Id.Map.map choose_randomly ranges
+                | Some r -> r
             in
             match mode with
-              | With_placeholders ->
-                  With_placeholders ranges
-              | With_ranges ->
-                  With_ranges ranges
-              | With_random_values ->
-                  let choose_randomly (min, max) =
-                    if max >= min then
-                      min + Random.int (max - min + 1)
-                    else
-                      max + Random.int (min - max + 1)
-                  in
-                  With_values (Id.Map.map choose_randomly ranges)
+              | With_placeholders -> With_placeholders ranges
+              | With_ranges -> With_ranges ranges
+              | With_random_values -> With_values (Id.Map.map choose_randomly ranges)
+              | With_rolled_values -> With_values roll_values
           in
           let strings =
             let ids = List.map (fun (stat: stat) -> stat.id) modifier.stats in
