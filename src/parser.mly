@@ -239,13 +239,19 @@ simple_instruction:
 | UNVEIL unveil_mods
   { node @@ Simple (Unveil $2) }
 
-instruction:
-| simple_instruction
-  { $1 }
+if_else:
 | IF condition THEN simple_instruction
   { node @@ If ($2, $4, None) }
 | IF condition THEN simple_instruction ELSE simple_instruction
   { node @@ If ($2, $4, Some $6) }
+| IF condition THEN simple_instruction ELSE if_else
+  { node @@ If ($2, $4, Some $6) }
+
+instruction:
+| simple_instruction
+  { $1 }
+| if_else
+  { $1 }
 | UNTIL condition DO simple_instruction
   { node @@ Until ($2, $4) }
 | WHILE condition DO simple_instruction
