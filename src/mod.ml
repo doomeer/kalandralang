@@ -246,7 +246,11 @@ let load filename =
                       generation_type := Some `Suffix
                   | "eater_implicit" ->
                       generation_type := Some `Eater_implicit
+                  | "archnemesis" ->
+                      generation_type := Some `Eater_implicit
                   | "exarch_implicit" ->
+                      generation_type := Some `Exarch_implicit
+                  | "searing_exarch_implicit" ->
                       generation_type := Some `Exarch_implicit
                   | _ ->
                       ()
