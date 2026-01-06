@@ -7,9 +7,16 @@ let as_currencies = function
       String_map.empty
   | Some json ->
       try
+        let as_item json =
+          let id = JSON.(json |-> "id" |> as_string) in
+          let name = JSON.(json |-> "name" |> as_string) in
+          id, name
+        in
+        let item_map = JSON.(json |-> "items" |> as_array) |> List.map as_item |> String_map.of_list in
         let as_currency json =
-          let name = JSON.(json |-> "currencyTypeName" |> as_string) in
-          let cost = JSON.(json |-> "chaosEquivalent" |> as_float) in
+          let id = JSON.(json |-> "id" |> as_string) in
+          let cost = JSON.(json |-> "primaryValue" |> as_float) in
+          let name = String_map.find id item_map in
           name, cost
         in
         JSON.(json |-> "lines" |> as_array) |> List.map as_currency |> String_map.of_list
@@ -18,14 +25,26 @@ let as_currencies = function
           (Printexc.to_string exn);
         String_map.empty
 
-let get_currencies league =
-  Uri.(with_query' (of_string "https://poe.ninja/api/data/CurrencyOverview")) [
+let get_currencies_ninja league currency_type =
+  Uri.(with_query' (of_string "https://poe.ninja/poe1/api/economy/exchange/current/overview")) [
     "league", league;
-    "type", "Currency";
+    "type", currency_type;
     "language", "en";
   ]
   |> Http_request.get_json "poe.ninja response"
   |> as_currencies
+
+let get_currencies league =
+  get_currencies_ninja league "Currency"
+
+let get_essences league =
+  get_currencies_ninja league "Essence"
+
+let get_fossils league =
+  get_currencies_ninja league "Fossil"
+
+let get_resonators league =
+  get_currencies_ninja league "Resonator"
 
 let as_items = function
   | None ->
@@ -43,8 +62,8 @@ let as_items = function
           (Printexc.to_string exn);
         String_map.empty
 
-let get_items ~league item_type =
-  Uri.(with_query' (of_string "https://poe.ninja/api/data/ItemOverview")) [
+let get_items league item_type =
+  Uri.(with_query' (of_string "https://poe.ninja/poe1/api/economy/stash/current/item/overview")) [
     "league", league;
     "type", item_type;
     "language", "en";
@@ -52,17 +71,8 @@ let get_items ~league item_type =
   |> Http_request.get_json "poe.ninja response"
   |> as_items
 
-let get_essences league =
-  get_items ~league "Essence"
-
-let get_fossils league =
-  get_items ~league "Fossil"
-
-let get_resonators league =
-  get_items ~league "Resonator"
-
 let get_beasts league =
-  get_items ~league "Beast"
+  get_items league "Beast"
 
 let as_tft = function
   | None ->
