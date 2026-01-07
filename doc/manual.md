@@ -52,7 +52,7 @@ kalandralang find --help
 
 #### Update Game Data
 
-Kalandralang requires data files from the [RePoE](https://github.com/brather1ng/RePoE)
+Kalandralang requires data files from the [repoe](https://github.com/repoe-fork/repoe)
 project to run. Those data files contain the list of base items, modifiers etc.
 Kalandralang looks for those files:
 - on Linux: in `~/.kalandralang/data`;
@@ -67,9 +67,10 @@ You probably also want to [Update Cost Data](#update-cost-data).
 
 #### Update Cost Data
 
-Kalandralang reads the cost of currencies, harvest crafts etc. from file `data/costs.json`.
-It is a good idea to regularly update this file.
-See [Costs](#costs) for more information.
+Kalandralang reads the cost of currencies, harvest crafts etc. from file
+`data/costs.json` (see [Update Game Data](#update-game-data)).  It is a
+good idea to regularly update this file.  See [Costs](#costs) for more
+information.
 
 ##### From poe.ninja and TFT
 
@@ -82,7 +83,7 @@ kalandralang update-costs
 ```
 If you are from the future, you may need to specify the league name:
 ```sh
-kalandralang update-costs --ninja-league Sentinel
+kalandralang update-costs --ninja-league Keepers
 ```
 You can also specify the folder to read from TFT's repository:
 ```
@@ -318,18 +319,18 @@ Average cost (out of 100):
      1.00 × craft "EinharMasterIncreasedLife3"
 Total: 125.97ex (21785c) — Profit: -115.97ex (-20055c)
 
-     █                                                                          
-   ▆ █                                                                          
-   █ █ ▅   ▅                                                                    
- ▃ █ █ █  ▃█                                                                    
- █ █ █ █ ▂██                                                                    
- █ █ █ █ ███                                                                    
- █ █████ ███                                                                    
- █▆█████▆███                                                                    
- ███████████▅ ▅      ▅                                                          
- ████████████ █▃▃▃  ▃█▃ ▃                                                       
-▂████████████ ████▂ ███ █▂▂    ▂                ▂                               
-█████████████ █████ ███ ███    █                █                               
+     █
+   ▆ █
+   █ █ ▅   ▅
+ ▃ █ █ █  ▃█
+ █ █ █ █ ▂██
+ █ █ █ █ ███
+ █ █████ ███
+ █▆█████▆███
+ ███████████▅ ▅      ▅
+ ████████████ █▃▃▃  ▃█▃ ▃
+▂████████████ ████▂ ███ █▂▂    ▂                ▂
+█████████████ █████ ███ ███    █                █
 ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 0ex                                                                       1000ex
 ```
@@ -348,7 +349,7 @@ of currencies, harvest crafts etc. Kalandralang has default values for each of
 those, but those values are unlikely to be very accurate as values change
 a lot over time. You can customize those values by creating a file named
 `costs.json` in the `data` directory that you set up in
-[Setup a Working Directory](#setup-a-working-directory).
+[Update Game Data](#update-game-data).
 
 To customize costs, it is recommended to generate `data/costs.json`
 using `write-default-costs` or `update-costs`
@@ -362,7 +363,7 @@ field `"harvest_reforge_life"` specifies the cost of the `harvest_reforge_life`
 [instruction](#harvest-crafting), and field `"pristine"` specifies the value
 of Pristine Fossils. For resonators, the fields are named
 `"primitive_resonator"`, `"potent_resonator"`, `"powerful_resonator"`
-and `"prime_resonator"`. The value of each field is the cost in chaos.
+and `"prime_resonator"`. The value of each field is the cost in Chaos Orbs.
 
 For instance, the following `costs.json` file:
 ```json
@@ -397,18 +398,18 @@ Use them to make your code more readable.
 Keywords are composed of lowercase letters (`a` to `z`) and underscores `_`.
 They are predefined and correspond to language instructions.
 Here are some examples:
-- `harvest_reforge_life`;
-- `chaos`;
-- `while`.
+- `harvest_reforge_life`
+- `chaos`
+- `while`
 
 #### Numbers
 
 Numbers are sequences of digits (`0` to `9`), optionally prefixed by
 a minus character `-` for negative numbers.
 Examples:
-- `0`;
-- `1234`;
-- `-9`.
+- `0`
+- `1234`
+- `-9`
 
 #### Identifiers
 
@@ -429,8 +430,8 @@ letters (`a` to `z` and `A` to `Z`), digits (`0` to `9`), and underscores `_`.
 They are used to refer to a given position in the code, to be able to jump
 to this position from other parts of the code.
 Here are some examples:
-- `.attempt_to_reforge_life`;
-- `.fail_miserably_for_the_3rd_time_and_try_again`.
+- `.attempt_to_reforge_life`
+- `.fail_miserably_for_the_3rd_time_and_try_again`
 
 Well-chosen label names help to make the code more readable.
 
@@ -528,6 +529,32 @@ has an open prefix or an open suffix:
 ```sh
 if open_prefix or open_suffix then augment
 ```
+
+#### Assertions
+
+To help with debugging of your programs you can add assertions.  These are
+conditions that are checked at that specific point of the program and ensure
+that the condition holds for *current item*.
+
+For example, if you want to add a guaranteed suffix with an Exalted Orb and make
+sure you will also have one open suffix afterwards (for bench crafting the last
+suffix) you can add an assertion that will check for this condition.  Once you
+implement the logic correctly, you can delete the assertion but it can stay
+there in case you will update your program in the future.
+
+To add an assertion, use `assert` keyword with a condition optionally followed
+by `:` and a string error message.
+
+``` sh
+assert rare and full_prefixes and suffix_count = 1 : "Must have full prefixes and two open suffixes"
+```
+
+If the assertion fails, the program will exit with a failure.
+
+Assertions are not used for controlling how your program crafts, only to check
+the conditions of your current state inbetween instructions.  If you only want
+to do an action if some condition holds, use [If
+Conditionals](#if-conditionals).
 
 ### Buying a Base
 
@@ -664,7 +691,7 @@ Projectiles Pierce an additional Target and the warlord modifier
 #% increased Area of Effect. But as both items could have more
 than one influenced modifier, this is not guaranteed.
 
-##### Recombinators
+##### Recombinators (Sentinel league)
 
 | Keyword | Currency |
 | --- | --- |
@@ -849,14 +876,16 @@ The following keywords are instructions to perform harvest crafts on the current
 
 The following keywords are instructions to perform beastcrafts on the current item.
 
-| Keyword | Craft |
-| --- | --- |
-| `beastcraft_aspect_of_the_avian` | Add Aspect of the Avian |
-| `beastcraft_aspect_of_the_cat` | Add Aspect of the Cat |
-| `beastcraft_aspect_of_the_crab` | Add Aspect of the Crab |
-| `beastcraft_aspect_of_the_spider` | Add Aspect of the Spider |
-| `beastcraft_split` | See [Split](#split) |
-| `beastcraft_imprint` | See [Imprint](#imprint) |
+| Keyword                               | Craft                                 |
+|---------------------------------------|---------------------------------------|
+| `beastcraft_aspect_of_the_avian`      | Add Aspect of the Avian               |
+| `beastcraft_aspect_of_the_cat`        | Add Aspect of the Cat                 |
+| `beastcraft_aspect_of_the_crab`       | Add Aspect of the Crab                |
+| `beastcraft_aspect_of_the_spider`     | Add Aspect of the Spider              |
+| `beastcraft_add_prefix_remove_suffix` | Add prefix and remove a random suffix |
+| `beastcraft_add_suffix_remove_prefix` | Add suffix and remove a random prefix |
+| `beastcraft_split`                    | See [Split](#split)                   |
+| `beastcraft_imprint`                  | See [Imprint](#imprint)               |
 
 ##### Split
 
@@ -898,7 +927,7 @@ through the Immortal Syndicate on the current item.
 
 | Keyword | Craft |
 | --- | --- |
-| `aisling` | Aisling T4: remove a random modifier and add a new veiled modifier |
+| `aisling` | Aisling T4: remove a random modifier and add a new veiled modifier (deprecated, use [Veiled Exalted Orb](#betrayal-currencies))|
 
 ##### Unveiling
 
@@ -1402,15 +1431,41 @@ The following expressions allow to get numeric properties from the current item.
 | `affix_count` | `affix_count` | Evaluates to the number of affixes (prefixes + suffixes) the current item has. |
 | `tier` | `tier <mod_group>` | See [Modifier Tiers](#modifier-tiers). |
 
-##### Modifier Tiers
+##### Modifier Groups
 
 Mod groups are [Identifiers](#identifiers) that are shared by several modifiers.
 For instance, all modifiers that add Strength are part of mod group `"Strength"`.
 The [Find Command](#finding-identifiers) can tell you the mod group of modifiers.
 
-If the current item has a modifier from group `<mod_group>`,
-expression `tier <mod_group>` evaluates to the tier that this modifier has in this group.
-If the current item has no modifier from this group, this expression
+Items can only ever have one modifier from a mod group. You can use this to
+block certain modifiers from appearing on the item when crafting, for example
+bench crafting mana modifier to prevent Exalted Orb from adding explicit mana
+prefix.
+
+The [Find Command](#finding-identifiers) can tell you the mod group of
+modifiers. You can also search only for modifiers from a certain group by using
+the `--group` option.
+
+##### Modifier Tiers
+
+Mod types are [Identifiers](#identifiers) that are shared by several modifiers
+of the same "type".  For instance, all modifiers that add fire resistance (and
+only fire resistance) are part of mod type `"FireResistance"` and have ids like
+`"FireResist1"`.  They are also part of the mod group called
+`"FireResistance"`.
+
+But the temple modifier which adds fire resistance and also added fire damage
+against burning enemies is of type `"FireResistanceAilments"` and its id is
+`"FireResistEnhancedModAilments"` while still being in the mod group
+`"FireResistance"` so they can't both appear on the same item.
+
+The [Find Command](#finding-identifiers) can tell you the mod type of
+modifiers. You can also search only for modifiers from a certain group by using
+the `--mod-type` option.
+
+If the current item has a modifier of type `<mod_type>`, expression `tier
+<mod_type>` evaluates to the tier that this modifier has in this set of
+modifiers.  If the current item has no modifier of this type, this expression
 evaluates to 999.
 
 For instance, if the item has the best possible Strength modifier that can spawn
