@@ -258,7 +258,7 @@ let pp_buy { exact; rarity; influence; base; ilvl; mods; cost } =
         match influence with
           | Not_influenced ->
               empty
-          | Fractured ->
+          | Fractured _ ->
               seq [ atom "fractured"; space ]
           | Synthesized ->
               seq [ atom "synthesized"; space ]
@@ -266,11 +266,11 @@ let pp_buy { exact; rarity; influence; base; ilvl; mods; cost } =
               seq [ pp_sec_influence sec; space ]
           | SEC_pair (sec1, sec2) ->
               seq [ pp_sec_influence sec1; space; pp_sec_influence sec2; space ]
-          | Exarch ->
+          | Eldritch Exarch ->
               seq [ atom "exarch"; space ]
-          | Eater ->
+          | Eldritch Eater ->
               seq [ atom "eater"; space ]
-          | Exarch_and_eater ->
+          | Eldritch Exarch_and_eater ->
               seq [ atom "exarch"; space; atom "eater"; space ]
       );
       Id.pp base;

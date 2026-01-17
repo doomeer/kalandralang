@@ -358,12 +358,12 @@ let item_must_be_normal_or_magic (item: Item.t) =
 let check_can_apply_conqueror_exalt (item: Item.t) =
   match item.influence with
     | Not_influenced -> ()
-    | Fractured ->
+    | Fractured _ ->
         fail "cannot use a conqueror exalted orb on a fractured item"
     | Synthesized ->
         fail "cannot use a conqueror exalted orb on a synthesized item"
     | SEC _ | SEC_pair _
-    | Exarch | Eater | Exarch_and_eater ->
+    | Eldritch _ ->
         fail "cannot use a conqueror exalted orb on an influenced item"
 
 let item_cannot_be_split (item: Item.t) =
@@ -553,7 +553,7 @@ let apply_currency state (currency: AST.currency) =
                 x
             | SEC_pair _ ->
                 fail "%s has more than one influence" name
-            | Not_influenced | Exarch | Eater | Exarch_and_eater | Synthesized | Fractured ->
+            | Not_influenced | Eldritch _ | Synthesized | Fractured _ ->
                 fail "%s does not have a Shaper / Elder / Conqueror influence" name
         in
         let item_influence = get_sec_influence "current item" item in
@@ -624,10 +624,9 @@ let apply_currency state (currency: AST.currency) =
         item_must_be_rare item;
         (
           match item.influence with
-            | Not_influenced ->
+            | Not_influenced | Eldritch _ ->
                 ()
-            | Synthesized | Fractured | SEC _ | SEC_pair _
-            | Exarch | Eater | Exarch_and_eater ->
+            | Synthesized | Fractured _ | SEC _ | SEC_pair _ ->
                 fail "cannot fracture influenced, synthesized, and already-fractured items"
         );
         if List.length (List.filter Item.is_prefix_or_suffix item.mods) < 4 then
@@ -637,9 +636,9 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         (
           match item.influence with
-            | Not_influenced | Synthesized | Fractured ->
+            | Not_influenced | Synthesized | Fractured _ ->
                 ()
-            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+            | SEC _ | SEC_pair _ | Eldritch _ ->
                 fail "cannot harvest augment an influenced item"
         );
         return @@ Item.harvest_augment_and_remove ~tag item
@@ -647,9 +646,9 @@ let apply_currency state (currency: AST.currency) =
         with_item state @@ fun item ->
         (
           match item.influence with
-            | Not_influenced | Synthesized | Fractured ->
+            | Not_influenced | Synthesized | Fractured _ ->
                 ()
-            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+            | SEC _ | SEC_pair _ | Eldritch _ ->
                 fail "cannot harvest non-X to X an influenced item"
         );
         let item =
@@ -700,11 +699,12 @@ let apply_currency state (currency: AST.currency) =
           match item.influence with
             | Not_influenced ->
                 ()
-            | Fractured ->
+            | Fractured _ ->
                 fail "cannot split a fractured item"
             | Synthesized ->
                 fail "cannot split a synthesized item"
-            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+            (* TODO: eldritch items can in fact be split *)
+            | SEC _ | SEC_pair _ | Eldritch _ ->
                 fail "cannot split an influenced item"
         );
         let item1, item2 = Item.split item in
@@ -716,9 +716,9 @@ let apply_currency state (currency: AST.currency) =
         (
           match item.influence with
             | Not_influenced | Synthesized
-            | SEC _ | SEC_pair _ | Exarch | Eater | Exarch_and_eater ->
+            | SEC _ | SEC_pair _ | Eldritch _ ->
                 ()
-            | Fractured ->
+            | Fractured _ ->
                 fail "cannot imprint a fractured item"
         );
         let state = return item in
@@ -831,7 +831,7 @@ let run_simple_instruction state loc (instruction: AST.simple_instruction) =
         let item = Item.make base_obj ilvl ?rarity influence in
         let item =
           let add_mod item ({ modifier; fractured }: AST.buy_with) =
-            let item = if fractured then Item.add_influence Fractured item else item in
+            let item = if fractured then Item.add_influence (Fractured None) item else item in
             Item.add_mod ~fractured (Mod.by_id modifier) item
           in
           List.fold_left add_mod item mods

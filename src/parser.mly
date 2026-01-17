@@ -57,10 +57,10 @@ influence:
 | HUNTER { Influence.SEC Hunter }
 | REDEEMER { Influence.SEC Redeemer }
 | WARLORD { Influence.SEC Warlord }
-| EXARCH { Influence.Exarch }
-| EATER { Influence.Eater }
+| EXARCH { Influence.Eldritch Exarch }
+| EATER { Influence.Eldritch Eater }
 | SYNTHESIZED { Influence.Synthesized }
-| FRACTURED { Influence.Fractured }
+| FRACTURED { Influence.Fractured None }
 
 buy_arguments:
 | EXACT buy_arguments

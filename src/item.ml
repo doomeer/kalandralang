@@ -332,19 +332,25 @@ let show item =
     match item.influence with
       | Not_influenced ->
           ""
-      | Fractured ->
+      | Fractured None ->
           " (Fractured)"
+      | Fractured (Some Exarch) ->
+          " (Fractured Exarch)"
+      | Fractured (Some Eater) ->
+          " (Fractured Eater)"
+      | Fractured (Some Exarch_and_eater) ->
+          " (Fractured Exarch / Eater)"
       | Synthesized ->
           " (Synthesized)"
       | SEC sec ->
           " (" ^ Influence.show_sec sec ^ ")"
       | SEC_pair (sec1, sec2) ->
           " (" ^ Influence.show_sec sec1 ^ " / " ^ Influence.show_sec sec2 ^ ")"
-      | Exarch ->
+      | Eldritch Exarch ->
           " (Exarch)"
-      | Eater ->
+      | Eldritch Eater ->
           " (Eater)"
-      | Exarch_and_eater ->
+      | Eldritch Exarch_and_eater ->
           " (Exarch / Eater)"
   in
   let split = if item.split then [ "Split" ] else [] in
@@ -748,7 +754,7 @@ let add_influence influence item =
         item |> add_sec_influence_tag sec
     | SEC_pair (sec1, sec2) ->
         item |> add_sec_influence_tag sec1 |> add_sec_influence_tag sec2
-    | Not_influenced | Fractured | Synthesized | Exarch | Eater | Exarch_and_eater ->
+    | Not_influenced | Fractured _ | Synthesized | Eldritch _ ->
         item
 
 let make ?rarity base level influence =
@@ -871,13 +877,13 @@ let spawn_random_eater_implicit tier item =
 
 let apply_eldritch_ichor tier item =
   item
-  |> add_influence Eater
+  |> add_influence (Eldritch Eater)
   |> remove_all_implicits_except_exarch
   |> spawn_random_eater_implicit tier
 
 let apply_eldritch_ember tier item =
   item
-  |> add_influence Exarch
+  |> add_influence (Eldritch Exarch)
   |> remove_all_implicits_except_eater
   |> spawn_random_exarch_implicit tier
 
@@ -994,11 +1000,9 @@ let apply_orb_of_dominance item =
       | SEC x -> [ x ]
       | SEC_pair (x, y) -> [ x; y ]
       | Not_influenced
-      | Fractured
+      | Fractured _
       | Synthesized
-      | Exarch
-      | Eater
-      | Exarch_and_eater ->
+      | Eldritch _ ->
           fail "item does not have a Shaper / Elder / Conqueror influence"
   in
   let candidates =
@@ -1079,11 +1083,9 @@ let apply_orb_of_dominance item =
 let get_influence_tags item =
   match item.influence with
     | Not_influenced
-    | Fractured
+    | Fractured _
     | Synthesized
-    | Exarch
-    | Eater
-    | Exarch_and_eater ->
+    | Eldritch _ ->
         Id.Set.empty
     | SEC sec ->
         (
@@ -1258,4 +1260,4 @@ let apply_fracturing_orb item =
       incr current_index;
       m
     in
-    { item with mods; influence = Influence.add item.influence Fractured }
+    { item with mods; influence = Influence.add item.influence (Fractured None) }
