@@ -93,14 +93,35 @@ let output ?(unit = "") histogram ~w ~h =
         done;
         print_newline ();
         let string_of_float x =
-          if x = 0. || x >= 1. then string_of_int (int_of_float x) else string_of_float x
+          (* if x = 0. || x >= 1. then string_of_int (int_of_float x) else string_of_float x *)
+          Printf.sprintf "%.1f" x
         in
-        let min_string = string_of_float min_value ^ unit in
-        let max_string = string_of_float max_value ^ unit in
-        let blank = w - String.length min_string - String.length max_string in
-        print_string min_string;
-        print_string (String.make blank ' ');
-        print_endline max_string;
+        let format_currency x cur = string_of_float x ^ " " ^ cur in
+        let step = (max_value -. min_value) /. 5. in
+        let printed_space = ref 0 in
+        for i = 0 to 5 do
+          let label_len = (String.length @@ format_currency (min_value +. float_of_int i *. step) unit) in
+          printed_space := !printed_space + label_len;
+        done;
+        let get_step_and_overflow x =
+          (Float.trunc x, x -. Float.trunc x)
+        in
+        let overflow = ref 0. in
+        for i = 0 to 5 do
+          let (blank, over) = (get_step_and_overflow @@ (float_of_int (w - !printed_space)) /. 5.) in
+          overflow := !overflow +. over;
+          let blank =
+            if !overflow >= 1. then begin
+              overflow := !overflow -. 1.;
+              blank +. 1.
+            end else
+              blank
+          in
+          print_string @@ format_currency (min_value +. float_of_int i *. step) unit;
+          if i < 5 then
+            print_string (String.make (int_of_float (if i = 4 && !overflow > 0. then blank +. 1. else blank)) ' ');
+        done;
+        print_endline "";
         ()
 
 let test () =
