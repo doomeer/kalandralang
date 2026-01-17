@@ -80,6 +80,8 @@
     | "hunter_exalt" -> CURRENCY Hunter_exalted_orb
     | "redeemer_exalt" -> CURRENCY Redeemer_exalted_orb
     | "warlord_exalt" -> CURRENCY Warlord_exalted_orb
+    | "shaper_exalt" -> CURRENCY Shaper_exalted_orb
+    | "elder_exalt" -> CURRENCY Elder_exalted_orb
     | "veiled_chaos" -> CURRENCY Veiled_chaos_orb
     | "veiled_exalt" -> CURRENCY Veiled_exalted_orb
     | "essence_of_anger" -> CURRENCY (Essence Anger)

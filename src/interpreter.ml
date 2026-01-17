@@ -515,6 +515,16 @@ let apply_currency state (currency: AST.currency) =
         item_must_be_rare item;
         check_can_apply_conqueror_exalt item;
         return @@ Item.spawn_random_sec_influence_mod Warlord item
+    | Shaper_exalted_orb ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        check_can_apply_conqueror_exalt item;
+        return @@ Item.spawn_random_sec_influence_mod Shaper item
+    | Elder_exalted_orb ->
+        with_item state @@ fun item ->
+        item_must_be_rare item;
+        check_can_apply_conqueror_exalt item;
+        return @@ Item.spawn_random_sec_influence_mod Elder item
     | Veiled_chaos_orb ->
         with_item state @@ fun item ->
         item_must_be_rare item;

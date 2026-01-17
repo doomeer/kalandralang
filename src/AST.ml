@@ -74,6 +74,8 @@ type currency =
   | Hunter_exalted_orb
   | Redeemer_exalted_orb
   | Warlord_exalted_orb
+  | Shaper_exalted_orb
+  | Elder_exalted_orb
   | Veiled_chaos_orb
   | Veiled_exalted_orb
   | Essence of Essence.name
@@ -137,6 +139,8 @@ let show_currency = function
   | Hunter_exalted_orb -> "hunter_exalt"
   | Redeemer_exalted_orb -> "redeemer_exalt"
   | Warlord_exalted_orb -> "warlord_exalt"
+  | Shaper_exalted_orb -> "shaper_exalt"
+  | Elder_exalted_orb -> "elder_exalt"
   | Veiled_chaos_orb -> "veiled_chaos"
   | Veiled_exalted_orb -> "veiled_exalt"
   | Essence name -> "essence_of_" ^ Essence.show_name name

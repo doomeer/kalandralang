@@ -102,6 +102,12 @@ let redeemer_exalt: field =
 let warlord_exalt: field =
   c "Warlord's Exalted Orb" "warlord_exalt" (0.5 *. div)
 
+let shaper_exalt: field =
+  c "Shaper's Exalted Orb" "shaper_exalt" (0.25 *. div)
+
+let elder_exalt: field =
+  c "Elder's Exalted Orb" "elder_exalt" (0.25 *. div)
+
 let veiled_chaos: field =
   c "Veiled Chaos Orb" "veiled_chaos" 5.
 
@@ -365,6 +371,10 @@ let get_currency (currency: AST.currency) =
         get redeemer_exalt
     | Warlord_exalted_orb ->
         get warlord_exalt
+    | Shaper_exalted_orb ->
+        get shaper_exalt
+    | Elder_exalted_orb ->
+        get elder_exalt
     | Veiled_chaos_orb ->
         get veiled_chaos
     | Veiled_exalted_orb ->

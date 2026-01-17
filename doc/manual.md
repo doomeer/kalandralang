@@ -617,10 +617,12 @@ The following keywords are instructions to apply currency to the current item.
 
 | Keyword | Currency |
 | --- | --- |
-| `crusader_exalt` | Crusader Exalted Orb |
-| `hunter_exalt` | Hunter Exalted Orb |
-| `redeemer_exalt` | Redeemer Exalted Orb |
-| `warlord_exalt` | Warlord Exalted Orb |
+| `crusader_exalt` | Crusader's Exalted Orb |
+| `hunter_exalt` | Hunter's Exalted Orb |
+| `redeemer_exalt` | Redeemer's Exalted Orb |
+| `warlord_exalt` | Warlord's Exalted Orb |
+| `shaper_exalt` | Shaper's Exalted Orb |
+| `elder_exalt` | Elder's Exalted Orb |
 
 ##### Eldritch Currencies
 
